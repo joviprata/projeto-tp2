@@ -1,0 +1,16 @@
+{
+  "name": "projeto-tp2",
+  "version": "1.0.0",
+  "scripts": {
+    "install": "npm install --prefix backend && npm install --prefix frontend",
+    "prisma": "docker compose exec backend npx prisma studio --hostname 0.0.0.0",
+    "prisma:generate": "docker compose exec backend npx prisma generate",
+    "prisma:migrate": "docker compose exec backend npx prisma migrate dev --name init",
+    "start": "docker compose up --build",
+    "stop": "docker compose down",
+    "logs": "docker compose logs -f",
+    "test:backend": "docker compose exec backend npm test",
+    "test:frontend": "docker compose exec frontend npm test",
+    "test": "npm run test:backend && npm run test:frontend"
+  }
+}

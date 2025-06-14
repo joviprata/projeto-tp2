@@ -1,0 +1,12 @@
+{
+  // --- Suas configurações existentes ---
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": ["javascript", "javascriptreact"],
+
+  // --- Nova seção para ocultar arquivos e pastas ---
+  "files.exclude": {
+    "**/.next": true,
+    "**/node_modules": true // Oculta todas as pastas node_modules
+  }
+}
