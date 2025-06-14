@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,40 +11,40 @@ datasource db {
 }
 
 model User {
-  id                 Int                  @id @default(autoincrement())
-  name               String               @db.VarChar(255)
-  role               String               @db.VarChar(50)
-  email              String               @unique @db.VarChar(255)
-  password           String               @db.VarChar(255)
-  createdAt          DateTime             @default(now()) @map("created_at")
+  id                 Int              @id @default(autoincrement())
+  name               String           @db.VarChar(255)
+  role               String           @db.VarChar(50)
+  email              String           @unique @db.VarChar(255)
+  password           String           @db.VarChar(255)
+  createdAt          DateTime         @default(now()) @map("created_at")
   priceRecords       PriceRecord[]
   shoppingLists      ShoppingList[]
-  managedSupermarket Supermarket?
+  managedSupermarket Supermarket? 
 
   @@map("users")
 }
 
 model Supermarket {
-  id        Int           @id @default(autoincrement())
-  managerId Int           @unique @map("gerente_id")
-  name      String        @db.VarChar(255)
-  address   String?       @db.VarChar(255) @map("endereco")
-  latitude  Decimal?      @db.Decimal(9, 6)
-  longitude Decimal?      @db.Decimal(9, 6)
-  manager   User          @relation(fields: [managerId], references: [id])
+  id           Int           @id @default(autoincrement())
+  managerId    Int?          @unique @map("gerente_id")
+  name         String        @db.VarChar(255)
+  address      String?       @db.VarChar(255) @map("endereco")
+  latitude     Decimal?      @db.Decimal(9, 6)
+  longitude    Decimal?      @db.Decimal(9, 6)
+  manager      User?         @relation(fields: [managerId], references: [id], onDelete: Cascade)
   priceRecords PriceRecord[]
 
   @@map("supermercado")
 }
 
 model Product {
-  id              Int             @id @default(autoincrement())
-  barCode         String          @unique @map("codigo_de_barras") @db.VarChar(255)
-  name            String          @map("nome") @db.VarChar(255)
-  variableDescription String?    @map("descricao_variada") @db.VarChar(255)
-  createdAt       DateTime        @default(now()) @map("created_at")
-  priceRecords    PriceRecord[]
-  listItems       ListItem[]
+  id                  Int             @id @default(autoincrement())
+  barCode             String          @unique @map("codigo_de_barras") @db.VarChar(255)
+  name                String          @map("nome") @db.VarChar(255)
+  variableDescription String?         @map("descricao_variada") @db.VarChar(255)
+  createdAt           DateTime        @default(now()) @map("created_at")
+  priceRecords        PriceRecord[]
+  listItems           ListItem[]
 
   @@map("produtos")
 }
@@ -61,9 +58,10 @@ model PriceRecord {
   productId     Int         @map("produto_id")
   supermarketId Int         @map("supermercado_id")
   userId        Int         @map("usuario_id")
-  product       Product     @relation(fields: [productId], references: [id])
-  supermarket   Supermarket @relation(fields: [supermarketId], references: [id])
-  user          User        @relation(fields: [userId], references: [id])
+  
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supermarket   Supermarket @relation(fields: [supermarketId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("registros_de_preco")
 }
@@ -73,19 +71,19 @@ model ShoppingList {
   listName     String     @map("nome_lista") @db.VarChar(255)
   creationDate DateTime   @default(now()) @map("data_criacao")
   userId       Int        @map("usuario_id")
-  user         User       @relation(fields: [userId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   items        ListItem[]
 
   @@map("listas_de_compra")
 }
 
 model ListItem {
-  listId      Int          @map("lista_id")
-  productId   Int          @map("produto_id")
-  quantity    Int?         @default(1) @map("quantidade")
-  isTaken     Boolean?     @default(false) @map("marcado_como_pego")
-  list        ShoppingList @relation(fields: [listId], references: [id])
-  product     Product      @relation(fields: [productId], references: [id])
+  listId    Int          @map("lista_id")
+  productId Int          @map("produto_id")
+  quantity  Int?         @default(1) @map("quantidade")
+  isTaken   Boolean?     @default(false) @map("marcado_como_pego")
+  list      ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([listId, productId])
   @@map("itens_da_lista")
