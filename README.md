@@ -16,7 +16,11 @@
 
 - inicie o container
   ```
-  npm run start && npm run prisma:generate
+  npm run start 
+  ```
+  **IMPORTANTE**: Caso seja a primeira vez rodando, ou alguém tenha realizado alterações no schema do banco de dados, rode:
+  ```
+    npm run prisma:migrate
   ```
 - Caso queria parar o container
   ```
@@ -40,3 +44,11 @@
   ```
   npm run logs
   ```
+**Importante**: Em caso de erro, verifique a versão instalada do npm e tenta fazer o upgrade dela.
+
+## Portas da aplicação
+| Aplicação         | Porta | 
+|----------  |:-------------:| 
+|  FrontEnd  | localhost:3000 |
+|  BackEnd   | localhost:3001 | 
+|  Prisma    | localhost:5555 |
