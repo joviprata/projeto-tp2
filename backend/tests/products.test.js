@@ -7,15 +7,15 @@ beforeAll(async () => {
     await prisma.$connect(); // Conecta ao banco de dados antes de iniciar os testes
 
     try {
-        await prisma.$executeRawUnsafe('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
-
+        await prisma.produtos.deleteMany();
+        console.log("Banco de dados limpo com sucesso.");
     } catch (error) {
         console.error("Erro ao limpar o banco de dados:", error);
     }
 });
 
 afterEach(async () => {
-    await prisma.product.deleteMany(); // Limpa os produtos após cada teste
+    await prisma.produtos.deleteMany(); // Limpa os produtos após cada teste
 })
 
 afterAll(async () => {
@@ -24,8 +24,3 @@ afterAll(async () => {
         await new Promise(resolve => server.close(resolve));
     }
 });
-
-
-
-
-
