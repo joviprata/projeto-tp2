@@ -21,8 +21,10 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.1",
     "jest": "^30.0.0",
+    "jsdoc": "^4.0.4",
     "nodemon": "^3.1.10",
     "prettier": "^3.5.3",
-    "prisma": "^6.9.0"
+    "prisma": "^6.9.0",
+    "supertest": "^7.1.1"
   }
 }
