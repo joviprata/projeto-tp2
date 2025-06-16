@@ -5,18 +5,18 @@ let testProductId;
 
 beforeAll(async () => {
     await prisma.$connect(); // Conecta ao banco de dados antes de iniciar os testes
-
     try {
-        await prisma.produtos.deleteMany();
+        await prisma.priceRecord.deleteMany({}); // Limpa os registros de preços antes de iniciar os testes
+        await prisma.listItem.deleteMany({});
+        await prisma.shoppingList.deleteMany({});
+        await prisma.product.deleteMany({});
+        await prisma.supermarket.deleteMany({});
+        await prisma.user.deleteMany({}); // Limpa os usuários antes de iniciar os testes
         console.log("Banco de dados limpo com sucesso.");
     } catch (error) {
         console.error("Erro ao limpar o banco de dados:", error);
     }
 });
-
-afterEach(async () => {
-    await prisma.produtos.deleteMany(); // Limpa os produtos após cada teste
-})
 
 afterAll(async () => {
     await prisma.$disconnect();
