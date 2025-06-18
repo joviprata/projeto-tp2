@@ -36,7 +36,7 @@ describe("Register Gerente Route", () => {
         name: "João",
         email: "joao@example.com",
         password: "senha123",
-        address: "Rua A, 123",
+        address: "",
       });
     expect(ResponseSemEndereco.status).toBe(400);
     expect(ResponseSemEndereco.body).toHaveProperty("error");
