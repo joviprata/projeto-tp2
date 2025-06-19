@@ -1,3 +1,5 @@
-const produtoService = require('../services/produto_service');
+const produtoService = require('../services/product_service');
 
 // Implementar registerProduct aqui
+
+

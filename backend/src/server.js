@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors"); // importa o cors para permitir requisições de outros domínios
-const ProductRoutes = require("./routes/product.routes.js");
+const ProductRoutes = require("./routes/product_routes");
 const app = express();
 
 app.use(express.json()); //
