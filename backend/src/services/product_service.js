@@ -22,6 +22,8 @@ const registerProduct = async (body) => {
     if (!Descricao || Descricao.trim() === "") {
         return { status: 400, error: "O campo Descrição é obrigatório" };
     }
+
+    return { status: 201, message: "Produto registrado com sucesso" };
 };
 
 module.exports = {
