@@ -51,5 +51,17 @@ describe("Register Product Routes", () => {
         expect(responseSemDescricao.body).toHaveProperty("error");
         expect(responseSemDescricao.body.error).toBe("O campo Descrição é obrigatório");
     });
+
+    it ("Deve retornar 201 quando o produto é registrado com sucesso", async () => {
+        const response = await request(app).post("/registerProduct").send({
+            name: "Produto Teste",
+            CodigoDeBarras: "1234567890123",
+            Data: "2025-06-19T14:15:30Z",
+            Descricao: "Produto de teste",
+        });
+        expect(response.statusCode).toBe(201);
+        expect(response.body).toHaveProperty("message");
+        expect(response.body.message).toBe("Produto registrado com sucesso");
+    });
 });
 
