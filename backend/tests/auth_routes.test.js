@@ -133,15 +133,16 @@ describe("POST /auth/register/manager - Registro de gerente com sucesso", () => 
     expect(response.body).toHaveProperty("message");
     expect(response.body.message).toBe("Gerente registrado com sucesso");
     expect(response.body).toHaveProperty("supermarketId");
+
     expect(response.body.supermarketId).toEqual(expect.any(Number));
     expect(response.body.supermarketId).toBeGreaterThan(0);
-    const supermaket = await prismaDatabase.supermercado.findUnique({
+    const supermarket = await prismaDatabase.supermarket.findUnique({
       where: { id: parseInt(response.body.supermarketId) },
     });
-    expect(supermaket).not.toBeNull();
-    expect(supermaket.name).toBe(payload.name);
-    expect(supermaket.address).toBe(payload.address);
-    const gerente = await prismaDatabase.users.findUnique({
+    expect(supermarket).not.toBeNull();
+    expect(supermarket.name).toBe(payload.name);
+    expect(supermarket.address).toBe(payload.address);
+    const gerente = await prismaDatabase.user.findUnique({
       where: { email: payload.email },
     });
     expect(gerente).not.toBeNull();
