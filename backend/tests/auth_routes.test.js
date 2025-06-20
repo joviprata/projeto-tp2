@@ -151,3 +151,25 @@ describe("POST /auth/register/manager - Registro de gerente com sucesso", () => 
     expect(gerente.role).toBe("GERENTE");
   });
 });
+
+describe("POST /auth/register/manager - validaçao de criaçao duplicada", () => {
+  it("Deve retornar 409 quando o email já estiver em uso", async () => {
+    const payload = {
+      name: "Supermercado Teste",
+      email: "test@example.com",
+      password: "senha123",
+      address: "Rua Teste, 123",
+    };
+
+    await request(app).post("/auth/register/manager").send(payload);
+
+    const response = await request(app)
+      .post("/auth/register/manager")
+      .send(payload);
+
+    expect(response.status).toBe(409);
+    expect(response.headers["content-type"]).toMatch(/json/);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Email já em uso");
+  });
+});
