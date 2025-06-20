@@ -10,6 +10,14 @@ const login = async (req, res) => {
     if (results.status === "400") {
       return res.status(400).json({ error: results.error });
     }
+    if (results.status === "200") {
+      return res.status(200).json({
+        message: results.message,
+        userId: results.userId,
+        role: results.role,
+      });
+    }
+    res.status(501);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }

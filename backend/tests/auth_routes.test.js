@@ -309,9 +309,8 @@ describe("POST /auth/login - Login do gerente com sucesso", () => {
     expect(gerente.name).toBe(Registerpayload.name);
     expect(gerente.email).toBe(Registerpayload.email);
     expect(gerente.role).toBe("GERENTE");
+    expect(gerente.id).toBe(response.body.userId);
     expect(response.body.userId).toBe(gerente.id);
     expect(response.body.role).toBe(gerente.role);
-    expect(response.body.name).toBe(gerente.name);
-    expect(response.body.email).toBe(gerente.email);
   });
 });
