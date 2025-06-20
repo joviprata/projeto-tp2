@@ -11,6 +11,9 @@ const login = async (loginData) => {
     if (!user) {
       return { status: "401", error: "Email inválido" };
     }
+    if (user.password !== password) {
+      return { status: "401", error: "Senha inválida" };
+    }
   } catch (error) {
     console.error("Erro ao autenticar usuário:", error);
     return { status: "500", error: "Erro interno do servidor" };
