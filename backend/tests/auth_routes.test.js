@@ -151,7 +151,6 @@ describe("POST /auth/register/manager - Registro de gerente com sucesso", () => 
     expect(gerente.role).toBe("GERENTE");
   });
 });
-
 describe("POST /auth/register/manager - validaçao de criaçao duplicada", () => {
   it("Deve retornar 409 quando o email já estiver em uso", async () => {
     const payload = {
@@ -171,5 +170,26 @@ describe("POST /auth/register/manager - validaçao de criaçao duplicada", () =>
     expect(response.headers["content-type"]).toMatch(/json/);
     expect(response.body).toHaveProperty("error");
     expect(response.body.error).toBe("Email já em uso");
+  });
+});
+
+describe("POST /auth/login - Login do gerente com erro de autenticação", () => {
+  it("Deve retornar 401 quando o email estiver incorreto", async () => {
+    const Registerpayload = {
+      name: "Supermercado Teste",
+      email: "email@teste.com",
+      password: "senha123",
+      address: "Rua Teste, 123",
+    };
+    await request(app).post("/auth/register/manager").send(Registerpayload);
+    const Loginpayload = {
+      email: "email@incorreto.com",
+      password: "senha123",
+    };
+    const response = await request(app).post("/auth/login").send(Loginpayload);
+    expect(response.status).toBe(401);
+    expect(response.headers["content-type"]).toMatch(/json/);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Email inválido");
   });
 });
