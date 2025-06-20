@@ -10,7 +10,7 @@ beforeAll(async () => {
     "listas_de_compra",
     "itens_da_lista",
   ];
-
+  console.log("Limpando tabelas antes dos testes...");
   for (const tableName of tableNames) {
     await prismaDatabase.$executeRawUnsafe(
       `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`
@@ -113,5 +113,40 @@ describe("POST /auth/register/manager - Validação de campos obrigatórios", ()
     expect(response.headers["content-type"]).toMatch(/json/);
     expect(response.body).toHaveProperty("error");
     expect(response.body.error).toBe("Requisição inválida");
+  });
+});
+describe("POST /auth/register/manager - Registro de gerente com sucesso", () => {
+  it("Deve registrar um gerente com sucesso", async () => {
+    const payload = {
+      name: "Supermercado Teste",
+      email: "test@example.com",
+      password: "senha123",
+      address: "Rua Teste, 123",
+    };
+
+    const response = await request(app)
+      .post("/auth/register/manager")
+      .send(payload);
+
+    expect(response.status).toBe(201);
+    expect(response.headers["content-type"]).toMatch(/json/);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toBe("Gerente registrado com sucesso");
+    expect(response.body).toHaveProperty("supermarketId");
+    expect(response.body.supermarketId).toEqual(expect.any(Number));
+    expect(response.body.supermarketId).toBeGreaterThan(0);
+    const supermaket = await prismaDatabase.supermercado.findUnique({
+      where: { id: parseInt(response.body.supermarketId) },
+    });
+    expect(supermaket).not.toBeNull();
+    expect(supermaket.name).toBe(payload.name);
+    expect(supermaket.address).toBe(payload.address);
+    const gerente = await prismaDatabase.users.findUnique({
+      where: { email: payload.email },
+    });
+    expect(gerente).not.toBeNull();
+    expect(gerente.name).toBe(payload.name);
+    expect(gerente.email).toBe(payload.email);
+    expect(gerente.role).toBe("GERENTE");
   });
 });
