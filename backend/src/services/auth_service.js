@@ -1,6 +1,15 @@
 const prismaDatabase = require("../prismaClient");
 
 const login = async (loginData) => {
+  if (
+    Object.keys(loginData).length === 0 ||
+    Object.keys(loginData).length > 2
+  ) {
+    return { status: "400", error: "Requisição inválida" };
+  }
+  if (!loginData || !loginData.email || !loginData.password) {
+    return { status: "400", error: "Requisição inválida" };
+  }
   try {
     const { email, password } = loginData;
     const user = await prismaDatabase.user.findUnique({
