@@ -22,6 +22,9 @@ const registerGerente = async (req, res) => {
         supermarketId: results.supermarketId,
       });
     }
+    if (results.status === "409") {
+      return res.status(409).json({ error: results.error });
+    }
     res.status(results.status);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });

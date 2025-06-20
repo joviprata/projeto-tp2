@@ -20,6 +20,14 @@ const registerGerente = async (gerenteData) => {
     return { status: "400", error: "Requisição inválida" };
   }
   try {
+    existingGerente = await prismaDatabase.user.findUnique({
+      where: {
+        email: gerenteData.email,
+      },
+    });
+    if (existingGerente) {
+      return { status: "409", error: "Email já em uso" };
+    }
     newGerente = await prismaDatabase.user.create({
       data: {
         name: gerenteData.name,
@@ -28,6 +36,7 @@ const registerGerente = async (gerenteData) => {
         role: "GERENTE",
       },
     });
+
     const newSupermarket = await prismaDatabase.supermarket.create({
       data: {
         name: gerenteData.name,
