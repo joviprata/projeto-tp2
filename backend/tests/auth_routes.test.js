@@ -271,3 +271,47 @@ describe("POST /auth/login - Login do gerente com erro de requisição", () => {
     expect(response.body.error).toBe("Requisição inválida");
   });
 });
+
+describe("POST /auth/login - Login do gerente com sucesso", () => {
+  it("Deve fazer login com sucesso", async () => {
+    const Registerpayload = {
+      name: "Supermercado Teste",
+      email: "email@teste.com",
+      password: "senha123",
+      address: "Rua Teste, 123",
+    };
+    const loginPayload = {
+      email: "email@teste.com",
+      password: "senha123",
+    };
+    await request(app).post("/auth/register/manager").send(Registerpayload);
+    const response = await request(app).post("/auth/login").send(loginPayload);
+    expect(response.status).toBe(200);
+    expect(response.headers["content-type"]).toMatch(/json/);
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toBe("Login realizado com sucesso");
+    expect(response.body).toHaveProperty("userId");
+    expect(response.body.userId).toEqual(expect.any(Number));
+    expect(response.body.userId).toBeGreaterThan(0);
+    expect(response.body).toHaveProperty("role");
+    expect(response.body.role).toBe("GERENTE");
+    const supermarket = await prismaDatabase.supermarket.findUnique({
+      where: { managerId: response.body.userId },
+    });
+    expect(supermarket).not.toBeNull();
+    expect(supermarket.name).toBe(Registerpayload.name);
+    expect(supermarket.address).toBe(Registerpayload.address);
+
+    const gerente = await prismaDatabase.user.findUnique({
+      where: { email: Registerpayload.email },
+    });
+    expect(gerente).not.toBeNull();
+    expect(gerente.name).toBe(Registerpayload.name);
+    expect(gerente.email).toBe(Registerpayload.email);
+    expect(gerente.role).toBe("GERENTE");
+    expect(response.body.userId).toBe(gerente.id);
+    expect(response.body.role).toBe(gerente.role);
+    expect(response.body.name).toBe(gerente.name);
+    expect(response.body.email).toBe(gerente.email);
+  });
+});
