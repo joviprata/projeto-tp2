@@ -192,4 +192,40 @@ describe("POST /auth/login - Login do gerente com erro de autenticação", () =>
     expect(response.body).toHaveProperty("error");
     expect(response.body.error).toBe("Email inválido");
   });
+  it("Deve retornar 401 quando a senha estiver incorreta", async () => {
+    const Registerpayload = {
+      name: "Supermercado Teste",
+      email: "email@teste.com",
+      password: "senha123",
+      address: "Rua Teste, 123",
+    };
+    await request(app).post("/auth/register/manager").send(Registerpayload);
+    const Loginpayload = {
+      email: "email@incorreto.com",
+      password: "senha123",
+    };
+    const response = await request(app).post("/auth/login").send(Loginpayload);
+    expect(response.status).toBe(401);
+    expect(response.headers["content-type"]).toMatch(/json/);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Email inválido");
+  });
+  it("Deve retornar 401 quando a senha estiver incorreta", async () => {
+    const Registerpayload = {
+      name: "Supermercado Teste",
+      email: "email@teste.com",
+      password: "senha123",
+      address: "Rua Teste, 123",
+    };
+    await request(app).post("/auth/register/manager").send(Registerpayload);
+    const Loginpayload = {
+      email: "email@teste.com",
+      password: "senha_incorreta",
+    };
+    const response = await request(app).post("/auth/login").send(Loginpayload);
+    expect(response.status).toBe(401);
+    expect(response.headers["content-type"]).toMatch(/json/);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Senha inválida");
+  });
 });
