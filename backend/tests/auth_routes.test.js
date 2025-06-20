@@ -229,3 +229,45 @@ describe("POST /auth/login - Login do gerente com erro de autenticação", () =>
     expect(response.body.error).toBe("Senha inválida");
   });
 });
+
+describe("POST /auth/login - Login do gerente com erro de requisição", () => {
+  it.each([
+    {
+      case: "corpo vazio",
+      payload: {},
+    },
+    {
+      case: "email e senha em branco",
+      payload: { email: "", password: "" },
+    },
+    {
+      case: "email em branco",
+      payload: { email: "", password: "senha123" },
+    },
+    {
+      case: "senha em branco",
+      payload: { email: "email@teste.com", password: "" },
+    },
+    {
+      case: "mais de 2 campos na requisição",
+      payload: {
+        email: "email@teste.com",
+        password: "senha123",
+        extraField: "extraValue",
+      },
+    },
+  ])("Deve retornar 400 quando o $case", async ({ payload }) => {
+    Registerpayload = {
+      name: "Supermercado Teste",
+      email: "email@teste.com",
+      password: "senha123",
+      address: "Rua Teste, 123",
+    };
+    await request(app).post("/auth/register/manager").send(Registerpayload);
+    const response = await request(app).post("/auth/login").send(payload);
+    expect(response.status).toBe(400);
+    expect(response.headers["content-type"]).toMatch(/json/);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Requisição inválida");
+  });
+});
