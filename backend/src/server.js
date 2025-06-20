@@ -12,8 +12,6 @@ app.get("/", (req, res) => {
   res.send("Projeto Rodando");
 });
 
-app.use(authRoutes);
-
 app.listen(3001, () => {
   console.log("Servidor rodando na porta 3001");
 });

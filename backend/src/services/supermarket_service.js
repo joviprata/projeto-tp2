@@ -1,7 +1,16 @@
 const prismaDatabase = require("../prismaClient");
 
 const getAllSupermarkets = async () => {
-  return { status: "500" };
+  try {
+    const supermarkets = await prismaDatabase.supermarket.findMany();
+    return { status: 200, supermarkets };
+  } catch (error) {
+    console.error("Erro ao buscar supermercados:", error);
+    return {
+      status: 500,
+      error: "Erro interno do servidor",
+    };
+  }
 };
 const updateSupermarket = async (id, supermarketData) => {
   return { status: "500" };

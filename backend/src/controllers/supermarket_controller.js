@@ -3,7 +3,9 @@ const supermarketService = require("../services/supermarket_service");
 const getAllSupermarkets = async (req, res) => {
   try {
     const results = await supermarketService.getAllSupermarkets();
-    res.status(results.status);
+    res
+      .status(results.status)
+      .json({ supermarkets: results.supermarkets || [] });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
