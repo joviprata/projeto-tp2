@@ -13,6 +13,9 @@ const registerGerente = async (req, res) => {
   try {
     const gerenteData = req.body;
     const results = await authService.registerGerente(gerenteData);
+    if (results.status === "400") {
+      return res.status(400).json({ error: results.error });
+    }
     res.status(results.status);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
