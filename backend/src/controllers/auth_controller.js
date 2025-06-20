@@ -4,7 +4,9 @@ const login = async (req, res) => {
   try {
     const loginData = req.body;
     const results = await authService.login(loginData);
-    res.status(results.status);
+    if (results.status === "401") {
+      return res.status(401).json({ error: results.error });
+    }
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }

@@ -1,7 +1,20 @@
 const prismaDatabase = require("../prismaClient");
 
 const login = async (loginData) => {
-  return { status: "500" };
+  try {
+    const { email, password } = loginData;
+    const user = await prismaDatabase.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) {
+      return { status: "401", error: "Email inválido" };
+    }
+  } catch (error) {
+    console.error("Erro ao autenticar usuário:", error);
+    return { status: "500", error: "Erro interno do servidor" };
+  }
 };
 const registerGerente = async (gerenteData) => {
   if (
