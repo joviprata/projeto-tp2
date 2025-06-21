@@ -13,7 +13,18 @@ const getAllSupermarkets = async () => {
   }
 };
 const updateSupermarket = async (id, supermarketData) => {
-  return { status: 500 };
+  try {
+    const updatedSupermarket = await prismaDatabase.supermarket.update({
+      where: { id: parseInt(id) },
+      data: supermarketData,
+    });
+    return { status: 200, message: "Supermercado atualizado com sucesso" };
+  } catch (error) {
+    console.error("Erro ao atualizar supermercado:", error);
+    if (error.code === "P2025") {
+      return { status: 404, error: "Supermercado não encontrado" };
+    }
+  }
 };
 const getSupermarketById = async (id) => {
   return { status: "500" };

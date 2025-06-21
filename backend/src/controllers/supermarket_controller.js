@@ -11,6 +11,9 @@ const getAllSupermarkets = async (req, res) => {
   }
 };
 const updateSupermarket = async (req, res) => {
+  if (Object.keys(req.body).length === 0 || Object.keys(req.body).length > 4) {
+    return res.status(400).json({ error: "Requisição inválida" });
+  }
   try {
     const { id } = req.params;
     const supermarketData = req.body;
@@ -18,7 +21,13 @@ const updateSupermarket = async (req, res) => {
       id,
       supermarketData
     );
-    res.status(results.status);
+    if (results.status === 404) {
+      return res.status(404).json({ error: "Supermercado não encontrado" });
+    }
+    if (results.status === 200) {
+      return res.status(200).json({ message: results.message });
+    }
+    res.status(500).json({ error: "Internal Server Error" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
