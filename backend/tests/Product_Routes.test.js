@@ -139,4 +139,20 @@ describe("PUT /products/:id - Atualizar produto", () => {
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error", "Produto não encontrado");
   });
+
+  it("Deve retornar status 400 se os dados do produto estiverem incompletos", async () => {
+    const productId = 1; // Substitua pelo ID do produto que você deseja testar
+    const incompleteProduct = {
+      name: "Produto Incompleto",
+    };
+
+    const response = await request(app)
+      .put(`/products/${productId}`)
+      .send(incompleteProduct);
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty(
+      "error",
+      "Dados do produto incompletos"
+    );
+  });
 });
