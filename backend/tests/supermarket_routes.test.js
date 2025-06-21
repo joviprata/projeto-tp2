@@ -57,3 +57,29 @@ describe("PUT /supermarkets/:id - Atualizar dados do supermercado", () => {
     );
   });
 });
+
+describe("GET /supermarkets/:id - Buscar supermercado por ID existente", () => {
+  it("deve retornar status 200 e os dados do supermercado", async () => {
+    const supermarketId = 1;
+
+    const response = await request(app).get(`/supermarkets/${supermarketId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("name");
+    expect(response.body).toHaveProperty("email");
+    expect(response.body).toHaveProperty("address");
+    expect(response.body).toHaveProperty("managerId");
+  });
+});
+
+describe("GET /supermarkets/:id - Buscar supermercado por ID inexistente", () => {
+  it("deve retornar status 404 e mensagem de erro", async () => {
+    const supermarketId = 999;
+
+    const response = await request(app).get(`/supermarkets/${supermarketId}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Supermercado não encontrado");
+  });
+});

@@ -37,7 +37,17 @@ const getSupermarketById = async (req, res) => {
   try {
     const { id } = req.params;
     const results = await supermarketService.getSupermarketById(id);
-    res.status(results.status);
+    if (results.status === 200) {
+      return res.status(200).json({
+        name: results.name,
+        email: results.email,
+        address: results.address,
+        managerId: results.managerId,
+      });
+    }
+    if (results.status === 404) {
+      return res.status(404).json({ error: "Supermercado não encontrado" });
+    }
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
