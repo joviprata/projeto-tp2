@@ -133,28 +133,27 @@ describe("GET /supermarkets/:id - Buscar supermercado por ID inexistente", () =>
 });
 
 describe("DELETE /supermarkets/:id - Deletar supermercado existente", () => {
-  it("deve retornar status 200 e mensagem de erro ao tentar deletar supermercado existente", async () => {
+  it("deve retornar status 204 e mensagem de erro ao tentar deletar supermercado existente", async () => {
     const supermarketId = 1;
 
     const response = await request(app).delete(
       `/supermarkets/${supermarketId}`
     );
 
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty("message", "Supermercado deletado");
+    expect(response.status).toBe(204);
   });
 });
 
 describe("DELETE /supermarkets/:id - Deletar supermercado", () => {
-  it("deve retornar status 500 e mensagem de erro ao tentar deletar supermercado inexistente", async () => {
+  it("deve retornar status 404 e mensagem de erro ao tentar deletar supermercado inexistente", async () => {
     const supermarketId = 999;
 
     const response = await request(app).delete(
       `/supermarkets/${supermarketId}`
     );
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
-    expect(response.body.error).toBe("Internal Server Error");
+    expect(response.body.error).toBe("Supermercado não encontrado");
   });
 });

@@ -58,7 +58,13 @@ const deleteSupermarket = async (req, res) => {
   try {
     const { id } = req.params;
     const results = await supermarketService.deleteSupermarket(id);
-    res.status(results.status);
+    console.log("Resultados do delete:", results);
+    if (results.status === 404) {
+      return res.status(404).json({ error: "Supermercado não encontrado" });
+    }
+    if (results.status === 204) {
+      return res.status(204).send();
+    }
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }

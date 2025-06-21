@@ -50,7 +50,24 @@ const getSupermarketById = async (id) => {
   }
 };
 const deleteSupermarket = async (id) => {
-  return { status: 200, message: "Supermercado deletado" };
+  try {
+    const deletedSupermarket = await prismaDatabase.supermarket.delete({
+      where: { id: parseInt(id) },
+    });
+
+    await prismaDatabase.user.delete({
+      where: { id: deletedSupermarket.managerId },
+    });
+
+    return { status: 204 };
+  } catch (error) {
+    if (error.code === "P2025") {
+      return { status: 404, error: "Supermercado não encontrado" };
+    }
+
+    console.error("Erro ao deletar supermercado:", error);
+    return { status: 500, error: "Erro interno do servidor" };
+  }
 };
 
 module.exports = {
