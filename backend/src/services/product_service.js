@@ -3,6 +3,9 @@ const prismaDatabase = require("../prismaClient");
 
 const registerProduct = async (body) => {
     try {
+        if (!body.name || !body.barCode || !body.variableDescription) {
+            return { status: 400, error: "Dados do produto incompletos"};
+        }
         const newProduct = await prismaDatabase.product.create({
             data: body,
         });
