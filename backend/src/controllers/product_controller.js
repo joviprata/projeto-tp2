@@ -4,8 +4,8 @@ const produtoService = require('../services/product_service');
 
 const registerProduct = async (req, res) => {
     try {
-        const supermarketData = req.body;
-        const result = await produtoService.registerProduct(supermarketData);
+        const productData = req.body;
+        const result = await produtoService.registerProduct(productData);
         res.status(result.status).json(result.data || { error: result.error});
     }
     catch (error) {

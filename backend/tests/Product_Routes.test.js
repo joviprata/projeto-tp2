@@ -6,9 +6,9 @@ const prismaDatabase = require("../src/prismaClient");
 beforeAll(async () => {
     console.log("Criando Produto inicial para Teste");
     const CreateProduct = {
-        nome: "Produto Teste",
-        CodidoDeBarras: "1234567890123",
-        descricao: "Descrição do Produto Teste"
+        name: "Produto Teste",
+        barCode: "1234567890123",
+        variableDescription: "Descrição do Produto Teste"
     };
     const response = await request(app).post("/products").send(CreateProduct);
     expect(response.status).toBe(201);
@@ -37,9 +37,9 @@ afterAll(async () => {
 describe("POST /products - Registrar um novo produto", () => {
     it("Deve retornar 201 e os dados do produto criado", async () => {
         const newProduct = {
-        nome: "Produto novo",
-        CodidoDeBarras: "9876543210987",
-        descricao: "Descrição do Produto novo"
+        name: "Produto novo",
+        barCode: "9876543210987",
+        variableDescription: "Descrição do Produto novo"
         };
 
         const response = await request(app).post("/products").send(newProduct);
