@@ -58,6 +58,40 @@ describe("PUT /supermarkets/:id - Atualizar dados do supermercado", () => {
   });
 });
 
+describe("PUT /supermarkets/:id - Atualizar dados do supermercado com dados inválidos", () => {
+  it("deve retornar status 400 e mensagem de erro ao tentar atualizar com dados inválidos", async () => {
+    const supermarketId = 1;
+    const updatedData = {
+      name: "",
+    };
+
+    const response = await request(app)
+      .put("/supermarkets/" + supermarketId)
+      .send(updatedData);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Requisição inválida");
+  });
+});
+
+describe("PUT /supermarkets/:id - Atualizar dados do supermercado com ID inexistente", () => {
+  it("deve retornar status 404 e mensagem de erro ao tentar atualizar supermercado inexistente", async () => {
+    const supermarketId = 999;
+    const updatedData = {
+      name: "Supermercado Inexistente",
+    };
+
+    const response = await request(app)
+      .put("/supermarkets/" + supermarketId)
+      .send(updatedData);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Supermercado não encontrado");
+  });
+});
+
 describe("GET /supermarkets/:id - Buscar supermercado por ID existente", () => {
   it("deve retornar status 200 e os dados do supermercado", async () => {
     const supermarketId = 1;

@@ -27,7 +27,6 @@ const updateSupermarket = async (req, res) => {
     if (results.status === 200) {
       return res.status(200).json({ message: results.message });
     }
-    res.status(500).json({ error: "Internal Server Error" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
