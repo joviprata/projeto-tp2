@@ -10,7 +10,11 @@ beforeAll(async () => {
         CodidoDeBarras: "1234567890123",
         descricao: "Descrição do Produto Teste"
     };
-    await request(app).post("/products").send(CreateProduct);
+    const response = await request(app).post("/products").send(CreateProduct);
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty("id");
+    CreateProduct.id = response.body.id; // Armazena o ID do produto criado para uso posterior
+    console.log("Produto inicial criado com ID:", CreateProduct.id);
 });
 
 afterAll(async () => {
@@ -24,10 +28,13 @@ afterAll(async () => {
     ];
 
     for (const tableName of TableNames) {
-        await prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "${tableName}" CASCADE;`);
+        await prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`);
     }
     await prismaDatabase.$disconnect();
+    console.log("Banco de dados limpo e desconectado.");
 });
+
+
 
 
 
