@@ -27,7 +27,25 @@ const updateSupermarket = async (id, supermarketData) => {
   }
 };
 const getSupermarketById = async (id) => {
-  return { status: "500" };
+  try {
+    const supermarket = await prismaDatabase.supermarket.findUnique({
+      where: { id: parseInt(id) },
+    });
+    const manager = await prismaDatabase.user.findUnique({
+      where: { id: supermarket.managerId },
+    });
+
+    return {
+      status: 200,
+      name: supermarket.name,
+      email: manager.email,
+      address: supermarket.address,
+      managerId: supermarket.managerId,
+    };
+  } catch (error) {
+    console.error("Erro ao buscar supermercado:", error);
+    return { status: 500, error: "Erro interno do servidor" };
+  }
 };
 const deleteSupermarket = async (id) => {
   return { status: "500" };
