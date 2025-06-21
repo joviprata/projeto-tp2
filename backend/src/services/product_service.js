@@ -29,6 +29,15 @@ const updateProduct = async (id, productData) => {
       return { status: 404, error: "Produto não encontrado" };
     }
 
+    // Verifica se os dados do produto estão completos
+    if (
+      !productData.name ||
+      !productData.barCode ||
+      !productData.variableDescription
+    ) {
+      return { status: 400, error: "Dados do produto incompletos" };
+    }
+
     // Atualiza o produto
     const updatedProduct = await prismaDatabase.product.update({
       where: { id: parseInt(id) },
