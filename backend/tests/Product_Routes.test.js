@@ -127,6 +127,12 @@ describe("PUT /products/:id - Atualizar produto", () => {
   it("Deve retornar status 404 se o produto não for encontrado", async () => {
     const nonExistentId = 9999; // ID que não existe no banco de dados
 
+    const updatedProduct = {
+      name: "Produto Inexistente",
+      barCode: "0000000000000",
+      variableDescription: "Este produto não existe",
+    };
+
     const response = await request(app)
       .put(`/products/${nonExistentId}`)
       .send(updatedProduct);

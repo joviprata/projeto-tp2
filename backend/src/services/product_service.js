@@ -20,10 +20,25 @@ const registerProduct = async (body) => {
 
 const updateProduct = async (id, productData) => {
   try {
+    // Verifica se o produto existe
+    const existingProduct = await prismaDatabase.product.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingProduct) {
+      return { status: 404, error: "Produto não encontrado" };
+    }
+
+    // Atualiza o produto
     const updatedProduct = await prismaDatabase.product.update({
       where: { id: parseInt(id) },
-      data: productData,
+      data: {
+        name: productData.name,
+        barCode: productData.barCode,
+        variableDescription: productData.variableDescription,
+      },
     });
+
     return { status: 200, data: updatedProduct };
   } catch (error) {
     console.error("Erro ao atualizar produto:", error);
