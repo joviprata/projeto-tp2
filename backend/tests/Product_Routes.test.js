@@ -49,7 +49,19 @@ describe("POST /products - Registrar um novo produto", () => {
         expect(response.body.CodidoDeBarras).toBe(newProduct.CodidoDeBarras);
         expect(response.body.descricao).toBe(newProduct.descricao);
     });
+
+    it("Deve retornar 400 se os dados do produto estiverem incompletos", async () => {
+        const incompleteProduct = {
+            name: "Produto Incompleto"
+        };
+
+        const response = await request(app).post("/products").send(incompleteProduct);
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
 })
+
+
 
 
 
