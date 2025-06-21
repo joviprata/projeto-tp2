@@ -11,9 +11,8 @@ const registerProduct = async (body) => {
         });
         return { status: 200, data: newProduct };
     } catch (error) {
-        console.error("Erro ao registrar produto:", error);
         if (error.code === 'P2002') {
-            return { status: 400, error: "Produto já existe" };
+            return { status: 400, error: "Produto já existe"};
         }
         return { status: 500, error: "Internal Server Error" };
     }
