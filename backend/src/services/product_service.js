@@ -42,6 +42,9 @@ const getProductById = async (id) => {
         const product = await prismaDatabase.product.findUnique({
             where: { id: parseInt(id) },
         });
+        if (!product) {
+            return { status: 404, error: "Produto não encontrado" };
+        }
         return { status: 200, data: product };
     } catch (error) {
         console.error("Erro ao obter produto:", error);
