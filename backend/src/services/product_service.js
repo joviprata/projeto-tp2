@@ -2,60 +2,68 @@
 const prismaDatabase = require("../prismaClient");
 
 const registerProduct = async (body) => {
-    try {
-        if (!body.name || !body.barCode || !body.variableDescription) {
-            return { status: 400, error: "Dados do produto incompletos"};
-        }
-        const newProduct = await prismaDatabase.product.create({
-            data: body,
-        });
-        return { status: 200, data: newProduct };
-    } catch (error) {
-        if (error.code === 'P2002') {
-            return { status: 400, error: "Produto já existe"};
-        }
-        return { status: 500, error: "Internal Server Error" };
+  try {
+    if (!body.name || !body.barCode || !body.variableDescription) {
+      return { status: 400, error: "Dados do produto incompletos" };
     }
+    const newProduct = await prismaDatabase.product.create({
+      data: body,
+    });
+    return { status: 200, data: newProduct };
+  } catch (error) {
+    if (error.code === "P2002") {
+      return { status: 400, error: "Produto já existe" };
+    }
+    return { status: 500, error: "Internal Server Error" };
+  }
 };
 
 const updateProduct = async (id, productData) => {
-    return { status: 500 };
+  try {
+    const updatedProduct = await prismaDatabase.product.update({
+      where: { id: parseInt(id) },
+      data: productData,
+    });
+    return { status: 200, data: updatedProduct };
+  } catch (error) {
+    console.error("Erro ao atualizar produto:", error);
+    return { status: 500, error: "Internal Server Error" };
+  }
 };
 
 const deleteProduct = async (id) => {
-    return { status: 500 };
+  return { status: 500 };
 };
 
 const getAllProducts = async () => {
-    try {
-        const products = await prismaDatabase.product.findMany();
-        return { status: 200, data: products };
-    } catch (error) {
-        console.error("Erro ao obter produtos:", error);
-        return { status: 500, error: "Internal Server Error" };
-    }
+  try {
+    const products = await prismaDatabase.product.findMany();
+    return { status: 200, data: products };
+  } catch (error) {
+    console.error("Erro ao obter produtos:", error);
+    return { status: 500, error: "Internal Server Error" };
+  }
 };
 
 const getProductById = async (id) => {
-    try {
-        const product = await prismaDatabase.product.findUnique({
-            where: { id: parseInt(id) },
-        });
-        if (!product) {
-            return { status: 404, error: "Produto não encontrado" };
-        }
-        return { status: 200, data: product };
-    } catch (error) {
-        console.error("Erro ao obter produto:", error);
-        return { status: 500, error: "Internal Server Error" };
+  try {
+    const product = await prismaDatabase.product.findUnique({
+      where: { id: parseInt(id) },
+    });
+    if (!product) {
+      return { status: 404, error: "Produto não encontrado" };
     }
+    return { status: 200, data: product };
+  } catch (error) {
+    console.error("Erro ao obter produto:", error);
+    return { status: 500, error: "Internal Server Error" };
+  }
 };
 
 module.exports = {
-    registerProduct,
-    updateProduct,
-    deleteProduct,
-    getAllProducts,
-    getProductById
+  registerProduct,
+  updateProduct,
+  deleteProduct,
+  getAllProducts,
+  getProductById,
 };
-
