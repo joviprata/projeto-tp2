@@ -34,7 +34,22 @@ afterAll(async () => {
     console.log("Banco de dados limpo e desconectado.");
 });
 
+describe("POST /products - Registrar um novo produto", () => {
+    it("Deve retornar 201 e os dados do produto criado", async () => {
+        const newProduct = {
+        nome: "Produto novo",
+        CodidoDeBarras: "9876543210987",
+        descricao: "Descrição do Produto novo"
+        };
 
+        const response = await request(app).post("/products").send(newProduct);
+        expect(response.status).toBe(201);
+        expect(response.body).toHaveProperty("id");
+        expect(response.body.nome).toBe(newProduct.nome);
+        expect(response.body.CodidoDeBarras).toBe(newProduct.CodidoDeBarras);
+        expect(response.body.descricao).toBe(newProduct.descricao);
+    });
+})
 
 
 
