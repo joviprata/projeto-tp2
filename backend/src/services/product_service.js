@@ -38,7 +38,15 @@ const getAllProducts = async () => {
 };
 
 const getProductById = async (id) => {
-    return { status: 500 };
+    try {
+        const product = await prismaDatabase.product.findUnique({
+            where: { id: parseInt(id) },
+        });
+        return { status: 200, data: product };
+    } catch (error) {
+        console.error("Erro ao obter produto:", error);
+        return { status: 500, error: "Internal Server Error" };
+    }
 };
 
 module.exports = {
