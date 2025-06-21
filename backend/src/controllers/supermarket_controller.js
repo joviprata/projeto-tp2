@@ -14,6 +14,9 @@ const updateSupermarket = async (req, res) => {
   if (Object.keys(req.body).length === 0 || Object.keys(req.body).length > 4) {
     return res.status(400).json({ error: "Requisição inválida" });
   }
+  if (!req.body) {
+    return res.status(400).json({ error: "Requisição inválida" });
+  }
   try {
     const { id } = req.params;
     const supermarketData = req.body;
