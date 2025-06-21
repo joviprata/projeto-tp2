@@ -83,6 +83,20 @@ describe("GET /products - Obter todos os produtos", () => {
     });
 });
 
+describe("GET /products/:id - Obter produto por ID", () => {
+    it("Deve retornar status 200 e os dados do produto", async () => {
+        const productId = 1; // Substitua pelo ID do produto que você deseja testar
+
+        const response = await request(app).get(`/products/${productId}`);
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty("id", productId);
+        expect(response.body).toHaveProperty("name");
+        expect(response.body).toHaveProperty("barCode");
+        expect(response.body).toHaveProperty("variableDescription");
+    });
+});
+
+
 
 
 
