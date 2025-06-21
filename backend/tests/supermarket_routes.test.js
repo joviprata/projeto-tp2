@@ -30,11 +30,30 @@ afterAll(async () => {
   await prismaDatabase.$disconnect();
 });
 
-describe("GET /supermarkets/allSupermarkets - Mostrar todos os supermercado", () => {
+describe("GET /supermarkets/ - Mostrar todos os supermercado", () => {
   it("deve retornar um objeto com status 200 e um array de supermercados", async () => {
     const response = await request(app).get("/supermarkets/");
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("supermarkets");
     expect(Array.isArray(response.body.supermarkets)).toBe(true);
+  });
+});
+
+describe("PUT /supermarkets/:id - Atualizar dados do supermercado", () => {
+  it("deve retornar status 200 e mensagem de sucesso ao atualizar supermercado", async () => {
+    const supermarketId = 1;
+    const updatedData = {
+      name: "Supermercado Atualizado",
+    };
+
+    const response = await request(app)
+      .put("/supermarkets/" + supermarketId)
+      .send(updatedData);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty(
+      "message",
+      "Supermercado atualizado com sucesso"
+    );
   });
 });

@@ -13,7 +13,7 @@ const getAllSupermarkets = async () => {
   }
 };
 const updateSupermarket = async (id, supermarketData) => {
-  return { status: "500" };
+  return { status: 500 };
 };
 const getSupermarketById = async (id) => {
   return { status: "500" };
