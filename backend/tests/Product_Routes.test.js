@@ -94,6 +94,14 @@ describe("GET /products/:id - Obter produto por ID", () => {
         expect(response.body).toHaveProperty("barCode");
         expect(response.body).toHaveProperty("variableDescription");
     });
+
+    it("Deve retornar status 404 se o produto não for encontrado", async () => {
+        const nonExistentId = 9999; // ID que não existe no banco de dados
+
+        const response = await request(app).get(`/products/${nonExistentId}`);
+        expect(response.status).toBe(404);
+        expect(response.body).toHaveProperty("error", "Produto não encontrado");
+    });
 });
 
 
