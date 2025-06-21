@@ -58,23 +58,37 @@ describe("PUT /supermarkets/:id - Atualizar dados do supermercado", () => {
   });
 });
 
-// describe("PUT /supermarkets/:id - Atualizar dados do supermercado com dados inválidos", () => {
-//   it("deve retornar status 400 e mensagem de erro ao tentar atualizar com dados inválidos", async () => {
-//     const supermarketId = 1;
-//     const updatedData = {
-//       name: "",
-//     };
+describe("PUT /supermarkets/:id - Atualizar dados do supermercado com dados inválidos", () => {
+  it.each([
+    {
+      case: "Dados vazios",
+      supermarketId: 1,
+      updatedData: {},
+    },
+    {
+      case: "Mais de 4 campos",
+      supermarketId: 1,
+      updatedData: {
+        name: "Supermercado Invalido",
+        email: "testinvalido@example.com",
+        password: "senhainvalida",
+        address: "Rua Invalida, 456",
+        extraField: "Campo Extra",
+      },
+    },
+  ])(
+    "deve retornar status 400 e mensagem de erro ao tentar atualizar com dados inválidos",
+    async ({ supermarketId, updatedData }) => {
+      const response = await request(app)
+        .put("/supermarkets/" + supermarketId)
+        .send(updatedData);
 
-//     const response = await request(app)
-//       .put("/supermarkets/" + supermarketId)
-//       .send(updatedData);
-
-//     expect(response.status).toBe(400);
-//     expect(response.body).toHaveProperty("error");
-//     expect(response.body.error).toBe("Requisição inválida");
-//   });
-// });
-
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty("error");
+      expect(response.body.error).toBe("Requisição inválida");
+    }
+  );
+});
 describe("PUT /supermarkets/:id - Atualizar dados do supermercado com ID inexistente", () => {
   it("deve retornar status 404 e mensagem de erro ao tentar atualizar supermercado inexistente", async () => {
     const supermarketId = 999;
