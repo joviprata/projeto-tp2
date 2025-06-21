@@ -59,6 +59,18 @@ describe("POST /products - Registrar um novo produto", () => {
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("error");
     });
+
+    it("Deve retornar 400 se o produto já existir (mesmo nome e código de barras)", async () => {
+        const existingProduct = {
+            name: "Produto Teste",
+            barCode: "1234567890123",
+            variableDescription: "Descrição do Produto Teste"
+        };
+
+        const response = await request(app).post("/products").send(existingProduct);
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("error");
+    });
 })
 
 
