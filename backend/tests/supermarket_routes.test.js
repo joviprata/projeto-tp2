@@ -145,16 +145,16 @@ describe("DELETE /supermarkets/:id - Deletar supermercado existente", () => {
   });
 });
 
-// describe("DELETE /supermarkets/:id - Deletar supermercado", () => {
-//   it("deve retornar status 500 e mensagem de erro ao tentar deletar supermercado inexistente", async () => {
-//     const supermarketId = 999;
+describe("DELETE /supermarkets/:id - Deletar supermercado", () => {
+  it("deve retornar status 500 e mensagem de erro ao tentar deletar supermercado inexistente", async () => {
+    const supermarketId = 999;
 
-//     const response = await request(app).delete(
-//       `/supermarkets/${supermarketId}`
-//     );
+    const response = await request(app).delete(
+      `/supermarkets/${supermarketId}`
+    );
 
-//     expect(response.status).toBe(500);
-//     expect(response.body).toHaveProperty("error");
-//     expect(response.body.error).toBe("Internal Server Error");
-//   });
-// });
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Internal Server Error");
+  });
+});

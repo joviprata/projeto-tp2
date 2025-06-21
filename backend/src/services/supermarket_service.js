@@ -50,7 +50,7 @@ const getSupermarketById = async (id) => {
   }
 };
 const deleteSupermarket = async (id) => {
-  return { status: "500" };
+  return { status: 200, message: "Supermercado deletado" };
 };
 
 module.exports = {
