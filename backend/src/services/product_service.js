@@ -1,32 +1,31 @@
 // Aqui fica o registerProduto que será chamado no controller
+const prismaDatabase = require("../prismaClient");
 
 const registerProduct = async (body) => {
-    if (!body || Object.keys(body).length === 0) {
-        return { status : 400, error: "Dados imcompletos ou inválidos" };
-    }
+    return { status: "500" };
+};
 
-    const { name, CodigoDeBarras, Data, Descricao } = body;
+const updateProduct = async (id, productData) => {
+    return { status: "500" };
+};
 
-    if (!name || name.trim() === "") {
-        return { status: 400, error: "O campo nome é obrigatório" };
-    }
+const deleteProduct = async (id) => {
+    return { status: "500" };
+}
 
-    if (!CodigoDeBarras || CodigoDeBarras.trim() === "") {
-        return { status: 400, error: "O campo Código de Barras é obrigatório" };
-    }
+const getAllProducts = async () => {
+    return { status: "500" };
+};
 
-    if (!Data || Data.trim() === "") {
-        return { status: 400, error: "O campo Data é obrigatório" };
-    }
-
-    if (!Descricao || Descricao.trim() === "") {
-        return { status: 400, error: "O campo Descrição é obrigatório" };
-    }
-
-    return { status: 201, message: "Produto registrado com sucesso" };
+const getProductById = async (id) => {
+    return { status: "500" };
 };
 
 module.exports = {
-    registerProduct
+    registerProduct,
+    updateProduct,
+    deleteProduct,
+    getAllProducts,
+    getProductById
 };
 
