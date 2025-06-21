@@ -9,7 +9,7 @@ const registerProduct = async (body) => {
         const newProduct = await prismaDatabase.product.create({
             data: body,
         });
-        return { status: 201, data: newProduct };
+        return { status: 200, data: newProduct };
     } catch (error) {
         console.error("Erro ao registrar produto:", error);
         if (error.code === 'P2002') {

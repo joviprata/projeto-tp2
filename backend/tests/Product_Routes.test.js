@@ -11,7 +11,7 @@ beforeAll(async () => {
         variableDescription: "Descrição do Produto Teste"
     };
     const response = await request(app).post("/products").send(CreateProduct);
-    expect(response.status).toBe(201);
+    expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
     CreateProduct.id = response.body.id; // Armazena o ID do produto criado para uso posterior
     console.log("Produto inicial criado com ID:", CreateProduct.id);
@@ -35,7 +35,7 @@ afterAll(async () => {
 });
 
 describe("POST /products - Registrar um novo produto", () => {
-    it("Deve retornar 201 e os dados do produto criado", async () => {
+    it("Deve retornar 200 e os dados do produto criado", async () => {
         const newProduct = {
         name: "Produto novo",
         barCode: "9876543210987",
@@ -43,7 +43,7 @@ describe("POST /products - Registrar um novo produto", () => {
         };
 
         const response = await request(app).post("/products").send(newProduct);
-        expect(response.status).toBe(201);
+        expect(response.status).toBe(200);
         expect(response.body).toHaveProperty("id");
         expect(response.body.nome).toBe(newProduct.nome);
         expect(response.body.CodidoDeBarras).toBe(newProduct.CodidoDeBarras);
@@ -72,6 +72,16 @@ describe("POST /products - Registrar um novo produto", () => {
         expect(response.body).toHaveProperty("error");
     });
 })
+
+describe("GET /products - Obter todos os produtos", () => {
+    it("Deve retornar status 200 e um array de produtos", async () => {
+        const response = await request(app).get("/products");
+        expect(response.status).toBe(200);
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBeGreaterThan(0); // Verifica se há pelo menos um produto
+        expect(response.body[0]).toHaveProperty("name");
+    });
+});
 
 
 
