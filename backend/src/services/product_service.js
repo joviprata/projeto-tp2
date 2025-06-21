@@ -28,7 +28,13 @@ const deleteProduct = async (id) => {
 };
 
 const getAllProducts = async () => {
-    return { status: 500 };
+    try {
+        const products = await prismaDatabase.product.findMany();
+        return { status: 200, data: products };
+    } catch (error) {
+        console.error("Erro ao obter produtos:", error);
+        return { status: 500, error: "Internal Server Error" };
+    }
 };
 
 const getProductById = async (id) => {
