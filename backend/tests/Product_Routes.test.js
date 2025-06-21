@@ -4,12 +4,13 @@ const prismaDatabase = require("../src/prismaClient");
 
 
 beforeAll(async () => {
-    console.log("Criando Produto para Teste");
-    await request(app).post("/products").send({ // Cria um produto para ser usado nos testes
+    console.log("Criando Produto inicial para Teste");
+    const CreateProduct = {
         nome: "Produto Teste",
         CodidoDeBarras: "1234567890123",
         descricao: "Descrição do Produto Teste"
-    });
+    };
+    await request(app).post("/products").send(CreateProduct);
 });
 
 afterAll(async () => {
@@ -27,6 +28,10 @@ afterAll(async () => {
     }
     await prismaDatabase.$disconnect();
 });
+
+
+
+
 
 
 
