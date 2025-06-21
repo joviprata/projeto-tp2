@@ -123,4 +123,14 @@ describe("PUT /products/:id - Atualizar produto", () => {
     expect(response.body).toHaveProperty("id", productId);
     expect(response.body.name).toBe(updatedProduct.name);
   });
+
+  it("Deve retornar status 404 se o produto não for encontrado", async () => {
+    const nonExistentId = 9999; // ID que não existe no banco de dados
+
+    const response = await request(app)
+      .put(`/products/${nonExistentId}`)
+      .send(updatedProduct);
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty("error", "Produto não encontrado");
+  });
 });
