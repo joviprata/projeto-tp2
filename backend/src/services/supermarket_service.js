@@ -31,6 +31,9 @@ const getSupermarketById = async (id) => {
     const supermarket = await prismaDatabase.supermarket.findUnique({
       where: { id: parseInt(id) },
     });
+    if (!supermarket) {
+      return { status: 404, error: "Supermercado não encontrado" };
+    }
     const manager = await prismaDatabase.user.findUnique({
       where: { id: supermarket.managerId },
     });

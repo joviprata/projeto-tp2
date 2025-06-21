@@ -45,6 +45,9 @@ const getSupermarketById = async (req, res) => {
         managerId: results.managerId,
       });
     }
+    if (results.status === 404) {
+      return res.status(404).json({ error: "Supermercado não encontrado" });
+    }
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
