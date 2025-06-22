@@ -1,0 +1,115 @@
+.container {
+  background: linear-gradient(to bottom left, #a8e6cf, #dcedc1, #b3d9ff);
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.5rem;
+  background: linear-gradient(to right, #2563eb, #4f46e5, #7c3aed);
+  padding: 1rem 2rem;
+  color: white;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.icons {
+  display: flex;
+  gap: 1rem;
+  font-size: 1.5rem;
+}
+
+.subtitulo {
+  background-color: #3b82f6;
+  color: white;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  border-radius: 20px;
+  margin: 1rem 2rem;
+}
+
+.produtos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  padding: 1rem 2rem;
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card-top {
+  background-color: #3b82f6;
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  font-weight: bold;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.card-body {
+  padding: 1rem;
+  text-align: center;
+}
+
+.descricao {
+  font-size: 0.85rem;
+  color: #555;
+  margin: 0.5rem 0;
+  height: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preco {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.acoes {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.editar,
+.excluir {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.excluir {
+  color: red;
+}
+
+.editar {
+  color: #007bff;
+}

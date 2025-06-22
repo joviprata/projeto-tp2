@@ -1,15 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 import styles from './Cadastro.module.css';
 import Image from 'next/image';
-
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 export default function Cadastro() {
   const [mostrarAdd, setMostrarAdd] = useState(false);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [endereco, setEndereco] = useState('');
+  const router = useRouter();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (mostrarAdd) {
+        const response = await axios.post(
+          'http://localhost:3001/auth/register/manager',
+          {
+            name: nome,
+            email: email,
+            password: senha,
+            address: endereco,
+          },
+        );
+        console.log(response.data);
+        if (response.status === 201) {
+          alert('Cadastro realizado com sucesso!');
+          setNome('');
+          setEmail('');
+          setSenha('');
+          setEndereco('');
+          setMostrarAdd(false);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar:', error);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -68,7 +97,9 @@ export default function Cadastro() {
           />
         )}
 
-        <button className={styles.button}>Criar conta</button>
+        <button className={styles.button} onClick={handleSubmit}>
+          Criar conta
+        </button>
       </div>
     </div>
   );
