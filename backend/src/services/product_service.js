@@ -41,6 +41,15 @@ const updateProduct = async (id, productData) => {
       };
     }
 
+    // Verifica se o array de campos é maior que 3
+    const fields = Object.keys(productData);
+    if (fields.length > 3) {
+      return {
+        status: 400,
+        error: "Dados do produto inválidos ou incompletos",
+      };
+    }
+
     // Atualiza o produto
     const updatedProduct = await prismaDatabase.product.update({
       where: { id: parseInt(id) },
