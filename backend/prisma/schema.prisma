@@ -17,21 +17,21 @@ model User {
   email              String           @unique @db.VarChar(255)
   password           String           @db.VarChar(255)
   createdAt          DateTime         @default(now()) @map("created_at")
+  managedSupermarket Supermarket?     // sem onDelete
   priceRecords       PriceRecord[]
   shoppingLists      ShoppingList[]
-  managedSupermarket Supermarket? 
 
   @@map("users")
 }
 
 model Supermarket {
   id           Int           @id @default(autoincrement())
-  managerId    Int?          @unique @map("gerente_id")
+  managerId    Int           @unique @map("gerente_id")
   name         String        @db.VarChar(255)
   address      String?       @db.VarChar(255) @map("endereco")
   latitude     Decimal?      @db.Decimal(9, 6)
   longitude    Decimal?      @db.Decimal(9, 6)
-  manager      User?         @relation(fields: [managerId], references: [id], onDelete: Cascade)
+  manager      User          @relation(fields: [managerId], references: [id], onDelete: Cascade)
   priceRecords PriceRecord[]
 
   @@map("supermercado")

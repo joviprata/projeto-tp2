@@ -16,7 +16,7 @@
 
 - inicie o container
   ```
-  npm run start 
+  npm run start
   ```
   **IMPORTANTE**: Caso seja a primeira vez rodando, ou alguém tenha realizado alterações no schema do banco de dados, rode:
   ```
@@ -35,6 +35,7 @@
   npm run test //Roda todos os Testes tanto do frontend como do backend
   npm run test:frontend //Roda so o do frontend
   npm run test:backend //Roda so o do backend
+  npm run test:backend:coverage // Rodas os testes do backend com cobertura de testes podesse abrir no navegador a cobertura na pasta gerada pelo comando ela fica em backend/coverage/lcov-report entao abre o arquivo index.html
   ```
 - Caso tenha alterado o banco de dados
   ```
@@ -44,11 +45,13 @@
   ```
   npm run logs
   ```
+
 **Importante**: Em caso de erro, verifique a versão instalada do npm e tenta fazer o upgrade dela.
 
 ## Portas da aplicação
-| Aplicação         | Porta | 
-|----------  |:-------------:| 
-|  FrontEnd  | localhost:3000 |
-|  BackEnd   | localhost:3001 | 
-|  Prisma    | localhost:5555 |
+
+| Aplicação |     Porta      |
+| --------- | :------------: |
+| FrontEnd  | localhost:3000 |
+| BackEnd   | localhost:3001 |
+| Prisma    | localhost:5555 |
