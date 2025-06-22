@@ -6,7 +6,7 @@ const registerProduct = async (body) => {
     if (!body.name.trim()) {
         return { status: 400, error: "Nome do produto não pode ser vazio" };
     }
-    if (!body.name || !body.barCode || !body.variableDescription) {
+    else if (!body.name || !body.barCode || !body.variableDescription) {
       return { status: 400, error: "Dados do produto incompletos" };
     }
     const newProduct = await prismaDatabase.product.create({
