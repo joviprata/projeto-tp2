@@ -86,6 +86,18 @@ describe("POST /products - Registrar um novo produto", () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
   });
+
+  it("Deve retornar 400 se o nome for uma string vazia", async () => {
+    const emptyNameProduct = {
+        name: "",
+        barCode: "1234567890123",
+        variableDescription: "Descrição do Produto com Nome Vazio",
+    };
+
+    const response = await request(app).post("/products").send(emptyNameProduct);
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("error", "Nome do produto não pode ser vazio");
+  })
 });
 
 describe("GET /products - Obter todos os produtos", () => {
