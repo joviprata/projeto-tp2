@@ -10,11 +10,22 @@ beforeAll(async () => {
     barCode: "1234567890123",
     variableDescription: "Descrição do Produto Teste",
   };
+  const CreateProduct2 = {
+    name: "Produto Teste 2",
+    barCode: "1234567890124",
+    variableDescription: "Descrição do Produto Teste 2",
+  };
   const response = await request(app).post("/products").send(CreateProduct);
   expect(response.status).toBe(200);
   expect(response.body).toHaveProperty("id");
   CreateProduct.id = response.body.id; // Armazena o ID do produto criado para uso posterior
   console.log("Produto inicial criado com ID:", CreateProduct.id);
+
+  const response2 = await request(app).post("/products").send(CreateProduct2);
+  expect(response2.status).toBe(200);
+  expect(response2.body).toHaveProperty("id");
+  CreateProduct2.id = response2.body.id; // Armazena o ID do segundo produto criado para uso posterior
+  console.log("Segundo Produto inicial criado com ID:", CreateProduct2.id);
 });
 
 afterAll(async () => {
@@ -172,6 +183,25 @@ describe("PUT /products/:id - Atualizar produto com dados incompletos ou inváli
       );
     }
   );
+});
+
+describe("PUT /products/:id - Atualizar produto com nome e código de barras já existentes", () => {
+  it("Deve retornar 400 se o nome ou código de barras já existirem", async () => {
+    const productId = 1; // Substitua pelo ID do produto que você deseja testar
+    const existingProduct = {
+      name: "Produto Teste 2",
+      barCode: "1234567890124",
+      variableDescription: "Descrição do Produto Teste",
+    };
+    const response = await request(app)
+      .put(`/products/${productId}`)
+      .send(existingProduct);
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty(
+      "error",
+      "Produto com nome ou código de barras já existente"
+    );
+  });
 });
 
 describe("DELETE /products/:id - Excluir produto", () => {
