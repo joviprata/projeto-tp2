@@ -68,7 +68,26 @@ const updateProduct = async (id, productData) => {
 };
 
 const deleteProduct = async (id) => {
-  return { status: 500 };
+  try {
+    const product = await prismaDatabase.product.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    await prismaDatabase.product.delete({
+      where: { id: parseInt(id) },
+    });
+
+    return {
+      status: 200,
+      data: { message: "Produto excluído com sucesso" },
+    };
+  } catch (error) {
+    console.error("Erro ao deletar produto:", error);
+    return {
+      status: 500,
+      data: { error: "Internal Server Error" },
+    };
+  }
 };
 
 const getAllProducts = async () => {
