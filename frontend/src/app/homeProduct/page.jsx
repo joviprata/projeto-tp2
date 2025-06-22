@@ -6,10 +6,9 @@ import styles from './page.module.css';
 export default function Produtos() {
   // Placeholder
   const produtos = Array(15).fill({
-    nome: 'Nome Produto 123',
-    descricao:
-      'Descrição do produto descrição do produto descrição do produto descrição do produto...',
-    preco: 'R$ 1000,00',
+    nome: 'Placeholder',
+    descricao: 'Placeholder',
+    preco: 'Placeholder',
   });
 
   return (
