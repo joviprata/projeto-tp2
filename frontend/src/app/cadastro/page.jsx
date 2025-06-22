@@ -5,7 +5,12 @@ import styles from './Cadastro.module.css';
 import Image from 'next/image';
 
 export default function Cadastro() {
-  const [mostrarAdd, setMostrarAdd] = useState(false); 
+  const [mostrarAdd, setMostrarAdd] = useState(false);
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [endereco, setEndereco] = useState('');
+  
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -20,9 +25,9 @@ export default function Cadastro() {
       </header>
 
       <div className={styles.formContainer}>
-        <input type="text" placeholder="Nome / Nome do Mercado" className={styles.input} />
-        <input type="text" placeholder="E-mail" className={styles.input} />
-        <input type="password" placeholder="Senha" className={styles.input} />
+        <input type="text" placeholder="Nome / Nome do Mercado" className={styles.input} value={nome}/>
+        <input type="text" placeholder="E-mail" className={styles.input} value={email}/>
+        <input type="password" placeholder="Senha" className={styles.input} value={senha}/>
         <label className={styles.checkboxContainer}>
           <input
             type="checkbox"
@@ -36,11 +41,11 @@ export default function Cadastro() {
           </span>
         </label>
         {mostrarAdd && (
-          <input type="text" placeholder="Endereço" className={styles.input} />
+          <input type="text" placeholder="Endereço" className={styles.input} value={endereco}/>
         )}
         
         <button className={styles.button}>Criar conta</button>
       </div>
     </div>
   );
-}
+} 

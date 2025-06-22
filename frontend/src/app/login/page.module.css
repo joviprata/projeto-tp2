@@ -19,8 +19,8 @@
 }
 
 .logo {
-  width: 40px;
-  height: 40px;
+  width: 1000px;
+  height: 100px;
   margin-right: 1rem;
 }
 
@@ -98,6 +98,7 @@
   color: white;
   text-decoration: underline;
 }
+
 .checkboxContainer {
   display: flex;
   align-items: center;
