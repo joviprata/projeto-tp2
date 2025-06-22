@@ -3,6 +3,9 @@ const prismaDatabase = require("../prismaClient");
 
 const registerProduct = async (body) => {
   try {
+    if (!body.name.trim()) {
+        return { status: 400, error: "Nome do produto não pode ser vazio" };
+    }
     if (!body.name || !body.barCode || !body.variableDescription) {
       return { status: 400, error: "Dados do produto incompletos" };
     }
