@@ -30,7 +30,6 @@ const login = async ({ email, password }) => {
       role: user.role,
     };
   } catch (error) {
-    console.error("Erro ao autenticar usuário:", error);
     return {
       status: 500,
       error: "Erro interno do servidor",
@@ -78,7 +77,6 @@ const registerGerente = async ({ name, email, password, address }) => {
       supermarketId: newSupermarket.id,
     };
   } catch (error) {
-    console.error("Erro ao registrar gerente:", error);
     return {
       status: 500,
       error: "Erro interno do servidor",

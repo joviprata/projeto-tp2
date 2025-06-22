@@ -58,7 +58,6 @@ const deleteSupermarket = async (req, res) => {
   try {
     const { id } = req.params;
     const results = await supermarketService.deleteSupermarket(id);
-    console.log("Resultados do delete:", results);
     if (results.status === 404) {
       return res.status(404).json({ error: "Supermercado não encontrado" });
     }

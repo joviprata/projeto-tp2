@@ -5,7 +5,6 @@ const getAllSupermarkets = async () => {
     const supermarkets = await prismaDatabase.supermarket.findMany();
     return { status: 200, supermarkets };
   } catch (error) {
-    console.error("Erro ao buscar supermercados:", error);
     return {
       status: 500,
       error: "Erro interno do servidor",
@@ -45,7 +44,6 @@ const getSupermarketById = async (id) => {
       managerId: supermarket.managerId,
     };
   } catch (error) {
-    console.error("Erro ao buscar supermercado:", error);
     return { status: 500, error: "Erro interno do servidor" };
   }
 };
@@ -65,7 +63,6 @@ const deleteSupermarket = async (id) => {
       return { status: 404, error: "Supermercado não encontrado" };
     }
 
-    console.error("Erro ao deletar supermercado:", error);
     return { status: 500, error: "Erro interno do servidor" };
   }
 };

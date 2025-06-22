@@ -3,7 +3,6 @@ const app = require("../src/server");
 const prismaDatabase = require("../src/prismaClient");
 
 beforeAll(async () => {
-  console.log("criando supermercado para testes");
   const CreateSupermarket = {
     name: "Supermercado Teste",
     email: "email@teste.com",

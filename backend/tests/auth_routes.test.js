@@ -10,7 +10,6 @@ beforeAll(async () => {
     "listas_de_compra",
     "itens_da_lista",
   ];
-  console.log("Limpando tabelas antes dos testes...");
   for (const tableName of tableNames) {
     await prismaDatabase.$executeRawUnsafe(
       `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`
