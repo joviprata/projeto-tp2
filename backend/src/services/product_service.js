@@ -73,6 +73,13 @@ const deleteProduct = async (id) => {
       where: { id: parseInt(id) },
     });
 
+    if (!product) {
+      return {
+        status: 404,
+        error: "Produto não encontrado",
+      };
+    }
+
     await prismaDatabase.product.delete({
       where: { id: parseInt(id) },
     });
