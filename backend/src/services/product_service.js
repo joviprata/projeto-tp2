@@ -62,6 +62,12 @@ const updateProduct = async (id, productData) => {
 
     return { status: 200, data: updatedProduct };
   } catch (error) {
+    if (error.code === "P2002") {
+      return {
+        status: 400,
+        error: "Produto com nome ou código de barras já existente",
+      };
+    }
     console.error("Erro ao atualizar produto:", error);
     return { status: 500, error: "Internal Server Error" };
   }
