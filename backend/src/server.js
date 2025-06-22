@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const logger = require("./config/logger");
 const morgan = require("morgan");
 const productRoutes = require("./routes/product_routes");
@@ -15,7 +16,7 @@ app.use(
 );
 app.use("/auth", authRoutes);
 app.use("/supermarkets", supermarketRoutes);
-app.use("/products", productRoutes); 
+app.use("/products", productRoutes);
 
 app.get("/", (req, res) => {
   res.send("Projeto Rodando");

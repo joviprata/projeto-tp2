@@ -7,20 +7,32 @@ import { useState } from 'react';
 import axios from 'axios';
 
 export default function Home() {
+  const router = useRouter();
+
   const makeAuth = async (e) => {
     try {
-      const response = await axios.post('localhost:3001/auth/login', {
+      console.log(email);
+      console.log(senha);
+      const response = await axios.post('http://localhost:3001/auth/login', {
         email: email,
-        senha: senha,
+        password: senha,
       });
-      if (response.status === 202) {
-        console.log(response.data);
+      console.log(response.status);
+      if (response.status === 200 && response.data.role === 'GERENTE') {
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('role', response.data.role);
+        console.log('Login realizado com sucesso!');
+        router.push('/homeProduct');
+      }
+      if (response.status === 401) {
+        console.log('Usuário ou senha inválidos');
+        alert('Usuário ou senha inválidos');
       }
     } catch (error) {
-      setMessage('Erro inesperado ao tentar logar.');
+      console.error('Erro ao fazer login:', error);
     }
   };
-  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
