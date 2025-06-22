@@ -185,4 +185,12 @@ describe("DELETE /products/:id - Excluir produto", () => {
       "Produto excluído com sucesso"
     );
   });
+
+  it("Deve retornar status 404 ao tentar excluir um produto inexistente", async () => {
+    const nonExistentId = 9999; // ID que não existe no banco de dados
+
+    const response = await request(app).delete(`/products/${nonExistentId}`);
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty("error", "Produto não encontrado");
+  });
 });
