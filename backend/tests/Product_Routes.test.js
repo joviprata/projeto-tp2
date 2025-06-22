@@ -142,7 +142,7 @@ describe("PUT /products/:id - Atualizar produto", () => {
   });
 });
 
-describe("PUT /products/:id - Atualizar produto com dados incompletos", () => {
+describe("PUT /products/:id - Atualizar produto com dados incompletos ou inválidos", () => {
   it.each([
     {
       case: "Dados incompletos",
@@ -172,4 +172,17 @@ describe("PUT /products/:id - Atualizar produto com dados incompletos", () => {
       );
     }
   );
+});
+
+describe("DELETE /products/:id - Excluir produto", () => {
+  it("Deve retornar status 200 e mensagem de sucesso ao excluir um produto existente", async () => {
+    const productId = 1; // Substitua pelo ID do produto que você deseja testar
+
+    const response = await request(app).delete(`/products/${productId}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty(
+      "message",
+      "Produto excluído com sucesso"
+    );
+  });
 });
