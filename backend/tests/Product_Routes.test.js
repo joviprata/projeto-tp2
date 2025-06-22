@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("../src/server");
 const prismaDatabase = require("../src/prismaClient");
+const { updateProduct } = require("../src/services/product_service");
 
 beforeAll(async () => {
   console.log("Criando Produto inicial para Teste");
@@ -139,20 +140,36 @@ describe("PUT /products/:id - Atualizar produto", () => {
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error", "Produto não encontrado");
   });
+});
 
-  it("Deve retornar status 400 se os dados do produto estiverem incompletos", async () => {
-    const productId = 1; // Substitua pelo ID do produto que você deseja testar
-    const incompleteProduct = {
-      name: "Produto Incompleto",
-    };
-
-    const response = await request(app)
-      .put(`/products/${productId}`)
-      .send(incompleteProduct);
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty(
-      "error",
-      "Dados do produto incompletos"
-    );
-  });
+describe("PUT /products/:id - Atualizar produto com dados incompletos", () => {
+  it.each([
+    {
+      case: "Dados incompletos",
+      productId: 1,
+      updateProduct: {},
+    },
+    {
+      case: "Mais de 3 campos",
+      productId: 1,
+      updateProduct: {
+        name: "Produto inválido",
+        barCode: "1234567890123",
+        variableDescription: "Descrição do Produto Inválido",
+        extraField: "Campo Extra",
+      },
+    },
+  ])(
+    "Deve retornar 400 se os dados do produto estiverem incompletos ou inválidos - $case",
+    async ({ productId, updateProduct }) => {
+      const response = await request(app)
+        .put(`/products/${productId}`)
+        .send(updateProduct);
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty("error");
+      expect(response.body.error).toBe(
+        "Dados do produto inválidos ou incompletos"
+      );
+    }
+  );
 });

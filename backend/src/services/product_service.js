@@ -35,7 +35,10 @@ const updateProduct = async (id, productData) => {
       !productData.barCode ||
       !productData.variableDescription
     ) {
-      return { status: 400, error: "Dados do produto incompletos" };
+      return {
+        status: 400,
+        error: "Dados do produto inválidos ou incompletos",
+      };
     }
 
     // Atualiza o produto
