@@ -10,7 +10,7 @@ export default function Cadastro() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [endereco, setEndereco] = useState('');
-  
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -25,9 +25,27 @@ export default function Cadastro() {
       </header>
 
       <div className={styles.formContainer}>
-        <input type="text" placeholder="Nome / Nome do Mercado" className={styles.input} value={nome}/>
-        <input type="text" placeholder="E-mail" className={styles.input} value={email}/>
-        <input type="password" placeholder="Senha" className={styles.input} value={senha}/>
+        <input
+          type="text"
+          placeholder="Nome / Nome do Mercado"
+          className={styles.input}
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="E-mail"
+          className={styles.input}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Senha"
+          className={styles.input}
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+        />
         <label className={styles.checkboxContainer}>
           <input
             type="checkbox"
@@ -41,11 +59,17 @@ export default function Cadastro() {
           </span>
         </label>
         {mostrarAdd && (
-          <input type="text" placeholder="Endereço" className={styles.input} value={endereco}/>
+          <input
+            type="text"
+            placeholder="Endereço"
+            className={styles.input}
+            value={endereco}
+            onChange={(e) => setEndereco(e.target.value)}
+          />
         )}
-        
+
         <button className={styles.button}>Criar conta</button>
       </div>
     </div>
   );
-} 
+}

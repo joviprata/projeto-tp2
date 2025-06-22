@@ -15,11 +15,11 @@
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4pxs 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-  width: 1000px;
+  width: 100px;
   height: 100px;
   margin-right: 1rem;
 }
@@ -145,7 +145,6 @@
   margin-left: 0.5rem;
 }
 
-
 /* Responsividade */
 @media (max-width: 640px) {
   .header {
@@ -160,7 +159,8 @@
     width: calc(100% - 2rem);
   }
 
-  .input, .button {
+  .input,
+  .button {
     font-size: 0.9rem;
   }
 }
