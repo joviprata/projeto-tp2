@@ -1,2 +1,3 @@
-require("./auth_routes.test");
-require("./supermarket_routes.test");
+require('./auth_routes.test');
+require('./supermarket_routes.test');
+require('./Product_Routes.test');

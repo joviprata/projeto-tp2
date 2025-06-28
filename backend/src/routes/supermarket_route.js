@@ -1,13 +1,14 @@
-const express = require("express");
+const express = require('express');
+
 const router = express.Router();
-const supermarketController = require("../controllers/supermarket_controller");
+const supermarketController = require('../controllers/supermarket_controller');
 
-router.put("/:id", supermarketController.updateSupermarket);
+router.put('/:id', supermarketController.updateSupermarket);
 
-router.get("/:id", supermarketController.getSupermarketById);
+router.get('/:id', supermarketController.getSupermarketById);
 
-router.get("/", supermarketController.getAllSupermarkets);
+router.get('/', supermarketController.getAllSupermarkets);
 
-router.delete("/:id", supermarketController.deleteSupermarket);
+router.delete('/:id', supermarketController.deleteSupermarket);
 
 module.exports = router;
