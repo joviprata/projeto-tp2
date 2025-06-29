@@ -1,11 +1,11 @@
-const authService = require("../services/auth_service");
+const authService = require('../services/auth_service');
 
 const login = async (req, res) => {
   if (Object.keys(req.body).length === 0 || Object.keys(req.body).length > 2) {
-    return res.status(400).json({ error: "Requisição inválida" });
+    return res.status(400).json({ error: 'Requisição inválida' });
   }
   if (!req.body || !req.body.email || !req.body.password) {
-    return res.status(400).json({ error: "Requisição inválida" });
+    return res.status(400).json({ error: 'Requisição inválida' });
   }
   try {
     const loginData = req.body;
@@ -20,23 +20,17 @@ const login = async (req, res) => {
         role: results.role,
       });
     }
-    res.status(500).json({ error: "Internal Server Error" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: 'Internal Server Error' });
+  } catch {
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 const registerGerente = async (req, res) => {
   if (Object.keys(req.body).length === 0 || Object.keys(req.body).length > 4) {
-    return res.status(400).json({ error: "Requisição inválida" });
+    return res.status(400).json({ error: 'Requisição inválida' });
   }
-  if (
-    !req.body ||
-    !req.body.name ||
-    !req.body.email ||
-    !req.body.password ||
-    !req.body.address
-  ) {
-    return res.status(400).json({ error: "Requisição inválida" });
+  if (!req.body || !req.body.name || !req.body.email || !req.body.password || !req.body.address) {
+    return res.status(400).json({ error: 'Requisição inválida' });
   }
   try {
     const gerenteData = req.body;
@@ -50,9 +44,9 @@ const registerGerente = async (req, res) => {
     if (results.status === 409) {
       return res.status(409).json({ error: results.error });
     }
-    res.status(500).json({ error: "Internal Server Error" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: 'Internal Server Error' });
+  } catch {
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 

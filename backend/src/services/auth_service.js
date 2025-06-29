@@ -1,7 +1,6 @@
-const prismaDatabase = require("../prismaClient");
+const prismaDatabase = require('../prismaClient');
 
-const isPasswordValid = (inputPassword, storedPassword) =>
-  inputPassword === storedPassword;
+const isPasswordValid = (inputPassword, storedPassword) => inputPassword === storedPassword;
 
 const login = async ({ email, password }) => {
   try {
@@ -12,27 +11,27 @@ const login = async ({ email, password }) => {
     if (!user) {
       return {
         status: 401,
-        error: "Email inválido",
+        error: 'Email inválido',
       };
     }
 
     if (!isPasswordValid(password, user.password)) {
       return {
         status: 401,
-        error: "Senha inválida",
+        error: 'Senha inválida',
       };
     }
 
     return {
       status: 200,
-      message: "Login realizado com sucesso",
+      message: 'Login realizado com sucesso',
       userId: user.id,
       role: user.role,
     };
-  } catch (error) {
+  } catch {
     return {
       status: 500,
-      error: "Erro interno do servidor",
+      error: 'Erro interno do servidor',
     };
   }
 };
@@ -46,7 +45,7 @@ const registerGerente = async ({ name, email, password, address }) => {
     if (existingUser) {
       return {
         status: 409,
-        error: "Email já em uso",
+        error: 'Email já em uso',
       };
     }
 
@@ -55,7 +54,7 @@ const registerGerente = async ({ name, email, password, address }) => {
         name,
         email,
         password,
-        role: "GERENTE",
+        role: 'GERENTE',
       },
     });
 
@@ -73,13 +72,13 @@ const registerGerente = async ({ name, email, password, address }) => {
 
     return {
       status: 201,
-      message: "Gerente registrado com sucesso",
+      message: 'Gerente registrado com sucesso',
       supermarketId: newSupermarket.id,
     };
-  } catch (error) {
+  } catch {
     return {
       status: 500,
-      error: "Erro interno do servidor",
+      error: 'Erro interno do servidor',
     };
   }
 };
