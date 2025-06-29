@@ -6,9 +6,10 @@
   "recommendations": [
     "esbenp.prettier-vscode",
     "ms-azuretools.vscode-docker",
-    "ms-vscode.vscode-typescript-tslint-plugin",
-    "redhat.vscode-yaml",
-    "streetsidesoftware.code-spell-checker"
+    "dbaeumer.vscode-eslint",
+    "ms-azuretools.vscode-containers",
+    "usernamehw.errorlens",
+    "prisma.prisma"
   ],
   // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
   "unwantedRecommendations": []
