@@ -9,14 +9,26 @@ const registerProduct = async (body) => {
     if (!body.name || !body.barCode || !body.variableDescription) {
       return { status: 400, error: 'Dados do produto incompletos' };
     }
+    // 1. Validar os dados de entrada primeiro
+
+    // 2. Verificar se um produto com o mesmo nome ou código de barras já existe
+    const existingProduct = await prismaDatabase.product.findFirst({
+      where: {
+        OR: [{ name: body.name }, { barCode: body.barCode }],
+      },
+    });
+
+    if (existingProduct) {
+      return { status: 400, error: 'Produto com este nome ou código de barras já existe' };
+    }
+
+    // 3. Se não existir, criar o novo produto
     const newProduct = await prismaDatabase.product.create({
       data: body,
     });
     return { status: 200, data: newProduct };
   } catch (error) {
-    if (error.code === 'P2002') {
-      return { status: 400, error: 'Produto já existe' };
-    }
+    console.error('Erro ao registrar produto:', error); // Log o erro para depuração
     return { status: 500, error: 'Internal Server Error' };
   }
 };
