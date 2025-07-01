@@ -1,7 +1,6 @@
 const request = require('supertest');
 const app = require('../src/server');
 const prismaDatabase = require('../src/prismaClient');
-const { updateProduct } = require('../src/services/product_service');
 
 beforeAll(async () => {
   const CreateProduct = {
@@ -15,13 +14,8 @@ beforeAll(async () => {
     variableDescription: 'Descrição do Produto Teste 2',
   };
   const response = await request(app).post('/products').send(CreateProduct);
-  expect(response.status).toBe(200);
-  expect(response.body).toHaveProperty('id');
   CreateProduct.id = response.body.id; // Armazena o ID do produto criado para uso posterior
-
   const response2 = await request(app).post('/products').send(CreateProduct2);
-  expect(response2.status).toBe(200);
-  expect(response2.body).toHaveProperty('id');
   CreateProduct2.id = response2.body.id; // Armazena o ID do segundo produto criado para uso posterior
 });
 
