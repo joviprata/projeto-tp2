@@ -90,7 +90,24 @@ const registerUser = async (userData) => {
   if (!userData || !userData.name || !userData.email || !userData.password) {
     return { status: 400, error: 'Requisição inválida' };
   }
-  return { status: 500 };
+  try {
+    newUser = await prismaDatabase.user.create({
+        data: {
+            name: userData.name,
+            email: userData.email,
+            password: userData.password,
+            role: 'USER',
+        },
+    });
+    return {
+      status: 201,
+      message: 'Usuário registrado com sucesso',
+      userId: newUser.id,
+    };
+  } catch (error) {
+    console.error('Erro ao registrar usuário:', error);
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
 };
 
 module.exports = {

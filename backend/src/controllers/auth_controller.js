@@ -57,6 +57,12 @@ const registerUser = async (req, res) => {
     if (results.status === 400) {
       return res.status(400).json({ error: results.error });
     }
+    if (results.status === 201) {
+        return res.status(201).json({
+            message: results.message,
+            userId: results.userId,
+        });
+    }
     res.status(results.status);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
