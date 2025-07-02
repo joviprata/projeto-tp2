@@ -83,13 +83,15 @@ const registerGerente = async ({ name, email, password, address }) => {
   }
 };
 
-
-const registerUser = async ({name,email,password}) => {
-  return {
-    status: 500,
-    message: '',
-  };
-}
+const registerUser = async (userData) => {
+  if (Object.keys(userData).length === 0 || Object.keys(userData).length > 3) {
+    return { status: 400, error: 'Requisição inválida' };
+  }
+  if (!userData || !userData.name || !userData.email || !userData.password) {
+    return { status: 400, error: 'Requisição inválida' };
+  }
+  return {status:500};
+};
 
 module.exports = {
   login,

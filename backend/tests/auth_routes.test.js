@@ -353,7 +353,7 @@ describe('POST /auth/register/user - Validação de campos obrigatórios', () =>
       },
     },
   ])('Deve retornar 400 quando $case', async ({ payload }) => {
-    const response = await request(app).post('/auth/register/client').send(payload);
+    const response = await request(app).post('/auth/register/user').send(payload);
 
     expect(response.status).toBe(400);
     expect(response.headers['content-type']).toMatch(/json/);

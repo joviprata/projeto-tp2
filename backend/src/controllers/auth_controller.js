@@ -50,12 +50,22 @@ const registerGerente = async (req, res) => {
   }
 };
 
-const registerUser = async (res, req) => {
-  return res.status(500).json({ message: '' });
+
+const registerUser = async (req, res) => {
+  try {
+    const userData = req.body;
+    const results = await authService.registerUser(userData);
+    if (results.status === 400) {
+      return res.status(400).json({ error: results.error });
+    }
+    res.status(results.status);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
 module.exports = {
   login,
   registerGerente,
-  registerUser,
+  registerUser
 };
