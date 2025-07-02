@@ -291,3 +291,73 @@ describe('POST /auth/login - Login do gerente com sucesso', () => {
   });
 });
 
+describe('POST /auth/register/user - Validação de campos obrigatórios', () => {
+  it.each([
+    {
+      case: 'corpo vazio',
+      payload: {},
+    },
+    {
+      case: 'faltando nome e senha',
+      payload: { email: 'client@example.com' },
+    },
+    {
+      case: 'faltando email e senha',
+      payload: { name: 'Cliente Teste' },
+    },
+    {
+      case: 'faltando a senha',
+      payload: {
+        name: 'Cliente Teste',
+        email: 'client@example.com',
+      },
+    },
+    {
+      case: 'faltando o email',
+      payload: {
+        name: 'Cliente Teste',
+        password: 'senhaCliente123',
+      },
+    },
+    {
+      case: 'nome em branco',
+      payload: {
+        name: '',
+        email: 'client@example.com',
+        password: 'senhaCliente123',
+      },
+    },
+    {
+      case: 'senha em branco',
+      payload: {
+        name: 'Cliente Teste',
+        email: 'client@example.com',
+        password: '',
+      },
+    },
+    {
+      case: 'email em branco',
+      payload: {
+        name: 'Cliente Teste',
+        password: 'senhaCliente123',
+        email: '',
+      },
+    },
+    {
+      case: 'Com mais de 3 campos na requisição (excluindo address)',
+      payload: {
+        name: 'Cliente Teste',
+        email: 'client@example.com',
+        password: 'senhaCliente123',
+        extraField: 'extraValue', // Campos extras não permitidos
+      },
+    },
+  ])('Deve retornar 400 quando $case', async ({ payload }) => {
+    const response = await request(app).post('/auth/register/client').send(payload);
+
+    expect(response.status).toBe(400);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toBe('Requisição inválida');
+  });
+});
