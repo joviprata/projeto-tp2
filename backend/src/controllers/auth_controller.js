@@ -50,7 +50,12 @@ const registerGerente = async (req, res) => {
   }
 };
 
+const registerUser = async (res, req) => {
+  return res.status(500).json({ message: '' });
+};
+
 module.exports = {
   login,
   registerGerente,
+  registerUser,
 };

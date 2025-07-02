@@ -290,3 +290,4 @@ describe('POST /auth/login - Login do gerente com sucesso', () => {
     expect(response.body.role).toBe(gerente.role);
   });
 });
+

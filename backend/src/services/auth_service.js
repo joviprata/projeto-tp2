@@ -83,7 +83,16 @@ const registerGerente = async ({ name, email, password, address }) => {
   }
 };
 
+
+const registerUser = async ({name,email,password}) => {
+  return {
+    status: 500,
+    message: '',
+  };
+}
+
 module.exports = {
   login,
   registerGerente,
+  registerUser
 };
