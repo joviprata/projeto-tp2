@@ -54,6 +54,9 @@ const registerUser = async (req, res) => {
   try {
     const userData = req.body;
     const results = await authService.registerUser(userData);
+    if(results.status === 409) {
+        return res.status(409).json({ error: results.error });
+    }
     if (results.status === 401) {
       return res.status(401).json({ error: results.error });
     }

@@ -91,13 +91,19 @@ const registerUser = async (userData) => {
     return { status: 401, error: 'Requisição inválida' };
   }
   try {
+    const existingUser = await prismaDatabase.user.findUnique({
+      where: { email: userData.email },
+    });
+    if (existingUser) {
+      return { status: 409, error: 'Email já em uso' };
+    }
     newUser = await prismaDatabase.user.create({
-        data: {
-            name: userData.name,
-            email: userData.email,
-            password: userData.password,
-            role: 'USER',
-        },
+      data: {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        role: 'USER',
+      },
     });
     return {
       status: 201,

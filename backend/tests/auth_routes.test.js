@@ -352,7 +352,7 @@ describe('POST /auth/register/user - Validação de campos obrigatórios', () =>
         extraField: 'extraValue', // Campos extras não permitidos
       },
     },
-  ])('Deve retornar 400 quando $case', async ({ payload }) => {
+  ])('Deve retornar 401 quando $case', async ({ payload }) => {
     const response = await request(app).post('/auth/register/user').send(payload);
 
     expect(response.status).toBe(401);
@@ -363,52 +363,51 @@ describe('POST /auth/register/user - Validação de campos obrigatórios', () =>
 });
 
 describe('POST /auth/register/user - Registro de usuário com sucesso', () => {
-    it('Deve registrar um usuário com sucesso', async () => {
-        const payload = {
-            name: 'Cliente Teste Sucesso',
-            email: 'cliente.sucesso@example.com',
-            password: 'senha123',
-        };
+  it('Deve registrar um usuário com sucesso', async () => {
+    const payload = {
+      name: 'Cliente Teste Sucesso',
+      email: 'cliente.sucesso@example.com',
+      password: 'senha123',
+    };
 
-        const response = await request(app).post('/auth/register/user').send(payload);
-        expect(response.status).toBe(201);
-        expect(response.headers['content-type']).toMatch(/json/);
-        expect(response.body).toHaveProperty('message');
-        expect(response.body.message).toBe('Usuário registrado com sucesso');
-        expect(response.body).toHaveProperty('userId');
+    const response = await request(app).post('/auth/register/user').send(payload);
+    expect(response.status).toBe(201);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('message');
+    expect(response.body.message).toBe('Usuário registrado com sucesso');
+    expect(response.body).toHaveProperty('userId');
 
-        expect(response.body.userId).toEqual(expect.any(Number));
-        expect(response.body.userId).toBeGreaterThan(0);
+    expect(response.body.userId).toEqual(expect.any(Number));
+    expect(response.body.userId).toBeGreaterThan(0);
 
-        const user = await prismaDatabase.user.findUnique({
-            where: { email: payload.email },
-        });
-
-        expect(user).not.toBeNull();
-        expect(user.name).toBe(payload.name);
-        expect(user.email).toBe(payload.email);
-        expect(user.role).toBe('USER');
+    const user = await prismaDatabase.user.findUnique({
+      where: { email: payload.email },
     });
+
+    expect(user).not.toBeNull();
+    expect(user.name).toBe(payload.name);
+    expect(user.email).toBe(payload.email);
+    expect(user.role).toBe('USER');
+  });
 });
 
 describe('POST /auth/register/user - validaçao de criaçao duplicada', () => {
-    it('Deve retornar 409 quando o email já estiver em uso', async () => {
-        const payload = {
-            name: 'Cliente Teste Duplicado',
-            email: 'cliente.duplicado@example.com',
-            password: 'senha123',
-        };
+  it('Deve retornar 409 quando o email já estiver em uso', async () => {
+    const payload = {
+      name: 'Cliente Teste Duplicado',
+      email: 'cliente.duplicado@example.com',
+      password: 'senha123',
+    };
 
-        // Primeiro registro
-        await request(app).post('/auth/register/user').send(payload);
+    // Primeiro registro
+    await request(app).post('/auth/register/user').send(payload);
 
-        // Tentativa de registro duplicado
-        const response = await request(app).post('/auth/register/user').send(payload);
+    // Tentativa de registro duplicado
+    const response = await request(app).post('/auth/register/user').send(payload);
 
-        expect(response.status).toBe(409);
-        expect(response.headers['content-type']).toMatch(/json/);
-        expect(response.body).toHaveProperty('error');
-        expect(response.body.error).toBe('Email já em uso');
-    });
+    expect(response.status).toBe(409);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toBe('Email já em uso');
+  });
 });
-
