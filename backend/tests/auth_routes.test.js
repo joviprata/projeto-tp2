@@ -361,3 +361,34 @@ describe('POST /auth/register/user - Validação de campos obrigatórios', () =>
     expect(response.body.error).toBe('Requisição inválida');
   });
 });
+
+describe('POST /auth/register/user - Registro de usuário com sucesso', () => {
+    it('Deve registrar um usuário com sucesso', async () => {
+        const payload = {
+            name: 'Cliente Teste Sucesso',
+            email: 'cliente.sucesso@example.com',
+            password: 'senha123',
+        };
+
+        const response = await request(app).post('/auth/register/user').send(payload);
+        expect(response.status).toBe(201);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body).toHaveProperty('message');
+        expect(response.body.message).toBe('Usuário registrado com sucesso');
+        expect(response.body).toHaveProperty('userId');
+
+        expect(response.body.userId).toEqual(expect.any(Number));
+        expect(response.body.userId).toBeGreaterThan(0);
+
+        const user = await prismaDatabase.user.findUnique({
+            where: { email: payload.email },
+        });
+
+        expect(user).not.toBeNull();
+        expect(user.name).toBe(payload.name);
+        expect(user.email).toBe(payload.email);
+        expect(user.role).toBe('USER');
+    });
+});
+
+

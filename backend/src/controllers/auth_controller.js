@@ -50,7 +50,6 @@ const registerGerente = async (req, res) => {
   }
 };
 
-
 const registerUser = async (req, res) => {
   try {
     const userData = req.body;
@@ -67,5 +66,5 @@ const registerUser = async (req, res) => {
 module.exports = {
   login,
   registerGerente,
-  registerUser
+  registerUser,
 };

@@ -90,11 +90,11 @@ const registerUser = async (userData) => {
   if (!userData || !userData.name || !userData.email || !userData.password) {
     return { status: 400, error: 'Requisição inválida' };
   }
-  return {status:500};
+  return { status: 500 };
 };
 
 module.exports = {
   login,
   registerGerente,
-  registerUser
+  registerUser,
 };
