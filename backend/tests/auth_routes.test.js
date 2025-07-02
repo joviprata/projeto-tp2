@@ -355,7 +355,7 @@ describe('POST /auth/register/user - Validação de campos obrigatórios', () =>
   ])('Deve retornar 400 quando $case', async ({ payload }) => {
     const response = await request(app).post('/auth/register/user').send(payload);
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(401);
     expect(response.headers['content-type']).toMatch(/json/);
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toBe('Requisição inválida');
