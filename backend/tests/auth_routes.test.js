@@ -391,4 +391,24 @@ describe('POST /auth/register/user - Registro de usuário com sucesso', () => {
     });
 });
 
+describe('POST /auth/register/user - validaçao de criaçao duplicada', () => {
+    it('Deve retornar 409 quando o email já estiver em uso', async () => {
+        const payload = {
+            name: 'Cliente Teste Duplicado',
+            email: 'cliente.duplicado@example.com',
+            password: 'senha123',
+        };
+
+        // Primeiro registro
+        await request(app).post('/auth/register/user').send(payload);
+
+        // Tentativa de registro duplicado
+        const response = await request(app).post('/auth/register/user').send(payload);
+
+        expect(response.status).toBe(409);
+        expect(response.headers['content-type']).toMatch(/json/);
+        expect(response.body).toHaveProperty('error');
+        expect(response.body.error).toBe('Email já em uso');
+    });
+});
 
