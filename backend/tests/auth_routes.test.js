@@ -411,5 +411,3 @@ describe('POST /auth/register/user - validaçao de criaçao duplicada', () => {
     expect(response.body.error).toBe('Email já em uso');
   });
 });
-
-describe
