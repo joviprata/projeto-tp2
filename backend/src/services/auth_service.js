@@ -84,12 +84,6 @@ const registerGerente = async ({ name, email, password, address }) => {
 };
 
 const registerUser = async (userData) => {
-  if (Object.keys(userData).length === 0 || Object.keys(userData).length > 3) {
-    return { status: 401, error: 'Requisição inválida' };
-  }
-  if (!userData || !userData.name || !userData.email || !userData.password) {
-    return { status: 401, error: 'Requisição inválida' };
-  }
   try {
     const existingUser = await prismaDatabase.user.findUnique({
       where: { email: userData.email },
@@ -97,7 +91,7 @@ const registerUser = async (userData) => {
     if (existingUser) {
       return { status: 409, error: 'Email já em uso' };
     }
-    newUser = await prismaDatabase.user.create({
+    const newUser = await prismaDatabase.user.create({
       data: {
         name: userData.name,
         email: userData.email,

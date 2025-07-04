@@ -1,9 +1,5 @@
 const userService = require('../services/user_service');
 
-const registerUser = async (req, res) => {
-  return res.status(500).json({ message: '' });
-};
-
 const getAllUsers = async (req, res) => {
   return res.status(500).json({ message: '' });
 };
@@ -21,7 +17,6 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
-  registerUser,
   getAllUsers,
   getUserById,
   updateUser,

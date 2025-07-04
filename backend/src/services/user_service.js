@@ -1,12 +1,5 @@
 const prismaDatabase = require('../prismaClient');
 
-const registerUser = async (userData) => {
-  return {
-    status: 500,
-    message: '',
-  };
-};
-
 const getAllUsers = async () => {
   return {
     status: 500,
@@ -36,7 +29,6 @@ const deleteUser = async (id) => {
 };
 
 module.exports = {
-  registerUser,
   getAllUsers,
   getUserById,
   updateUser,

@@ -25,6 +25,7 @@ const login = async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 const registerGerente = async (req, res) => {
   if (Object.keys(req.body).length === 0 || Object.keys(req.body).length > 4) {
     return res.status(400).json({ error: 'Requisição inválida' });
@@ -51,22 +52,25 @@ const registerGerente = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
+  if (Object.keys(req.body).length === 0 || Object.keys(req.body).length > 3) {
+    return res.status(401).json({ error: 'Requisição inválida' });
+  }
+  if (!req.body || !req.body.name || !req.body.email || !req.body.password) {
+    return res.status(401).json({ error: 'Requisição inválida' });
+  }
   try {
     const userData = req.body;
     const results = await authService.registerUser(userData);
-    if(results.status === 409) {
-        return res.status(409).json({ error: results.error });
-    }
-    if (results.status === 401) {
-      return res.status(401).json({ error: results.error });
-    }
     if (results.status === 201) {
-        return res.status(201).json({
-            message: results.message,
-            userId: results.userId,
-        });
+      return res.status(201).json({
+        message: results.message,
+        userId: results.userId,
+      });
     }
-    res.status(results.status);
+    if (results.status === 409) {
+      return res.status(409).json({ error: results.error });
+    }
+    return res.status(500).json({ error: 'Internal Server Error' });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
