@@ -12,7 +12,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  const tableNames = [
+  tableNames = [
     'users',
     'supermercado',
     'produtos',
@@ -29,7 +29,7 @@ afterAll(async () => {
 });
 
 describe('GET /users/ - Mostrar todos os usuários', () => {
-  it('Deve retornar status 200 e um array de usuários', async () => {
+  it('deve retornar um objeto com status 200 e um array de usuários', async () => {
     const response = await request(app).get('/users/');
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('users');
