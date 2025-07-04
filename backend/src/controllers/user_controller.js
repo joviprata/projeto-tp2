@@ -10,7 +10,7 @@ const getAllUsers = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
-  return res.status(500).json({ message: '' });
+    return res.status(500).json({ message: '' });
 };
 
 const updateUser = async (req, res) => {

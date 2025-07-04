@@ -36,3 +36,15 @@ describe('GET /users/ - Mostrar todos os usuários', () => {
     expect(Array.isArray(response.body.users)).toBe(true);
   });
 });
+
+describe('GET /users/:id - Mostrar usuário por ID', () => {
+  it('deve retornar um objeto com status 200 e o usuário correspondente', async () => {
+    const userId = 1; // Supondo que o usuário com ID 1 exista
+    const response = await request(app).get(`/users/${userId}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('name');
+    expect(response.body).toHaveProperty('email');
+    expect(response.body).toHaveProperty('address');
+    expect(response.body).toHaveProperty('userId');
+  });
+});
