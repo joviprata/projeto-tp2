@@ -22,7 +22,7 @@ export default function Home() {
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('role', response.data.role);
         console.log('Login realizado com sucesso!');
-        router.push('/homeProduct');
+        router.push('/homeCliente');
       }
       if (response.status === 401) {
         console.log('Usuário ou senha inválidos');
