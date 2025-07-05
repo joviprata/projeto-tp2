@@ -10,6 +10,7 @@ interface Product {
   description: string;
   price: number;
   marketName: string;
+  loc: string;
 }
 
 const mockProducts: Product[] = [
@@ -18,56 +19,64 @@ const mockProducts: Product[] = [
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   },
   {
     id: 2,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   },
   {
     id: 3,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   },
   {
     id: 4,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   },
   {
     id: 5,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   },
   {
     id: 6,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   },
   {
     id: 7,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   },
   {
     id: 8,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
     price: 1000.00,
-    marketName: "Nome do Mercado"
+    marketName: "Nome do Mercado",
+    loc: "Ceilondres"
   }
 ];
 // Logo component
@@ -105,6 +114,12 @@ function App() {
   const [locationFilter, setLocationFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
+    // Estado do modal de preço
+  const [showPriceModal, setShowPriceModal] = useState(false);
+  const [productName, setProductName] = useState('');
+  const [productPrice, setProductPrice] = useState('R$ 1000,00');
+
+
   const handleLogoClick = () => {
     router.push('/homeCliente');
   };
@@ -120,6 +135,9 @@ function App() {
   const handleCartClick = () => {
     router.push('/shopCart');
   };
+  const handlePopUp = () => {
+    this.showPriceModal = true;
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -132,10 +150,21 @@ function App() {
     console.log(`Adding product ${productId} to cart`);
   };
 
+    // Funções do modal
+  const openPriceModal = (id, name) => {
+    setShowPriceModal(true);
+  }
+  const closePriceModal = () => setShowPriceModal(false);
+  const handleSolicitarAlteracao = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Aqui você pode adicionar lógica para enviar a alteração
+    setShowPriceModal(false);
+  };
+
   return (
     <div className={styles.appContainer}>
       {/* Header */}
-      <header className={styles.appHeader}>
+      <header className={styles.appHeader} style={{ position: 'relative', zIndex: 20 }}>
         <div className={styles.headerContent}>
           <div className={styles.headerBrand}>
             <div className={styles.brandIcon} onClick={handleLogoClick}>
@@ -153,6 +182,36 @@ function App() {
           </div>
         </div>
       </header>
+      {/* Overlay e Modal de Preço */}
+      {showPriceModal && (
+        <div className={styles['price-modal-overlay']}>
+          <form className={styles['price-modal']} onSubmit={handleSolicitarAlteracao}>
+            <div className={styles['price-modal-header']}>
+              Insira o novo preço:
+            </div>
+            <div className={styles['price-modal-content']}>
+              {/* MUDAR NOME DO PRODUT */}
+              <label className={styles['price-modal-label']}>Nome do produto</label>
+              <input
+                className={styles['price-modal-input']}
+                type="text"
+                value={productPrice}
+                onChange={e => setProductPrice(e.target.value)}
+                placeholder="R$ 1000,00"
+                required
+              />
+              <div className={styles['price-modal-actions']}>
+                <button type="submit" className={styles['price-modal-btn']}>
+                  Solicitar alteração
+                </button>
+                <button type="button" className={`${styles['price-modal-btn']} ${styles['cancel']}`} onClick={closePriceModal}>
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Search Section */}
       <div className={styles.searchContainer}>
@@ -167,15 +226,7 @@ function App() {
                 className={styles.searchInput}
               />
             </div>
-            <div className={styles.searchInputGroup}>
-              <input
-                type="text"
-                placeholder="Filtrar por Localização"
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                className={styles.searchInput}
-              />
-            </div>
+            
             <div className={styles.searchInputGroup}>
               <input
                 type="text"
@@ -205,7 +256,11 @@ function App() {
                 <p className={styles.productDescription}>
                   {product.description}
                 </p>
-
+                
+                <p className={styles.productDescription}>
+                  Localização: {product.loc}
+                </p>
+                
                 <div className={styles.productInfo}>
                   <span className={styles.productMarket}>{product.marketName}</span>
                   <span className={styles.productPrice}>
@@ -219,6 +274,13 @@ function App() {
                 >
                   Adicionar ao carrinho
                 </button>
+
+                <p className={styles.productDescription}>
+                  O preço não é esse?{' '}
+                  <a onClick={openPriceModal}>
+                    <u>Clique aqui</u>
+                  </a>
+                </p>
               </div>
             </div>
           ))}

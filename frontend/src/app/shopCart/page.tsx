@@ -128,7 +128,8 @@ function App() {
     router.push('/homeCliente');
   };
   const handleCheckout = () => {
-    alert(`Finalizando compra no valor de ${formatCurrency(cartTotal)}`);
+    setCartItems([]);
+    alert('Produtos encomendados com sucesso!');
   };
 
   if (loading) {
@@ -197,21 +198,7 @@ function App() {
                           </button>
                         </div>
                         
-                        <button
-                          className="remove-btn"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          <XIcon />
-                          REMOVER
-                        </button>
                         
-                        <button
-                          className="add-btn"
-                          onClick={() => updateQuantity(item.id, 1)}
-                        >
-                          <PlusIcon />
-                          ADICIONAR
-                        </button>
                       </div>
                     </div>
                   ))
