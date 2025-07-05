@@ -12,7 +12,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  tableNames = [
+  const tableNames = [
     'users',
     'supermercado',
     'produtos',
@@ -37,14 +37,28 @@ describe('GET /users/ - Mostrar todos os usuários', () => {
   });
 });
 
-describe('GET /users/:id - Mostrar usuário por ID', () => {
-  it('deve retornar um objeto com status 200 e o usuário correspondente', async () => {
-    const userId = 1; // Supondo que o usuário com ID 1 exista
+describe('GET /users/:id - Obter cliente por ID', () => {
+  it('Deve retornar 200 e os dados do cliente se o ID for válido', async () => {
+    const registerResponse = await request(app).post('/auth/register/user').send({
+      name: 'Cliente Para Buscar',
+      email: 'buscar@test.com',
+      password: 'senha123',
+    });
+
+    expect(registerResponse.status).toBe(201);
+    expect(registerResponse.body).toHaveProperty('userId');
+    expect(registerResponse.body.userId).not.toBeNull();
+    expect(registerResponse.body.userId).toBeDefined();
+
+    const userId = registerResponse.body.userId;
     const response = await request(app).get(`/users/${userId}`);
+
     expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('name');
-    expect(response.body).toHaveProperty('email');
-    expect(response.body).toHaveProperty('address');
-    expect(response.body).toHaveProperty('userId');
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).not.toBeNull();
+    expect(response.body).toHaveProperty('id', userId);
+    expect(response.body).toHaveProperty('name', 'Cliente Para Buscar');
+    expect(response.body).toHaveProperty('email', 'buscar@test.com');
+    expect(response.body).toHaveProperty('role', 'USER');
   });
 });

@@ -11,10 +11,18 @@ const getAllUsers = async () => {
 };
 
 const getUserById = async (id) => {
-  return {
-    status: 500,
-    message: '',
-  };
+    try {
+        const user = await prismaDatabase.user.findUnique({
+            where: { id: parseInt(id, 10) },
+        });
+        return {
+            status: 200,
+            data:user,
+        };
+    } catch (error) {
+        console.error("Erro ao buscar usuário:", error);
+        return { status: 500, error: 'Erro interno do servidor' };
+    }
 };
 
 const updateUser = async (id, userData) => {
