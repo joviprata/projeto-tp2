@@ -15,9 +15,9 @@ const getUserById = async (id) => {
     const user = await prismaDatabase.user.findUnique({
       where: { id: parseInt(id, 10) },
     });
-    // if (!user) {
-    //   return { status: 404, error: 'Usuário não encontrado' };
-    // }
+    if (!user) {
+      return { status: 404, error: 'Usuário não encontrado' };
+    }
     return {
       status: 200,
       data: user,

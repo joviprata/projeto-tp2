@@ -16,9 +16,9 @@ const getUserById = async (req, res) => {
     if (results.status === 200) {
       return res.status(200).json(results.data);
     }
-    // if (results.status === 404) {
-    //   return res.status(404).json({ error: 'Usuário não encontrado' });
-    // }
+    if (results.status === 404) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
     return res.status(500).json({ message: 'Service Error' });
   } catch (error) {
     return res.status(500).json({ message: 'Erro interno do servidor' });
