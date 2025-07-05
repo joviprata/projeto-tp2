@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ShoppingCartIcon, UserIcon, CartIcon, SearchIcon, PlusIcon, MinusIcon, XIcon } from '../components/Icons';
+import { UserIcon, SearchIcon, PlusIcon, MinusIcon } from '../components/Icons';
 import './page.css';
 
 const Logo = () => (

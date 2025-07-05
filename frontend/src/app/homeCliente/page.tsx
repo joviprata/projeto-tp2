@@ -8,9 +8,6 @@ interface Product {
   id: number;
   name: string;
   description: string;
-  price: number;
-  marketName: string;
-  loc: string;
 }
 
 const mockProducts: Product[] = [
@@ -18,65 +15,48 @@ const mockProducts: Product[] = [
     id: 1,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
   },
   {
     id: 2,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
+    
   },
   {
     id: 3,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
+    
   },
   {
     id: 4,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
+    
   },
   {
     id: 5,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
+    
   },
   {
     id: 6,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
+    
   },
   {
     id: 7,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
+    
   },
   {
     id: 8,
     name: "Nome Produto 123",
     description: "Descrição do produto descrição do produto descrição do produto descrição do produto descr...",
-    price: 1000.00,
-    marketName: "Nome do Mercado",
-    loc: "Ceilondres"
+    
   }
 ];
 // Logo component
@@ -146,7 +126,7 @@ function App() {
     }).format(price);
   };
 
-  const handleAddToCart = (productId: number) => {
+  const handleAddShopList = (productId: number) => {
     console.log(`Adding product ${productId} to cart`);
   };
 
@@ -217,15 +197,6 @@ function App() {
       <div className={styles.searchContainer}>
         <div className={styles.searchCard}>
           <div className={styles.searchForm}>
-            <div className={styles.searchInputGroup}>
-              <input
-                type="text"
-                placeholder="Filtrar por Preço"
-                value={priceFilter}
-                onChange={(e) => setPriceFilter(e.target.value)}
-                className={styles.searchInput}
-              />
-            </div>
             
             <div className={styles.searchInputGroup}>
               <input
@@ -256,31 +227,13 @@ function App() {
                 <p className={styles.productDescription}>
                   {product.description}
                 </p>
-                
-                <p className={styles.productDescription}>
-                  Localização: {product.loc}
-                </p>
-                
-                <div className={styles.productInfo}>
-                  <span className={styles.productMarket}>{product.marketName}</span>
-                  <span className={styles.productPrice}>
-                    {formatPrice(product.price)}
-                  </span>
-                </div>
 
                 <button
-                  onClick={() => handleAddToCart(product.id)}
+                  onClick={() => handleAddShopList(product.id)}
                   className={styles.addToCartButton}
                 >
-                  Adicionar ao carrinho
+                  Adicionar a sua lista de compras
                 </button>
-
-                <p className={styles.productDescription}>
-                  O preço não é esse?{' '}
-                  <a onClick={openPriceModal}>
-                    <u>Clique aqui</u>
-                  </a>
-                </p>
               </div>
             </div>
           ))}
