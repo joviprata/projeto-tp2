@@ -63,7 +63,10 @@ body {
   align-items: center;
   padding: 0 2rem;
 }
-
+.logo {
+  width: 100px;
+  height: 100px;
+}
 .logo-section {
   display: flex;
   align-items: center;

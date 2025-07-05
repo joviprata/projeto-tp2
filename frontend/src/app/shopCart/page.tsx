@@ -1,8 +1,19 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { ShoppingCartIcon, UserIcon, CartIcon, SearchIcon, PlusIcon, MinusIcon, XIcon } from '../components/Icons';
 import './page.css';
 
+const Logo = () => (
+  <Image
+    src="/Global_Market_Logo.png"
+    width={100}
+    height={100}
+    alt="Logo"
+    className='logo'
+  />
+);
 interface Product {
   id: number;
   name: string;
@@ -49,6 +60,7 @@ const formatCurrency = (value: number): string => {
 };
 
 function App() {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +121,12 @@ function App() {
       setCartItems(prevItems => [...prevItems, { ...product, quantity: 1 }]);
     }
   };
-
+  const handleUserClick  = () => {
+    router.push('/perfil');
+  };
+  const handleSearchClick  = () => {
+    router.push('/homeCliente');
+  };
   const handleCheckout = () => {
     alert(`Finalizando compra no valor de ${formatCurrency(cartTotal)}`);
   };
@@ -128,18 +145,15 @@ function App() {
       <header className="app-header">
         <div className="header-content">
           <div className="logo-section">
-            <ShoppingCartIcon />
+            <Logo/>
             <h1 className="logo-text">Global Market</h1>
           </div>
           
           <div className="header-icons">
-            <button className="icon-button">
+            <button className="icon-button" onClick={handleUserClick}>
               <UserIcon />
             </button>
-            <button className="icon-button">
-              <CartIcon />
-            </button>
-            <button className="icon-button">
+            <button className="icon-button"  onClick={handleSearchClick}>
               <SearchIcon />
             </button>
           </div>
