@@ -64,14 +64,12 @@ describe('GET /users/:id - Obter cliente por ID', () => {
 });
 
 describe('GET /users/:id - Obter cliente por ID inexistente', () => {
-    it('Deve retornar 404 se o cliente não for encontrado', async () => {
-        const nonExistentId = 9999; // ID que não existe
-        const response = await request(app).get(`/users/${nonExistentId}`);
+  it('Deve retornar 404 se o cliente não for encontrado', async () => {
+    const nonExistentId = 9999; // ID que não existe
+    const response = await request(app).get(`/users/${nonExistentId}`);
 
-        expect(response.status).toBe(404);
-        expect(response.headers['content-type']).toMatch(/json/);
-        expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
-    });
-})
-
-
+    expect(response.status).toBe(404);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
+  });
+});
