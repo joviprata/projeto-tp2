@@ -1,5 +1,7 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 interface Product {
@@ -68,11 +70,15 @@ const mockProducts: Product[] = [
     marketName: "Nome do Mercado"
   }
 ];
-// Custom SVG Icons
-const ShoppingCartIcon = () => (
-  <svg className={styles.brandIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h7M9.5 18a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-  </svg>
+// Logo component
+const Logo = () => (
+  <Image
+    src="/Global_Market_Logo.png"
+    width={100}
+    height={100}
+    alt="Logo"
+    className={styles.logo}
+  />
 );
 
 const UserIcon = () => (
@@ -94,9 +100,26 @@ const SearchIcon = () => (
 );
 
 function App() {
+  const router = useRouter();
   const [priceFilter, setPriceFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleLogoClick = () => {
+    router.push('/homeCliente');
+  };
+
+  const handleTitleClick = () => {
+    router.push('/homeCliente');
+  };
+
+  const handleUserClick = () => {
+    router.push('/perfil');
+  };
+
+  const handleCartClick = () => {
+    router.push('/shopCart');
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -115,16 +138,16 @@ function App() {
       <header className={styles.appHeader}>
         <div className={styles.headerContent}>
           <div className={styles.headerBrand}>
-            <div className={styles.brandIcon}>
-              <ShoppingCartIcon />
+            <div className={styles.brandIcon} onClick={handleLogoClick}>
+              <Logo />
             </div>
-            <h1 className={styles.brandTitle}>Global Market</h1>
+            <h1 className={styles.brandTitle} onClick={handleTitleClick}>Global Market</h1>
           </div>
           <div className={styles.headerActions}>
-            <button className={styles.headerButton}>
+            <button className={styles.headerButton} onClick={handleUserClick}>
               <UserIcon />
             </button>
-            <button className={styles.headerButton}>
+            <button className={styles.headerButton} onClick={handleCartClick}>
               <CartIcon />
             </button>
           </div>
