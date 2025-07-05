@@ -50,7 +50,7 @@ describe('GET /users/:id - Obter cliente por ID', () => {
     expect(registerResponse.body.userId).not.toBeNull();
     expect(registerResponse.body.userId).toBeDefined();
 
-    const userId = registerResponse.body.userId;
+    const { userId } = registerResponse.body;
     const response = await request(app).get(`/users/${userId}`);
 
     expect(response.status).toBe(200);
@@ -60,5 +60,16 @@ describe('GET /users/:id - Obter cliente por ID', () => {
     expect(response.body).toHaveProperty('name', 'Cliente Para Buscar');
     expect(response.body).toHaveProperty('email', 'buscar@test.com');
     expect(response.body).toHaveProperty('role', 'USER');
+  });
+});
+
+describe('GET /users/:id - Obter cliente por ID inexistente', () => {
+  it('Deve retornar 404 se o cliente não for encontrado', async () => {
+    const nonExistentId = 9999; // ID que não existe
+    const response = await request(app).get(`/users/${nonExistentId}`);
+
+    expect(response.status).toBe(404);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
   });
 });
