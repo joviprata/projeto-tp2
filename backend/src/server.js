@@ -6,6 +6,7 @@ const productRoutes = require('./routes/product_routes');
 const authRoutes = require('./routes/auth_route');
 const supermarketRoutes = require('./routes/supermarket_route');
 const userRoutes = require('./routes/user_route');
+const productListRoutes = require('./routes/product_lists_route');
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use('/auth', authRoutes);
 app.use('/supermarkets', supermarketRoutes);
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
+app.use('/product-lists', productListRoutes);
 
 app.get('/', (req, res) => {
   res.send('Projeto Rodando');
