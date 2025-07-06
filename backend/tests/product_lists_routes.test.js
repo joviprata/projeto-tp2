@@ -71,4 +71,12 @@ describe('POST /product-lists - Criar uma nova lista de compras', () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty('error', 'ID do usuário e nome da lista são obrigatórios');
   });
+
+  it('Deve retornar 400 se o nome da lista for vazio', async () => {
+    const response = await request(app)
+      .post('/product-lists')
+      .send({ userId: testUserId, listName: '' });
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'O nome da lista não pode ser vazio');
+  });
 });

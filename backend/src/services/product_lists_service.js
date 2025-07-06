@@ -2,9 +2,6 @@ const prismaDatabase = require('../prismaClient');
 
 const createProductList = async (userId, listName) => {
   try {
-    if (!userId || !listName) {
-      return { status: 400, error: 'ID do usuário e nome da lista são obrigatórios' };
-    }
     const newList = await prismaDatabase.shoppingList.create({
       data: {
         listName,

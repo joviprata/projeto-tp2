@@ -3,9 +3,7 @@ const productListsService = require('../services/product_lists_service');
 const createProductList = async (req, res) => {
   const { userId, listName } = req.body;
   if (!userId || !listName) {
-    return res
-      .status(400)
-      .json({ error: 'ID do usuário e nome da lista são obrigatórios' });
+    return res.status(400).json({ error: 'ID do usuário e nome da lista são obrigatórios' });
   }
   try {
     const result = await productListsService.createProductList(userId, listName);
