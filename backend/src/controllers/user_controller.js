@@ -30,7 +30,13 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  return res.status(500).json({ message: '' });
+  try {
+    const { id } = req.params;
+    const results = await userService.deleteUser(id);
+    res.status(results.status).json({ message: results.message });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
 };
 
 module.exports = {
