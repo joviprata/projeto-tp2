@@ -199,7 +199,6 @@ describe('PUT /users/:id - Atualizar usuário', () => {
   // Conflitos de email
   describe('Atualizar usuário com email já existente', () => {
     let conflictingUserId;
-
     beforeAll(async () => {
       // Cria um usuário para causar conflito
       const createResponse = await request(app).post('/auth/register/user').send({
@@ -290,4 +289,3 @@ describe('PUT /users/:id - Atualizar usuário', () => {
     expect(response.body.email).toBe(updateWithExtraFields.email);
   });
 });
-

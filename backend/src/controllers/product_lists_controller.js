@@ -25,10 +25,10 @@ const deleteList = async (req, res) => {
 };
 
 module.exports = {
-    createProductList,
-    getListsByUserId,
-    addProductToList,
-    updateProductFromList,
-    deleteProductFromList,
-    deleteList,
-}
+  createProductList,
+  getListsByUserId,
+  addProductToList,
+  updateProductFromList,
+  deleteProductFromList,
+  deleteList,
+};
