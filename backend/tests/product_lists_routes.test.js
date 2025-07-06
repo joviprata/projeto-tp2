@@ -21,7 +21,12 @@ beforeAll(async () => {
   }
 
   const user = await prismaDatabase.user.create({
-    data: { name: 'Cliente Teste Lista', email: 'lista@test.com', password: 'senha123', role: 'USER' },
+    data: {
+      name: 'Cliente Teste Lista',
+      email: 'lista@test.com',
+      password: 'senha123',
+      role: 'USER',
+    },
   });
   testUserId = user.id;
 
@@ -36,8 +41,26 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  await prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "listas_de_compra" RESTART IDENTITY CASCADE;`);
-  await prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "itens_da_lista" RESTART IDENTITY CASCADE;`);
+  await prismaDatabase.$executeRawUnsafe(
+    `TRUNCATE TABLE "listas_de_compra" RESTART IDENTITY CASCADE;`,
+  );
+  await prismaDatabase.$executeRawUnsafe(
+    `TRUNCATE TABLE "itens_da_lista" RESTART IDENTITY CASCADE;`,
+  );
 });
+
+describe('POST /product-lists - Criar uma nova lista de compras', () => {
+    it('Deve criar uma nova lista de compras com sucesso', async () => {
+      const response = await request(app)
+        .post('/product-lists')
+        .send({ userId: testUserId, listName: 'Primeira Lista' });
+
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.listName).toBe('Primeira Lista');
+      expect(response.body.userId).toBe(testUserId);
+    });
+});
+
 
 

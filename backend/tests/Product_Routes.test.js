@@ -2,10 +2,6 @@ const request = require('supertest');
 const app = require('../src/server');
 const prismaDatabase = require('../src/prismaClient');
 
-// Variáveis para IDs dos produtos criados no beforeEach
-let createdProductId1;
-let createdProductId2;
-
 // Limpeza geral do banco de dados antes de tudo e desconexão após
 beforeAll(async () => {
   // Limpeza de todas as tabelas antes de todos os testes
