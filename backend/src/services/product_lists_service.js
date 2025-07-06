@@ -1,7 +1,17 @@
 const prismaDatabase = require('../prismaClient');
 
 const createProductList = async (userId, listName) => {
-  return { status: 500, message: 'Not implemented yet' };
+  try {
+    const newList = await prismaDatabase.shoppingList.create({
+      data: {
+        listName,
+        userId
+      },
+    });
+    return { status: 201, data: newList, message: 'Lista de compras criada com sucesso' };
+  } catch (error) {
+    return { status: 500, error: 'Internal Server Error' };
+  }
 };
 
 const getListsByUserId = async (userId) => {

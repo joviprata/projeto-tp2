@@ -1,7 +1,13 @@
 const productListsService = require('../services/product_lists_service');
 
 const createProductList = async (req, res) => {
-  return { status: 500, message: 'Not implemented yet' };
+  const { userId, listName } = req.body;
+  try {
+    const result = await productListsService.createProductList(userId, listName);
+    return res.status(result.status).json({ data: result.data, message: result.message });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal Server Error', message: error.message });
+  }
 };
 
 const getListsByUserId = async (req, res) => {

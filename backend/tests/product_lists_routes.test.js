@@ -50,17 +50,15 @@ beforeEach(async () => {
 });
 
 describe('POST /product-lists - Criar uma nova lista de compras', () => {
-    it('Deve criar uma nova lista de compras com sucesso', async () => {
-      const response = await request(app)
-        .post('/product-lists')
-        .send({ userId: testUserId, listName: 'Primeira Lista' });
-
-      expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.listName).toBe('Primeira Lista');
-      expect(response.body.userId).toBe(testUserId);
-    });
+  it('Deve criar uma nova lista de compras com sucesso', async () => {
+    const response = await request(app)
+      .post('/product-lists')
+      .send({ userId: testUserId, listName: 'Primeira Lista' });
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveProperty('id');
+    expect(response.body.data.listName).toBe('Primeira Lista');
+    expect(response.body.data.userId).toBe(testUserId);
+    expect(response.body).toHaveProperty('message', 'Lista de compras criada com sucesso');
+  });
 });
-
-
-
