@@ -79,4 +79,12 @@ describe('POST /product-lists - Criar uma nova lista de compras', () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty('error', 'O nome da lista não pode ser vazio');
   });
+
+  it('Deve retornar 404 se o usuário não existir', async () => {
+    const response = await request(app)
+      .post('/product-lists')
+      .send({ userId: 999999, listName: 'Lista Inexistente' });
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
+  });
 });
