@@ -6,14 +6,16 @@ const createProductList = async (req, res) => {
     return res
       .status(400)
       .json({ error: 'O nome da lista não pode ser vazio' });
-  }
-  else if (!userId || !listName) {
+  } else if (!userId || !listName) {
     return res
       .status(400)
       .json({ error: 'ID do usuário e nome da lista são obrigatórios' });
   }
   try {
     const result = await productListsService.createProductList(userId, listName);
+    if (result.status === 404) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
     return res.status(result.status).json({ data: result.data, message: result.message });
   } catch (error) {
     return res.status(500).json({ error: 'Internal Server Error', message: error.message });
