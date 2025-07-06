@@ -73,3 +73,41 @@ describe('GET /users/:id - Obter cliente por ID inexistente', () => {
     expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
   });
 });
+
+describe('DELETE /users/:id - Deletar usuário', () => {
+  it('Deve retornar 200 e uma mensagem de sucesso ao deletar um usuário', async () => {
+    // Cria um novo usuário para deletar
+    const newUser = {
+      name: 'Usuário para Deletar',
+      email: 'delete@test.com',
+      password: 'senha123',
+    };
+
+    const createResponse = await request(app).post('/auth/register/user').send(newUser);
+
+    expect(createResponse.status).toBe(201);
+    const { userId } = createResponse.body;
+
+    // Deleta o usuário criado
+    const deleteResponse = await request(app).delete(`/users/${userId}`);
+
+    expect(deleteResponse.status).toBe(200);
+    expect(deleteResponse.body).toHaveProperty('message', 'Usuário deletado com sucesso');
+  });
+
+  it('Deve retornar 404 ao tentar deletar um usuário que não existe', async () => {
+    const nonExistentId = 9999;
+    const response = await request(app).delete(`/users/${nonExistentId}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('message', 'Usuário não encontrado');
+  });
+
+  it('Deve retornar 400 ao passar um ID inválido', async () => {
+    const invalidId = 'abc';
+    const response = await request(app).delete(`/users/${invalidId}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message', 'ID inválido');
+  });
+});
