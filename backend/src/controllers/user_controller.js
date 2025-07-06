@@ -26,7 +26,19 @@ const getUserById = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  return res.status(500).json({ message: '' });
+  try {
+    const { id } = req.params;
+    const userData = req.body;
+    const result = await userService.updateUser(id, userData);
+
+    if (result.status === 200) {
+      return res.status(200).json(result.data);
+    }
+
+    return res.status(result.status).json({ message: result.message });
+  } catch (error) {
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
 };
 
 const deleteUser = async (req, res) => {
