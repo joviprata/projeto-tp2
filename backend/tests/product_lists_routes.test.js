@@ -61,4 +61,14 @@ describe('POST /product-lists - Criar uma nova lista de compras', () => {
     expect(response.body.data.userId).toBe(testUserId);
     expect(response.body).toHaveProperty('message', 'Lista de compras criada com sucesso');
   });
+
+  it('Deve retornar 400 se o userId ou listName estiver faltando', async () => {
+    let response = await request(app).post('/product-lists').send({ listName: 'Lista sem User' });
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'ID do usuário e nome da lista são obrigatórios');
+
+    response = await request(app).post('/product-lists').send({ userId: testUserId });
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'ID do usuário e nome da lista são obrigatórios');
+  });
 });
