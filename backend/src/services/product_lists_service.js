@@ -7,6 +7,8 @@ const createProductList = async (userId, listName) => {
     });
     if (!userExists) {
       return { status: 404, error: 'Usuário não encontrado' };
+    } else if (userExists.role === 'GERENTE') {
+      return { status: 403, error: 'Apenas usuários clientes podem criar listas de compras' };
     }
     const newList = await prismaDatabase.shoppingList.create({
       data: {
