@@ -135,4 +135,12 @@ describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada');
   });
+
+  it('Deve retornar 404 se o produto não existir', async () => {
+    const response = await request(app)
+      .post(`/product-lists/${listId}/items`)
+      .send({ productId: 999999, quantity: 2 });
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Produto não encontrado');
+  });
 });
