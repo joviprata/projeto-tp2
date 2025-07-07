@@ -87,6 +87,25 @@ describe('POST /product-lists - Criar uma nova lista de compras', () => {
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
   });
+
+  it('Deve retornar 403 se o usuário não for um cliente', async () => {
+    const gerenteUser = await prismaDatabase.user.create({
+      data: {
+        name: 'Gerente Teste',
+        email: 'gerenteteste@email.com',
+        password: 'senha123',
+        role: 'GERENTE',
+      },
+    });
+    const response = await request(app)
+      .post('/product-lists')
+      .send({ userId: gerenteUser.id, listName: 'Lista de Gerente' });
+    expect(response.status).toBe(403);
+    expect(response.body).toHaveProperty(
+      'error',
+      'Apenas usuários clientes podem criar listas de compras',
+    );
+  });
 });
 
 describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma lista de compras', () => {
