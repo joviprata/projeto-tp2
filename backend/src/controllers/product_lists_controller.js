@@ -10,10 +10,10 @@ const createProductList = async (req, res) => {
   try {
     const result = await productListsService.createProductList(userId, listName);
     if (result.status === 404) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+      return res.status(404).json({ error: result.error });
     }
     else if (result.status === 403) {
-      return res.status(403).json({ error: 'Apenas usuários clientes podem criar listas de compras' });
+      return res.status(403).json({ error: result.error });
     }
     return res.status(result.status).json({ data: result.data, message: result.message });
   } catch (error) {
@@ -34,6 +34,9 @@ const addProductToList = async (req, res) => {
       productId,
       quantity,
     );
+    if (result.status === 404) {
+      return res.status(404).json({ error: result.error});
+    }
     return res.status(result.status).json({ data: result.data, message: result.message });
   } catch (error) {
     return res.status(500).json({ error: 'Erro interno do servidor', message: error.message });
