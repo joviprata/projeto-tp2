@@ -28,6 +28,12 @@ const getListsByUserId = async (userId) => {
 
 const addProductToList = async (listId, productId, quantity) => {
   try {
+    const productExists = await prismaDatabase.product.findUnique({
+        where: { id: productId },
+    });
+    if (!productExists) {
+        return { status: 404, error: 'Produto não encontrado' };
+    }
     const listExists = await prismaDatabase.shoppingList.findUnique({
         where: { id: listId },
     });
