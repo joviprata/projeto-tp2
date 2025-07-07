@@ -3,15 +3,15 @@ const prismaDatabase = require('../prismaClient');
 const createProductList = async (userId, listName) => {
   try {
     const userExists = await prismaDatabase.user.findUnique({
-        where: { id: userId },
+      where: { id: userId },
     });
     if (!userExists) {
-        return { status: 404, error: 'Usuário não encontrado' };
+      return { status: 404, error: 'Usuário não encontrado' };
     }
     const newList = await prismaDatabase.shoppingList.create({
       data: {
         listName,
-        userId
+        userId,
       },
     });
     return { status: 201, data: newList, message: 'Lista de compras criada com sucesso' };
@@ -25,7 +25,33 @@ const getListsByUserId = async (userId) => {
 };
 
 const addProductToList = async (listId, productId, quantity) => {
-  return { status: 500, message: 'Not implemented yet' };
+//   try {
+//     const listItem = await prismaDatabase.listItem.upsert({
+//       where: {
+//         listId_productId: {
+//           listId: listId,
+//           productId: productId,
+//         },
+//       },
+//       update: {
+//         quantity: {
+//           increment: quantity, // Incrementa a quantidade se o item já existe
+//         },
+//       },
+//       create: {
+//         listId: listId,
+//         productId: productId,
+//         quantity: quantity,
+//       },
+//     });
+//     return {
+//       status: 201,
+//       data: listItem,
+//       message: 'Produto adicionado/atualizado na lista com sucesso.',
+//     };
+//   } catch (error) {
+//     return { status: 500, error: 'Erro interno do servidor' };
+//   }
 };
 
 const updateProductFromList = async (listId, productId, quantity) => {

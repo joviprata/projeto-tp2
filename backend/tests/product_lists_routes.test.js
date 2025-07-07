@@ -88,3 +88,24 @@ describe('POST /product-lists - Criar uma nova lista de compras', () => {
     expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
   });
 });
+
+describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma lista de compras', () => {
+  let listId;
+  beforeEach(async () => {
+    const listResponse = await request(app)
+      .post('/product-lists')
+      .send({ userId: testUserId, listName: 'Lista de Teste' });
+    listId = listResponse.body.data.id;
+  });
+
+  it('Deve adicionar um produto à lista de compras', async () => {
+    const response = await request(app)
+      .post(`/product-lists/${listId}/items`)
+      .send({ productId: testProductId, quantity: 2 });
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data.listId).toBe(listId);
+    expect(response.body.data.productId).toBe(testProductId);
+    expect(response.body.data.quantity).toBe(2);
+  });
+});
