@@ -25,33 +25,33 @@ const getListsByUserId = async (userId) => {
 };
 
 const addProductToList = async (listId, productId, quantity) => {
-//   try {
-//     const listItem = await prismaDatabase.listItem.upsert({
-//       where: {
-//         listId_productId: {
-//           listId: listId,
-//           productId: productId,
-//         },
-//       },
-//       update: {
-//         quantity: {
-//           increment: quantity, // Incrementa a quantidade se o item já existe
-//         },
-//       },
-//       create: {
-//         listId: listId,
-//         productId: productId,
-//         quantity: quantity,
-//       },
-//     });
-//     return {
-//       status: 201,
-//       data: listItem,
-//       message: 'Produto adicionado/atualizado na lista com sucesso.',
-//     };
-//   } catch (error) {
-//     return { status: 500, error: 'Erro interno do servidor' };
-//   }
+  try {
+    const listItem = await prismaDatabase.listItem.upsert({
+      where: {
+        listId_productId: {
+          listId: listId,
+          productId: productId,
+        },
+      },
+      update: {
+        quantity: {
+          increment: quantity, // Incrementa a quantidade se o item já existe
+        },
+      },
+      create: {
+        listId: listId,
+        productId: productId,
+        quantity: quantity,
+      },
+    });
+    return {
+      status: 201,
+      data: listItem,
+      message: 'Produto adicionado/atualizado na lista com sucesso.',
+    };
+  } catch (error) {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
 };
 
 const updateProductFromList = async (listId, productId, quantity) => {
