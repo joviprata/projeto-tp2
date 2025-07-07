@@ -152,5 +152,25 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
     expect(response.body).toHaveProperty('data');
     expect(response.body.data).toEqual([]);
   });
-});
 
+  it('Deve retornar as listas do usuário com seus itens e detalhes do produto', async () => {
+    const listResponse = await request(app)
+      .post('/product-lists')
+      .send({ userId: testUserId, listName: 'Lista de Compras' });
+    const listId = listResponse.body.data.id;
+
+    await request(app)
+      .post(`/product-lists/${listId}/items`)
+      .send({ productId: testProductId, quantity: 3 });
+
+    const response = await request(app).get(`/product-lists/user/${testUserId}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.data[0]).toHaveProperty('id', listId);
+    expect(response.body.data[0]).toHaveProperty('listName', 'Lista de Compras');
+    expect(response.body.data[0].items).toHaveLength(1);
+    expect(response.body.data[0].items[0]).toHaveProperty('product');
+    expect(response.body.data[0].items[0].product).toHaveProperty('id', testProductId);
+  });
+});

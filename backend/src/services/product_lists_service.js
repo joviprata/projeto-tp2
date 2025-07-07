@@ -7,7 +7,8 @@ const createProductList = async (userId, listName) => {
     });
     if (!userExists) {
       return { status: 404, error: 'Usuário não encontrado' };
-    } else if (userExists.role === 'GERENTE') {
+    }
+    if (userExists.role === 'GERENTE') {
       return { status: 403, error: 'Apenas usuários clientes podem criar listas de compras' };
     }
     const newList = await prismaDatabase.shoppingList.create({
@@ -23,45 +24,45 @@ const createProductList = async (userId, listName) => {
 };
 
 const getListsByUserId = async (userId) => {
-    try {
-        const userExists = await prismaDatabase.user.findUnique({
-            where: { id: userId },
-        });
-        const productLists = await prismaDatabase.shoppingList.findMany({
-            where: {userId: userId},
-            include: {
-                items: {
-                    include: {
-                        product: true,
-                    },
-                },
-            },
-        });
-        return { status: 200, data: productLists };
-    } catch (error) {
-        return { status: 500, error: 'Erro interno do servidor' };
-    }
+  try {
+    const userExists = await prismaDatabase.user.findUnique({
+      where: { id: userId },
+    });
+    const productLists = await prismaDatabase.shoppingList.findMany({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+    return { status: 200, data: productLists };
+  } catch (error) {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
 };
 
 const addProductToList = async (listId, productId, quantity) => {
   try {
     const productExists = await prismaDatabase.product.findUnique({
-        where: { id: productId },
+      where: { id: productId },
     });
     if (!productExists) {
-        return { status: 404, error: 'Produto não encontrado' };
+      return { status: 404, error: 'Produto não encontrado' };
     }
     const listExists = await prismaDatabase.shoppingList.findUnique({
-        where: { id: listId },
+      where: { id: listId },
     });
     if (!listExists) {
-        return { status: 404, error: 'Lista de compras não encontrada' };
+      return { status: 404, error: 'Lista de compras não encontrada' };
     }
     const listItem = await prismaDatabase.listItem.upsert({
       where: {
         listId_productId: {
-          listId: listId,
-          productId: productId,
+          listId,
+          productId,
         },
       },
       update: {
@@ -70,9 +71,9 @@ const addProductToList = async (listId, productId, quantity) => {
         },
       },
       create: {
-        listId: listId,
-        productId: productId,
-        quantity: quantity,
+        listId,
+        productId,
+        quantity,
       },
     });
     return {
