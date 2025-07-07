@@ -144,3 +144,13 @@ describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma
     expect(response.body).toHaveProperty('error', 'Produto não encontrado');
   });
 });
+
+describe('GET /product-lists/user/:userId - Obter listas de compras por ID do usuário', () => {
+  it('Deve retornar uma lista vazia se o usuário não tiver listas', async () => {
+    const response = await request(app).get(`/product-lists/user/${testUserId}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toEqual([]);
+  });
+});
+
