@@ -23,7 +23,24 @@ const createProductList = async (userId, listName) => {
 };
 
 const getListsByUserId = async (userId) => {
-  return { status: 500, message: 'Not implemented yet' };
+    try {
+        const userExists = await prismaDatabase.user.findUnique({
+            where: { id: userId },
+        });
+        const productLists = await prismaDatabase.shoppingList.findMany({
+            where: {userId: userId},
+            include: {
+                items: {
+                    include: {
+                        product: true,
+                    },
+                },
+            },
+        });
+        return { status: 200, data: productLists };
+    } catch (error) {
+        return { status: 500, error: 'Erro interno do servidor' };
+    }
 };
 
 const addProductToList = async (listId, productId, quantity) => {

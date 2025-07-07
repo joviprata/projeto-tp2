@@ -22,7 +22,13 @@ const createProductList = async (req, res) => {
 };
 
 const getListsByUserId = async (req, res) => {
-  return { status: 500, message: 'Not implemented yet' };
+    const { userId } = req.params;
+    try {
+        const result = await productListsService.getListsByUserId(parseInt(userId, 10));
+        return res.status(result.status).json({ data: result.data });
+    } catch (error) {
+        return res.status(500).json({ error: 'Erro interno do servidor', message: error.message });
+    }
 };
 
 const addProductToList = async (req, res) => {
