@@ -26,8 +26,31 @@ const updateSupermarket = async (req, res) => {
       return res.status(200).json({ message: results.message });
     }
     return res.status(500).json({ error: 'Internal Server Error' });
-  } catch {
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
+};
+
+const putSupermarketByManagerId = async (req, res) => {
+  if (Object.keys(req.body).length === 0 || Object.keys(req.body).length > 4) {
+    return res.status(400).json({ error: 'Requisição inválida' });
+  }
+  if (!req.body) {
+    return res.status(400).json({ error: 'Requisição inválida' });
+  }
+  try {
+    const { manangerId } = req.params;
+    const supermarketData = req.body;
+    const results = await supermarketService.putSupermarketByManagerId(manangerId, supermarketData);
+    if (results.status === 404) {
+      return res.status(404).json({ error: 'Supermercado não encontrado' });
+    }
+    if (results.status === 200) {
+      return res.status(200).json({ message: results.message });
+    }
     return res.status(500).json({ error: 'Internal Server Error' });
+  } catch (e) {
+    return res.status(500).json({ error: 'error' });
   }
 };
 
@@ -51,6 +74,7 @@ const getSupermarketById = async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 const deleteSupermarket = async (req, res) => {
   try {
     const { id } = req.params;
@@ -66,9 +90,11 @@ const deleteSupermarket = async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 module.exports = {
   getAllSupermarkets,
   updateSupermarket,
+  putSupermarketByManagerId,
   getSupermarketById,
   deleteSupermarket,
 };

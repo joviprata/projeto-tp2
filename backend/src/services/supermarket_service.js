@@ -22,7 +22,7 @@ const updateSupermarket = async (id, supermarketData) => {
     if (error.code === 'P2025') {
       return { status: 404, error: 'Supermercado não encontrado' };
     }
-    return { status: 500, error: 'Erro interno do servidor' };
+    return { status: 501, error: 'Erro interno do servidor' };
   }
 };
 const getSupermarketById = async (id) => {
@@ -68,9 +68,42 @@ const deleteSupermarket = async (id) => {
   }
 };
 
+const putSupermarketByManagerId = async (id, supermarketData) => {
+  try {
+    const supermarket = await prismaDatabase.supermarket.findUnique({
+      where: { managerId: parseInt(id, 10) },
+    });
+    if (!supermarket) {
+      return { status: 404, error: 'Supermercado não encontrado' };
+    }
+    await prismaDatabase.user.update({
+      where: { id: parseInt(id, 10) },
+      data: {
+        name: supermarketData.name,
+        email: supermarketData.email,
+        password: supermarketData.password,
+      },
+    });
+    await prismaDatabase.supermarket.update({
+      where: { id: parseInt(supermarket.id, 10) },
+      data: {
+        name: supermarketData.name,
+        address: supermarketData.address,
+      },
+    });
+    return { status: 200, message: 'Supermercado atualizado com sucesso' };
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return { status: 404, error: 'Supermercado não encontrado' };
+    }
+    return { status: 500, error: 'Error' };
+  }
+};
+
 module.exports = {
   getAllSupermarkets,
   updateSupermarket,
   getSupermarketById,
   deleteSupermarket,
+  putSupermarketByManagerId,
 };

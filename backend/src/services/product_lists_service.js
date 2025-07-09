@@ -3,15 +3,15 @@ const prismaDatabase = require('../prismaClient');
 const createProductList = async (userId, listName) => {
   try {
     const userExists = await prismaDatabase.user.findUnique({
-        where: { id: userId },
+      where: { id: userId },
     });
     if (!userExists) {
-        return { status: 404, error: 'Usuário não encontrado' };
+      return { status: 404, error: 'Usuário não encontrado' };
     }
     const newList = await prismaDatabase.shoppingList.create({
       data: {
         listName,
-        userId
+        userId,
       },
     });
     return { status: 201, data: newList, message: 'Lista de compras criada com sucesso' };
