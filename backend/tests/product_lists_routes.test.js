@@ -173,4 +173,12 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
     expect(response.body.data[0].items[0]).toHaveProperty('product');
     expect(response.body.data[0].items[0].product).toHaveProperty('id', testProductId);
   });
+
+  it('Deve retornar 404 se o usuário não existir', async () => {
+    const nonExistentUserId = 999999;
+    const response = await request(app).get(`/product-lists/user/${nonExistentUserId}`);
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
+  });
 });
+
