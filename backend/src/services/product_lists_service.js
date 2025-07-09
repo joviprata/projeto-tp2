@@ -82,7 +82,7 @@ const addProductToList = async (listId, productId, quantity) => {
     return {
       status: 201,
       data: listItem,
-      message: 'Produto adicionado/atualizado na lista com sucesso.',
+      message: 'Produto adicionado na lista com sucesso.',
     };
   } catch (error) {
     return { status: 500, error: 'Erro interno do servidor' };
@@ -99,7 +99,7 @@ const updateProductFromList = async (listId, productId, updateData) => {
         },
       },
       data: updateData,
-  });
+    });
     return { status: 200, data: updatedItem, message: 'Produto atualizado na lista com sucesso.' };
   } catch (error) {
     return { status: 500, error: 'Erro interno do servidor' };

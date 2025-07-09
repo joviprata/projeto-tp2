@@ -215,5 +215,20 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
       expect(updatedItem.quantity).toBe(5);
       expect(updatedItem.isTaken).toBe(true);
     });
+
+    it('Deve retornar 404 se a lista de compras não existir', async () => {
+      const response = await request(app)
+        .put('/product-lists/999999/items/999999')
+        .send({ quantity: 3, isTaken: true });
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada');
+    });
+    it('Deve retornar 400 se os dados de atualização estiverem vazios', async () => {
+      const response = await request(app)
+        .put(`/product-lists/${listId}/items/${testProductId}`)
+        .send({});
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('error', 'Dados de atualização inválidos');
+    });
   });
 });
