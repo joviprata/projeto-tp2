@@ -229,7 +229,7 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
             .put(`/product-lists/${listId}/items/999999`)
             .send({ quantity: 5, isTaken: true });
         expect(response.status).toBe(404);
-        expect(response.body).toHaveProperty('error', 'Item da lista não encontrado');
+        expect(response.body).toHaveProperty('error', 'Item da lista não foi encontrado');
     });
   });
 });

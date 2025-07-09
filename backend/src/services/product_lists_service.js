@@ -91,6 +91,17 @@ const addProductToList = async (listId, productId, quantity) => {
 
 const updateProductFromList = async (listId, productId, updateData) => {
   try {
+    const listItemExists = await prismaDatabase.listItem.findUnique({
+      where: {
+        listId_productId: {
+          listId: listId,
+          productId: productId,
+        },
+      },
+    });
+    if (!listItemExists) {
+      return { status: 404, error: 'Item da lista não foi encontrado' };
+    }
     if (Object.keys(updateData).length === 0) {
       return { status: 400, error: 'Dados de atualização inválidos' };
     }
