@@ -180,5 +180,40 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
   });
-});
 
+  describe('PUT - /product-lists/:listId/items/:productId - Atualizar produto em uma lista de compras', () => {
+    let listId;
+    let listItemId;
+
+    beforeEach(async () => {
+      const listResponse = await request(app)
+        .post('/product-lists')
+        .send({ userId: testUserId, listName: 'Lista de Teste' });
+      listId = listResponse.body.data.id;
+
+      await request(app)
+        .post(`/product-lists/${listId}/items`)
+        .send({ productId: testProductId, quantity: 2 });
+    });
+
+    it('Deve atualizar a quantidade de um produto e o status isTaken de uma lista com sucesso', async () => {
+      const updatePayload = { quantity: 5, isTaken: true };
+      const response = await request(app)
+        .put(`/product-lists/${listId}/items/${testProductId}`)
+        .send(updatePayload);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('data');
+      expect(response.body.data).toHaveProperty('listId', listId);
+      expect(response.body.data).toHaveProperty('productId', testProductId);
+      expect(response.body.data).toHaveProperty('quantity', 5);
+      expect(response.body.data).toHaveProperty('isTaken', true);
+
+      const updatedItem = await prismaDatabase.listItem.findUnique({
+        where: { listId_productId: { listId, productId: testProductId } },
+      });
+      expect(updatedItem.quantity).toBe(5);
+      expect(updatedItem.isTaken).toBe(true);
+    });
+  });
+});
