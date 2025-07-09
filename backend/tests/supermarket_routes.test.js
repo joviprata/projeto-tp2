@@ -96,6 +96,22 @@ describe('PUT /supermarkets/:id - Atualizar dados do supermercado com ID inexist
   });
 });
 
+describe('PUT /supermarkets/manager/:id - Atualizar supermercado por ID de gerente', () => {
+  it('deve retornar status 200 e mensagem de sucesso ao atualizar supermercado por ID', async () => {
+    const managerId = 1;
+    const updatedData = {
+      name: 'Supermercado Inexistente',
+      email: 'supermercado@inexistente.com',
+      password: 'supermercadoinexistente',
+      address: 'supermercado inexistente, 123',
+    };
+
+    const response = await request(app).put(`/supermarkets/manager/${managerId}`).send(updatedData);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('message', 'Supermercado atualizado com sucesso');
+  });
+});
+
 describe('GET /supermarkets/:id - Buscar supermercado por ID existente', () => {
   it('deve retornar status 200 e os dados do supermercado', async () => {
     const supermarketId = 1;
