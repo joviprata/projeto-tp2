@@ -14,6 +14,24 @@ export default function Produtos() {
     preco: 'R$ 1000,00',
   });
 
+  function UserIcon() {
+    return (
+      <svg
+        className={styles.headerIcon}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    );
+  }
+
   const handleEditarSupermarket = (e) => {
     e.preventDefault();
     router.push('/perfilMercado');
@@ -30,22 +48,12 @@ export default function Produtos() {
           />
           <h1 className={styles.title}>Global Market</h1>
         </div>
-        <div className={styles.icon}>
+        <div className={styles.headerActions}>
           <button
-            className={styles.sair}
+            className={styles.headerButton}
             onClick={handleEditarSupermarket}
-            type="button"
           >
-            🔄
-          </button>
-        </div>
-        <div className={styles.icon}>
-          <button
-            className={styles.sair}
-            onClick={handleEditarSupermarket}
-            type="button"
-          >
-            👤
+            <UserIcon />
           </button>
         </div>
       </header>
@@ -58,10 +66,6 @@ export default function Produtos() {
             <div className={styles['card-body']}>
               <p className={styles.descricao}>{produto.descricao}</p>
               <p className={styles.preco}>{produto.preco}</p>
-              <div className={styles.acoes}>
-                <button className={styles.editar}>Editar</button>
-                <button className={styles.excluir}>Excluir</button>
-              </div>
             </div>
           </div>
         ))}
