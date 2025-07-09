@@ -1,10 +1,11 @@
 'use client';
 
 import { use, useState } from 'react';
-import styles from './Cadastro.module.css';
 import Image from 'next/image';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import styles from './Cadastro.module.css';
+
 export default function Cadastro() {
   const [mostrarAdd, setMostrarAdd] = useState(false);
   const [nome, setNome] = useState('');
@@ -20,10 +21,10 @@ export default function Cadastro() {
           'http://localhost:3001/auth/register/manager',
           {
             name: nome,
-            email: email,
+            email,
             password: senha,
             address: endereco,
-          },
+          }
         );
         console.log(response.data);
         if (response.status === 201) {
@@ -34,7 +35,25 @@ export default function Cadastro() {
           setEndereco('');
           setMostrarAdd(false);
         }
+      } else {
+        const response = await axios.post(
+          'http://localhost:3001/auth/register/user',
+          {
+            name: nome,
+            email,
+            password: senha,
+          }
+        );
+        console.log(response.data);
+        if (response.status === 201) {
+          alert('Cadastro realizado com sucesso!');
+          setNome('');
+          setEmail('');
+          setSenha('');
+          setMostrarAdd(false);
+        }
       }
+      router.push('/login');
     } catch (error) {
       console.error('Erro ao cadastrar:', error);
     }
@@ -82,7 +101,7 @@ export default function Cadastro() {
             onChange={(e) => setMostrarAdd(e.target.checked)}
             className={styles.checkboxInput}
           />
-          <span className={styles.checkboxCustom}></span>
+          <span className={styles.checkboxCustom} />
           <span className={styles.checkboxText}>
             Caso seja um Gerente de um supermercado, marque esta opção!
           </span>

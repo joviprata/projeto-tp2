@@ -290,3 +290,124 @@ describe('POST /auth/login - Login do gerente com sucesso', () => {
     expect(response.body.role).toBe(gerente.role);
   });
 });
+
+describe('POST /auth/register/user - Validação de campos obrigatórios', () => {
+  it.each([
+    {
+      case: 'corpo vazio',
+      payload: {},
+    },
+    {
+      case: 'faltando nome e senha',
+      payload: { email: 'client@example.com' },
+    },
+    {
+      case: 'faltando email e senha',
+      payload: { name: 'Cliente Teste' },
+    },
+    {
+      case: 'faltando a senha',
+      payload: {
+        name: 'Cliente Teste',
+        email: 'client@example.com',
+      },
+    },
+    {
+      case: 'faltando o email',
+      payload: {
+        name: 'Cliente Teste',
+        password: 'senhaCliente123',
+      },
+    },
+    {
+      case: 'nome em branco',
+      payload: {
+        name: '',
+        email: 'client@example.com',
+        password: 'senhaCliente123',
+      },
+    },
+    {
+      case: 'senha em branco',
+      payload: {
+        name: 'Cliente Teste',
+        email: 'client@example.com',
+        password: '',
+      },
+    },
+    {
+      case: 'email em branco',
+      payload: {
+        name: 'Cliente Teste',
+        password: 'senhaCliente123',
+        email: '',
+      },
+    },
+    {
+      case: 'Com mais de 3 campos na requisição (excluindo address)',
+      payload: {
+        name: 'Cliente Teste',
+        email: 'client@example.com',
+        password: 'senhaCliente123',
+        extraField: 'extraValue', // Campos extras não permitidos
+      },
+    },
+  ])('Deve retornar 401 quando $case', async ({ payload }) => {
+    const response = await request(app).post('/auth/register/user').send(payload);
+
+    expect(response.status).toBe(401);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toBe('Requisição inválida');
+  });
+});
+
+describe('POST /auth/register/user - Registro de usuário com sucesso', () => {
+  it('Deve registrar um usuário com sucesso', async () => {
+    const payload = {
+      name: 'Cliente Teste Sucesso',
+      email: 'cliente.sucesso@example.com',
+      password: 'senha123',
+    };
+
+    const response = await request(app).post('/auth/register/user').send(payload);
+    expect(response.status).toBe(201);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('message');
+    expect(response.body.message).toBe('Usuário registrado com sucesso');
+    expect(response.body).toHaveProperty('userId');
+
+    expect(response.body.userId).toEqual(expect.any(Number));
+    expect(response.body.userId).toBeGreaterThan(0);
+
+    const user = await prismaDatabase.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    expect(user).not.toBeNull();
+    expect(user.name).toBe(payload.name);
+    expect(user.email).toBe(payload.email);
+    expect(user.role).toBe('USER');
+  });
+});
+
+describe('POST /auth/register/user - validaçao de criaçao duplicada', () => {
+  it('Deve retornar 409 quando o email já estiver em uso', async () => {
+    const payload = {
+      name: 'Cliente Teste Duplicado',
+      email: 'cliente.duplicado@example.com',
+      password: 'senha123',
+    };
+
+    // Primeiro registro
+    await request(app).post('/auth/register/user').send(payload);
+
+    // Tentativa de registro duplicado
+    const response = await request(app).post('/auth/register/user').send(payload);
+
+    expect(response.status).toBe(409);
+    expect(response.headers['content-type']).toMatch(/json/);
+    expect(response.body).toHaveProperty('error');
+    expect(response.body.error).toBe('Email já em uso');
+  });
+});

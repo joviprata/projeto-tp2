@@ -21,7 +21,6 @@ const login = async ({ email, password }) => {
         error: 'Senha inválida',
       };
     }
-
     return {
       status: 200,
       message: 'Login realizado com sucesso',
@@ -83,7 +82,35 @@ const registerGerente = async ({ name, email, password, address }) => {
   }
 };
 
+const registerUser = async (userData) => {
+  try {
+    const existingUser = await prismaDatabase.user.findUnique({
+      where: { email: userData.email },
+    });
+    if (existingUser) {
+      return { status: 409, error: 'Email já em uso' };
+    }
+    const newUser = await prismaDatabase.user.create({
+      data: {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        role: 'USER',
+      },
+    });
+    return {
+      status: 201,
+      message: 'Usuário registrado com sucesso',
+      userId: newUser.id,
+    };
+  } catch (error) {
+    console.error('Erro ao registrar usuário:', error);
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
+};
+
 module.exports = {
   login,
   registerGerente,
+  registerUser,
 };

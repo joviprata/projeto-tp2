@@ -1,16 +1,41 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 export default function Produtos() {
-  // Placeholder
+  const router = useRouter();
+
   const produtos = Array(15).fill({
     nome: 'Nome Produto 123',
     descricao:
       'Descrição do produto descrição do produto descrição do produto descrição do produto...',
     preco: 'R$ 1000,00',
   });
+
+  function UserIcon() {
+    return (
+      <svg
+        className={styles.headerIcon}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    );
+  }
+
+  const handleEditarSupermarket = (e) => {
+    e.preventDefault();
+    router.push('/perfilMercado');
+  };
 
   return (
     <div className={styles.container}>
@@ -23,9 +48,13 @@ export default function Produtos() {
           />
           <h1 className={styles.title}>Global Market</h1>
         </div>
-        <div className={styles.icons}>
-          <span className={styles.icon}>👤</span>
-          <span className={styles.icon}>🔄</span>
+        <div className={styles.headerActions}>
+          <button
+            className={styles.headerButton}
+            onClick={handleEditarSupermarket}
+          >
+            <UserIcon />
+          </button>
         </div>
       </header>
 
@@ -37,10 +66,6 @@ export default function Produtos() {
             <div className={styles['card-body']}>
               <p className={styles.descricao}>{produto.descricao}</p>
               <p className={styles.preco}>{produto.preco}</p>
-              <div className={styles.acoes}>
-                <button className={styles.editar}>Editar</button>
-                <button className={styles.excluir}>Excluir</button>
-              </div>
             </div>
           </div>
         ))}

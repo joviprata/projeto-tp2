@@ -1,10 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import styles from './page.module.css';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import axios from 'axios';
+import styles from './page.module.css';
 
 export default function Home() {
   const router = useRouter();
@@ -14,16 +14,21 @@ export default function Home() {
       console.log(email);
       console.log(senha);
       const response = await axios.post('http://localhost:3001/auth/login', {
-        email: email,
+        email,
         password: senha,
       });
       console.log(response.status);
-      if (response.status === 200 && response.data.role === 'GERENTE') {
+      if (response.status === 200) {
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('role', response.data.role);
         console.log('Login realizado com sucesso!');
-        router.push('/homeProduct');
+        if (response.data.role === 'GERENTE') {
+          router.push('/homeProduct');
+        } else {
+          router.push('/homeCliente');
+        }
       }
+
       if (response.status === 401) {
         console.log('Usuário ou senha inválidos');
         alert('Usuário ou senha inválidos');

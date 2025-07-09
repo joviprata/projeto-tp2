@@ -1,32 +1,11 @@
 const request = require('supertest');
 const app = require('../src/server');
 const prismaDatabase = require('../src/prismaClient');
-const { updateProduct } = require('../src/services/product_service');
 
+// Limpeza geral do banco de dados antes de tudo e desconexão após
 beforeAll(async () => {
-  const CreateProduct = {
-    name: 'Produto Teste',
-    barCode: '1234567890123',
-    variableDescription: 'Descrição do Produto Teste',
-  };
-  const CreateProduct2 = {
-    name: 'Produto Teste 2',
-    barCode: '1234567890124',
-    variableDescription: 'Descrição do Produto Teste 2',
-  };
-  const response = await request(app).post('/products').send(CreateProduct);
-  expect(response.status).toBe(200);
-  expect(response.body).toHaveProperty('id');
-  CreateProduct.id = response.body.id; // Armazena o ID do produto criado para uso posterior
-
-  const response2 = await request(app).post('/products').send(CreateProduct2);
-  expect(response2.status).toBe(200);
-  expect(response2.body).toHaveProperty('id');
-  CreateProduct2.id = response2.body.id; // Armazena o ID do segundo produto criado para uso posterior
-});
-
-afterAll(async () => {
-  const TableNames = [
+  // Limpeza de todas as tabelas antes de todos os testes
+  const tableNames = [
     'users',
     'supermercado',
     'produtos',
@@ -34,13 +13,36 @@ afterAll(async () => {
     'listas_de_compra',
     'itens_da_lista',
   ];
-
-  TableNames.forEach(async (tableName) => {
+  // Usar for...of para garantir que todos os TRUNCATE terminem sequencialmente
+  for (const tableName of tableNames) {
     await prismaDatabase.$executeRawUnsafe(
       `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`,
     );
-  });
+  }
+});
+
+afterAll(async () => {
   await prismaDatabase.$disconnect();
+});
+
+// beforeEach para garantir que os produtos base sejam criados para cada grupo de testes
+beforeEach(async () => {
+  await prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "produtos" RESTART IDENTITY CASCADE;`);
+
+  // Recria os produtos base para cada teste que os necessita
+  const CreateProduct = {
+    name: 'Produto Teste Original',
+    barCode: '1234567890123',
+    variableDescription: 'Descrição do Produto Teste Original',
+  };
+  const CreateProduct2 = {
+    name: 'Produto Teste 2 Original',
+    barCode: '1234567890124',
+    variableDescription: 'Descrição do Produto Teste 2 Original',
+  };
+
+  await request(app).post('/products').send(CreateProduct);
+  await request(app).post('/products').send(CreateProduct2);
 });
 
 describe('POST /products - Registrar um novo produto', () => {
