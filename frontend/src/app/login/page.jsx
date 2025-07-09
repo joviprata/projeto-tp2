@@ -25,7 +25,7 @@ export default function Home() {
         if (response.data.role === 'GERENTE') {
           router.push('/homeProduct');
         } else {
-          router.push('/homeClient');
+          router.push('/homeCliente');
         }
       }
 
