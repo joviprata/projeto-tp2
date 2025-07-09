@@ -13,6 +13,7 @@ export default function Perfil() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [endereco, setEndereco] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Acessa o localStorage apenas após o componente estar montado
   useEffect(() => {
@@ -55,6 +56,42 @@ export default function Perfil() {
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (showDeleteModal === true) {
+      handleCancelDelete();
+      try {
+        const response = await axios.delete(
+          `http://localhost:3001/users/${id}`
+        );
+        console.log(response.status);
+        if (response.status === 200) {
+          console.log(`Supermercado ${id} deletado com sucesso!`);
+          router.push('/login');
+        }
+        if (response.status === 404) {
+          console.log('Supermercado não encontrado');
+          alert('Supermercado não encontrado');
+        }
+        if (response.status === 500) {
+          console.log('Erro interno do servidor');
+          alert('Erro interno do servidor');
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+      } finally {
+        handleCancelDelete();
+      }
     }
   };
 
@@ -130,13 +167,43 @@ export default function Perfil() {
               <button className={styles.editButton} type="submit">
                 Editar
               </button>
-              <button className={styles.deleteButton} type="button">
+              <button
+                className={styles.deleteButton}
+                type="button"
+                onClick={handleDeleteClick}
+              >
                 Excluir
               </button>
             </div>
           </form>
         </section>
       </main>
+
+      {/* Modal de confirmação de exclusão */}
+      {showDeleteModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h2 className={styles.modalTitle}>Confirmar Exclusão</h2>
+            <p className={styles.modalText}>
+              Tem certeza que deseja excluir este supermercado?
+            </p>
+            <div className={styles.modalButtons}>
+              <button
+                className={styles.confirmButton}
+                onClick={handleDeleteConfirmed}
+              >
+                Confirmar
+              </button>
+              <button
+                className={styles.cancelButton}
+                onClick={handleCancelDelete}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
