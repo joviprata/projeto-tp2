@@ -28,6 +28,9 @@ const getListsByUserId = async (userId) => {
     const userExists = await prismaDatabase.user.findUnique({
       where: { id: userId },
     });
+    if (!userExists) {
+        return { status: 404, error: 'Usuário não encontrado' };
+    }
     const productLists = await prismaDatabase.shoppingList.findMany({
       where: { userId },
       include: {
