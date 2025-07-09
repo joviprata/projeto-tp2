@@ -29,7 +29,7 @@ const getListsByUserId = async (userId) => {
       where: { id: userId },
     });
     if (!userExists) {
-        return { status: 404, error: 'Usuário não encontrado' };
+      return { status: 404, error: 'Usuário não encontrado' };
     }
     const productLists = await prismaDatabase.shoppingList.findMany({
       where: { userId },
@@ -89,8 +89,21 @@ const addProductToList = async (listId, productId, quantity) => {
   }
 };
 
-const updateProductFromList = async (listId, productId, quantity) => {
-  return { status: 500, message: 'Not implemented yet' };
+const updateProductFromList = async (listId, productId, updateData) => {
+  try {
+    const updatedItem = await prismaDatabase.listItem.update({
+      where: {
+        listId_productId: {
+          listId: listId,
+          productId: productId,
+        },
+      },
+      data: updateData,
+  });
+    return { status: 200, data: updatedItem, message: 'Produto atualizado na lista com sucesso.' };
+  } catch (error) {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
 };
 
 const deleteProductFromList = async (listId, productId) => {
