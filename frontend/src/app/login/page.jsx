@@ -14,17 +14,21 @@ export default function Home() {
       console.log(email);
       console.log(senha);
       const response = await axios.post('http://localhost:3001/auth/login', {
-        id,
         email,
         password: senha,
       });
       console.log(response.status);
-      if (response.status === 200 && response.data.role === 'GERENTE') {
-        localStorage.setItem('userId', response.data.name);
+      if (response.status === 200) {
+        localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('role', response.data.role);
         console.log('Login realizado com sucesso!');
-        router.push('/homeProduct');
+        if (response.data.role === 'GERENTE') {
+          router.push('/homeProduct');
+        } else {
+          router.push('/homeClient');
+        }
       }
+
       if (response.status === 401) {
         console.log('Usuário ou senha inválidos');
         alert('Usuário ou senha inválidos');

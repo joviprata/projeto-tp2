@@ -1,15 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import styles from './page.module.css';
 
 export default function Perfil() {
+  const router = useRouter();
   // Valores iniciais simulados (poderiam vir de uma API)
-  const id = localStorage.getItem('userId');
+  const [id, setId] = useState(null);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [endereco, setEndereco] = useState('');
+
+  // Acessa o localStorage apenas após o componente estar montado
+  useEffect(() => {
+    const storedId = localStorage.getItem('userId');
+    if (storedId) {
+      setId(storedId);
+    }
+  }, []);
 
   // Função para lidar com mudanças nos campos
   const handleChange = (setter) => (e) => {
@@ -17,13 +28,15 @@ export default function Perfil() {
   };
 
   const makeUpdate = async (e) => {
+    e.preventDefault();
     try {
-      console.log(nome);
-      console.log(email);
-      console.log(senha);
-      console.log(endereco);
+      console.log('id: ', id);
+      console.log('nome: ', nome);
+      console.log('email: ', email);
+      console.log('senha: ', senha);
+      console.log('endereco: ', endereco);
       const response = await axios.put(
-        'http://localhost:3001/supermarkets/${id}',
+        `http://localhost:3001/supermarkets/manager/${id}`,
         {
           name: nome,
           email,
@@ -32,7 +45,7 @@ export default function Perfil() {
         }
       );
       console.log(response.status);
-      if (response.status === 200 && response.data.role === 'GERENTE') {
+      if (response.status === 200) {
         console.log('Edição realizada com sucesso!');
         router.push('/homeProduct');
       }
@@ -72,7 +85,7 @@ export default function Perfil() {
               className={styles.profileIcon}
             />
           </div>
-          <form className={styles.form} onSubmit={handleEditar}>
+          <form className={styles.form} onSubmit={makeUpdate}>
             <label className={styles.label} htmlFor="nome">
               Nome
             </label>

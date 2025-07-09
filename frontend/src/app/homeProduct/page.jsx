@@ -1,16 +1,23 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 export default function Produtos() {
-  // Placeholder
+  const router = useRouter();
+
   const produtos = Array(15).fill({
     nome: 'Nome Produto 123',
     descricao:
       'Descrição do produto descrição do produto descrição do produto descrição do produto...',
     preco: 'R$ 1000,00',
   });
+
+  const handleEditarSupermarket = (e) => {
+    e.preventDefault();
+    router.push('/perfilMercado');
+  };
 
   return (
     <div className={styles.container}>
@@ -23,9 +30,23 @@ export default function Produtos() {
           />
           <h1 className={styles.title}>Global Market</h1>
         </div>
-        <div className={styles.icons}>
-          <span className={styles.icon}>👤</span>
-          <span className={styles.icon}>🔄</span>
+        <div className={styles.icon}>
+          <button
+            className={styles.sair}
+            onClick={handleEditarSupermarket}
+            type="button"
+          >
+            🔄
+          </button>
+        </div>
+        <div className={styles.icon}>
+          <button
+            className={styles.sair}
+            onClick={handleEditarSupermarket}
+            type="button"
+          >
+            👤
+          </button>
         </div>
       </header>
 
