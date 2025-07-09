@@ -91,6 +91,9 @@ const addProductToList = async (listId, productId, quantity) => {
 
 const updateProductFromList = async (listId, productId, updateData) => {
   try {
+    if (Object.keys(updateData).length === 0) {
+      return { status: 400, error: 'Dados de atualização inválidos' };
+    }
     const updatedItem = await prismaDatabase.listItem.update({
       where: {
         listId_productId: {
