@@ -68,16 +68,16 @@ const deleteSupermarket = async (id) => {
   }
 };
 
-const putSupermarketByManagerId = async (id, supermarketData) => {
+const putSupermarketByManagerId = async (Id, supermarketData) => {
   try {
     const supermarket = await prismaDatabase.supermarket.findUnique({
-      where: { managerId: parseInt(id, 10) },
+      where: { managerId: parseInt(Id, 10) },
     });
     if (!supermarket) {
       return { status: 404, error: 'Supermercado não encontrado' };
     }
     await prismaDatabase.user.update({
-      where: { id: parseInt(id, 10) },
+      where: { id: parseInt(Id, 10) },
       data: {
         name: supermarketData.name,
         email: supermarketData.email,

@@ -39,9 +39,9 @@ const putSupermarketByManagerId = async (req, res) => {
     return res.status(400).json({ error: 'Requisição inválida' });
   }
   try {
-    const { manangerId } = req.params;
+    const { id } = req.params;
     const supermarketData = req.body;
-    const results = await supermarketService.putSupermarketByManagerId(manangerId, supermarketData);
+    const results = await supermarketService.putSupermarketByManagerId(id, supermarketData);
     if (results.status === 404) {
       return res.status(404).json({ error: 'Supermercado não encontrado' });
     }
