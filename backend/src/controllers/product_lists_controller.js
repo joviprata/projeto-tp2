@@ -89,8 +89,7 @@ const deleteList = async (req, res) => {
     const result = await productListsService.deleteList(parseInt(listId, 10));
     if (result.status === 204) {
       return res.status(204).send();
-    }
-    else if (result.status === 404) {
+    } else if (result.status === 404) {
       return res.status(404).json({ error: result.error });
     }
     return res
@@ -100,7 +99,6 @@ const deleteList = async (req, res) => {
     return res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
-
 
 module.exports = {
   createProductList,

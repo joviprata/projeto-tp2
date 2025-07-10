@@ -272,3 +272,29 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
     });
   });
 });
+
+describe('DELETE - /product-lists/:listId/items/:productId - Deletar um item de uma lista de compras', () => {
+  let listId;
+
+  beforeEach(async () => {
+    const listResponse = await request(app)
+      .post('/product-lists')
+      .send({ userId: testUserId, listName: 'Lista para deletar produto' });
+    listId = listResponse.body.data.id;
+
+    await request(app)
+      .post(`/product-lists/${listId}/items`)
+      .send({ productId: testProductId, quantity: 2 });
+  });
+
+  it('Deve deletar um item de uma lista de compras com sucesso', async () => {
+    const response = await request(app).delete(`/product-lists/${listId}/items/${testProductId}`);
+    expect(response.status).toBe(204);
+    expect(response.body).toEqual({});
+
+    const deletedItem = await prismaDatabase.listItem.findUnique({
+      where: { id: listId, productId: testProductId },
+    });
+    expect(deletedItem).toBeNull();
+  });
+});

@@ -121,7 +121,21 @@ const updateProductFromList = async (listId, productId, updateData) => {
 };
 
 const deleteProductFromList = async (listId, productId) => {
-  return { status: 500, message: 'Not implemented yet' };
+  try {
+    await prismaDatabase.listItem.delete({
+      where: {
+        listId_productId: {
+          listId,
+          productId: {
+            productId,
+          },
+        },
+      },
+    });
+    return { status: 204, message: 'Produto deletado da lista com sucesso.' };
+  } catch (error) {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
 };
 
 const deleteList = async (listId) => {
