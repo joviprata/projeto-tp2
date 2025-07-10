@@ -126,6 +126,12 @@ const deleteProductFromList = async (listId, productId) => {
 
 const deleteList = async (listId) => {
   try {
+    const listExists = await prismaDatabase.shoppingList.findUnique({
+      where: { id: listId },
+    });
+    if (!listExists) {
+      return { status: 404, error: 'Lista de compras não encontrada' };
+    }
     await prismaDatabase.shoppingList.delete({
       where: { id: listId },
     });
