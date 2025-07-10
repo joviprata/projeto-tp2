@@ -94,8 +94,8 @@ const updateProductFromList = async (listId, productId, updateData) => {
     const listItemExists = await prismaDatabase.listItem.findUnique({
       where: {
         listId_productId: {
-          listId: listId,
-          productId: productId,
+          listId,
+          productId,
         },
       },
     });
@@ -108,8 +108,8 @@ const updateProductFromList = async (listId, productId, updateData) => {
     const updatedItem = await prismaDatabase.listItem.update({
       where: {
         listId_productId: {
-          listId: listId,
-          productId: productId,
+          listId,
+          productId,
         },
       },
       data: updateData,

@@ -64,9 +64,11 @@ const updateProductFromList = async (req, res) => {
     );
     if (result.status === 200) {
       return res.status(200).json({ data: result.data, message: result.message });
-    } else if (result.status === 400) {
+    }
+    if (result.status === 400) {
       return res.status(400).json({ error: result.error });
-    } else if (result.status === 404) {
+    }
+    if (result.status === 404) {
       return res.status(404).json({ error: result.error });
     }
     return res
