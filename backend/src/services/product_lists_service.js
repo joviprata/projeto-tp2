@@ -121,7 +121,18 @@ const updateProductFromList = async (listId, productId, updateData) => {
 };
 
 const deleteProductFromList = async (listId, productId) => {
-    try {
+  try {
+    const listItemExists = await prismaDatabase.listItem.findUnique({
+      where: {
+        listId_productId: {
+          listId,
+          productId,
+        },
+      },
+    });
+    if (!listItemExists) {
+      return { status: 404, error: 'Item da lista não foi encontrado' };
+    }
     await prismaDatabase.listItem.delete({
       where: {
         listId_productId: {

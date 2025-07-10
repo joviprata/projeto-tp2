@@ -80,21 +80,23 @@ const updateProductFromList = async (req, res) => {
 };
 
 const deleteProductFromList = async (req, res) => {
-    const { listId, productId } = req.params;
-    try {
-        const result = await productListsService.deleteProductFromList(
-        parseInt(listId, 10),
-        parseInt(productId, 10),
-        );
-        if (result.status === 204) {
-        return res.status(204).send();
-        }
-        return res
-        .status(result.status || 500)
-        .json({ error: result.error || 'Erro interno do servidor' });
-    } catch (error) {
-        return res.status(500).json({ error: 'Erro interno do servidor' });
+  const { listId, productId } = req.params;
+  try {
+    const result = await productListsService.deleteProductFromList(
+      parseInt(listId, 10),
+      parseInt(productId, 10),
+    );
+    if (result.status === 204) {
+      return res.status(204).send();
+    } else if (result.status === 404) {
+      return res.status(404).json({ error: result.error });
     }
+    return res
+      .status(result.status || 500)
+      .json({ error: result.error || 'Erro interno do servidor' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 };
 
 const deleteList = async (req, res) => {
