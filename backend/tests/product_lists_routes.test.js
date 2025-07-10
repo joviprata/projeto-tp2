@@ -232,4 +232,35 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
       expect(response.body).toHaveProperty('error', 'Item da lista não foi encontrado');
     });
   });
+
+  describe('DELETE - /product-lists/:listId - Deve deletar uma lista inteira', () => {
+    let listIdToDelete;
+
+    beforeEach(async () => {
+      const listResponse = await request(app)
+        .post('/product-lists')
+        .send({ userId: testUserId, listName: 'Lista para Deletar' });
+      listIdToDelete = listResponse.body.data.id;
+
+      await request(app)
+        .post(`/product-lists/${listIdToDelete}/items`)
+        .send({ productId: testProductId, quantity: 2 });
+    });
+
+    it('Deve deletar uma lista de compras com sucesso', async () => {
+      const response = await request(app).delete(`/product-lists/${listIdToDelete}`);
+      expect(response.status).toBe(204);
+      expect(response.body).toHaveProperty('message', 'Lista de compras deletada com sucesso');
+
+      const deletedList = await prismaDatabase.list.findUnique({
+        where: { id: listIdToDelete },
+      });
+      expect(deletedList).toBeNull();
+
+      const deletedItems = await prismaDatabase.listItem.findMany({
+        where: { listId_productId: { listId: listIdToDelete, productId: testProductId } },
+      });
+      expect(deletedItems).toHaveLength(0);
+    });
+  });
 });
