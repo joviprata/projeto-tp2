@@ -297,4 +297,10 @@ describe('DELETE - /product-lists/:listId/items/:productId - Deletar um item de 
     });
     expect(deletedItem).toBeNull();
   });
+
+  it('Deve retornar 404 se o item da lista não existir', async () => {
+    const response = await request(app).delete(`/product-lists/${listId}/items/999999`);
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Item da lista não foi encontrado');
+  });
 });
