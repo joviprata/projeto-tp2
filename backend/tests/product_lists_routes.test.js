@@ -264,5 +264,11 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
       });
       expect(deletedItems).toHaveLength(0);
     });
+
+    it('Deve retornar 404 se a lista de compras não existir', async () => {
+      const response = await request(app).delete('/product-lists/999999');
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada');
+    });
   });
 });
