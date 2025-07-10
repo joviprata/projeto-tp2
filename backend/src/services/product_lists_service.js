@@ -125,7 +125,14 @@ const deleteProductFromList = async (listId, productId) => {
 };
 
 const deleteList = async (listId) => {
-  return { status: 500, message: 'Not implemented yet' };
+  try {
+    await prismaDatabase.shoppingList.delete({
+      where: { id: listId },
+    });
+    return { status: 204, message: 'Lista de compras deletada com sucesso' };
+  } catch (error) {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
 };
 
 module.exports = {

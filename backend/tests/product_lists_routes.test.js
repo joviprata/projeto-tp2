@@ -240,7 +240,7 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
       const listResponse = await request(app)
         .post('/product-lists')
         .send({ userId: testUserId, listName: 'Lista para Deletar' });
-      listIdToDelete = listResponse.body.data.id;
+      listIdToDelete = listResponse.body.data.id; // Usando o produto de teste criado no beforeAll
 
       await request(app)
         .post(`/product-lists/${listIdToDelete}/items`)
@@ -250,15 +250,17 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
     it('Deve deletar uma lista de compras com sucesso', async () => {
       const response = await request(app).delete(`/product-lists/${listIdToDelete}`);
       expect(response.status).toBe(204);
-      expect(response.body).toHaveProperty('message', 'Lista de compras deletada com sucesso');
-
-      const deletedList = await prismaDatabase.list.findUnique({
+      expect(response.body).toEqual({});
+      const deletedList = await prismaDatabase.shoppingList.findUnique({
         where: { id: listIdToDelete },
       });
       expect(deletedList).toBeNull();
 
       const deletedItems = await prismaDatabase.listItem.findMany({
-        where: { listId_productId: { listId: listIdToDelete, productId: testProductId } },
+        where: {
+          listId: listIdToDelete,
+          productId: testProductId,
+        },
       });
       expect(deletedItems).toHaveLength(0);
     });

@@ -84,7 +84,18 @@ const deleteProductFromList = async (req, res) => {
 };
 
 const deleteList = async (req, res) => {
-  return { status: 500, message: 'Not implemented yet' };
+  const { listId } = req.params;
+  try {
+    const result = await productListsService.deleteList(parseInt(listId, 10));
+    if (result.status === 204) {
+      return res.status(204).send();
+    }
+    return res
+      .status(result.status || 500)
+      .json({ error: result.error || 'Erro interno do servidor' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 };
 
 module.exports = {
