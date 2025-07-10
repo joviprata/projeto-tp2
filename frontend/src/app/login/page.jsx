@@ -9,19 +9,18 @@ import styles from './page.module.css';
 export default function Home() {
   const router = useRouter();
 
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+
   const makeAuth = async (e) => {
     try {
-      console.log(email);
-      console.log(senha);
       const response = await axios.post('http://localhost:3001/auth/login', {
         email,
         password: senha,
       });
-      console.log(response.status);
       if (response.status === 200) {
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('role', response.data.role);
-        console.log('Login realizado com sucesso!');
         if (response.data.role === 'GERENTE') {
           router.push('/homeProduct');
         } else {
@@ -37,9 +36,6 @@ export default function Home() {
       console.error('Erro ao fazer login:', error);
     }
   };
-
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
 
   const cadRedirect = (e) => {
     e.preventDefault();

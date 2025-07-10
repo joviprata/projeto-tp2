@@ -1,8 +1,31 @@
 'use client';
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
+
+function UserIcon({ className }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+      />
+    </svg>
+  );
+}
+
+UserIcon.propTypes = {
+  className: PropTypes.string.isRequired,
+};
 
 export default function Produtos() {
   const router = useRouter();
@@ -13,24 +36,6 @@ export default function Produtos() {
       'Descrição do produto descrição do produto descrição do produto descrição do produto...',
     preco: 'R$ 1000,00',
   });
-
-  function UserIcon() {
-    return (
-      <svg
-        className={styles.headerIcon}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-        />
-      </svg>
-    );
-  }
 
   const handleEditarSupermarket = (e) => {
     e.preventDefault();
@@ -53,7 +58,7 @@ export default function Produtos() {
             className={styles.headerButton}
             onClick={handleEditarSupermarket}
           >
-            <UserIcon />
+            <UserIcon className={styles.headerIcon} />
           </button>
         </div>
       </header>
