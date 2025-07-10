@@ -293,7 +293,7 @@ describe('DELETE - /product-lists/:listId/items/:productId - Deletar um item de 
     expect(response.body).toEqual({});
 
     const deletedItem = await prismaDatabase.listItem.findUnique({
-      where: { id: listId, productId: testProductId },
+      where: { listId_productId: { listId, productId: testProductId } },
     });
     expect(deletedItem).toBeNull();
   });

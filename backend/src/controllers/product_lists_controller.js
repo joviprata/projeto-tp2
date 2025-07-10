@@ -80,7 +80,21 @@ const updateProductFromList = async (req, res) => {
 };
 
 const deleteProductFromList = async (req, res) => {
-  return { status: 500, message: 'Not implemented yet' };
+    const { listId, productId } = req.params;
+    try {
+        const result = await productListsService.deleteProductFromList(
+        parseInt(listId, 10),
+        parseInt(productId, 10),
+        );
+        if (result.status === 204) {
+        return res.status(204).send();
+        }
+        return res
+        .status(result.status || 500)
+        .json({ error: result.error || 'Erro interno do servidor' });
+    } catch (error) {
+        return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
 };
 
 const deleteList = async (req, res) => {

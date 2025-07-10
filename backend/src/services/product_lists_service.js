@@ -121,14 +121,12 @@ const updateProductFromList = async (listId, productId, updateData) => {
 };
 
 const deleteProductFromList = async (listId, productId) => {
-  try {
+    try {
     await prismaDatabase.listItem.delete({
       where: {
         listId_productId: {
           listId,
-          productId: {
-            productId,
-          },
+          productId,
         },
       },
     });
