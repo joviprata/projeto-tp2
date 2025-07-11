@@ -27,8 +27,7 @@ const registerProduct = async (body) => {
       data: body,
     });
     return { status: 200, data: newProduct };
-  } catch (error) {
-    console.error('Erro ao registrar produto:', error); // Log o erro para depuração
+  } catch {
     return { status: 500, error: 'Internal Server Error' };
   }
 };

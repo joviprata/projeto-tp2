@@ -103,8 +103,7 @@ const registerUser = async (userData) => {
       message: 'Usuário registrado com sucesso',
       userId: newUser.id,
     };
-  } catch (error) {
-    console.error('Erro ao registrar usuário:', error);
+  } catch {
     return { status: 500, error: 'Erro interno do servidor' };
   }
 };
