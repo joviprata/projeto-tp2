@@ -108,6 +108,43 @@ describe('POST /product-lists - Criar uma nova lista de compras', () => {
   });
 });
 
+describe('GET /product-lists/user/:userId - Obter listas de compras por ID do usuário', () => {
+  it('Deve retornar uma lista vazia se o usuário não tiver listas', async () => {
+    const response = await request(app).get(`/product-lists/user/${testUserId}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toEqual([]);
+  });
+
+  it('Deve retornar as listas do usuário com seus itens e detalhes do produto', async () => {
+    const listResponse = await request(app)
+      .post('/product-lists')
+      .send({ userId: testUserId, listName: 'Lista de Compras' });
+    const listId = listResponse.body.data.id;
+
+    await request(app)
+      .post(`/product-lists/${listId}/items`)
+      .send({ productId: testProductId, quantity: 3 });
+
+    const response = await request(app).get(`/product-lists/user/${testUserId}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.data[0]).toHaveProperty('id', listId);
+    expect(response.body.data[0]).toHaveProperty('listName', 'Lista de Compras');
+    expect(response.body.data[0].items).toHaveLength(1);
+    expect(response.body.data[0].items[0]).toHaveProperty('product');
+    expect(response.body.data[0].items[0].product).toHaveProperty('id', testProductId);
+  });
+
+  it('Deve retornar 404 se o usuário não existir', async () => {
+    const nonExistentUserId = 999999;
+    const response = await request(app).get(`/product-lists/user/${nonExistentUserId}`);
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
+  });
+});
+
 describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma lista de compras', () => {
   let listId;
   beforeEach(async () => {
@@ -145,134 +182,58 @@ describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma
   });
 });
 
-describe('GET /product-lists/user/:userId - Obter listas de compras por ID do usuário', () => {
-  it('Deve retornar uma lista vazia se o usuário não tiver listas', async () => {
-    const response = await request(app).get(`/product-lists/user/${testUserId}`);
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('data');
-    expect(response.body.data).toEqual([]);
-  });
+describe('PUT /product-lists/:listId/items/:productId - Atualizar produto em uma lista de compras', () => {
+  let listId;
 
-  it('Deve retornar as listas do usuário com seus itens e detalhes do produto', async () => {
+  beforeEach(async () => {
     const listResponse = await request(app)
       .post('/product-lists')
-      .send({ userId: testUserId, listName: 'Lista de Compras' });
-    const listId = listResponse.body.data.id;
+      .send({ userId: testUserId, listName: 'Lista de Teste' });
+    listId = listResponse.body.data.id;
 
     await request(app)
       .post(`/product-lists/${listId}/items`)
-      .send({ productId: testProductId, quantity: 3 });
+      .send({ productId: testProductId, quantity: 2 });
+  });
 
-    const response = await request(app).get(`/product-lists/user/${testUserId}`);
+  it('Deve atualizar a quantidade de um produto e o status isTaken de uma lista com sucesso', async () => {
+    const updatePayload = { quantity: 5, isTaken: true };
+    const response = await request(app)
+      .put(`/product-lists/${listId}/items/${testProductId}`)
+      .send(updatePayload);
+
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('data');
-    expect(response.body.data).toHaveLength(1);
-    expect(response.body.data[0]).toHaveProperty('id', listId);
-    expect(response.body.data[0]).toHaveProperty('listName', 'Lista de Compras');
-    expect(response.body.data[0].items).toHaveLength(1);
-    expect(response.body.data[0].items[0]).toHaveProperty('product');
-    expect(response.body.data[0].items[0].product).toHaveProperty('id', testProductId);
+    expect(response.body.data).toHaveProperty('listId', listId);
+    expect(response.body.data).toHaveProperty('productId', testProductId);
+    expect(response.body.data).toHaveProperty('quantity', 5);
+    expect(response.body.data).toHaveProperty('isTaken', true);
+
+    const updatedItem = await prismaDatabase.listItem.findUnique({
+      where: { listId_productId: { listId, productId: testProductId } },
+    });
+    expect(updatedItem.quantity).toBe(5);
+    expect(updatedItem.isTaken).toBe(true);
   });
 
-  it('Deve retornar 404 se o usuário não existir', async () => {
-    const nonExistentUserId = 999999;
-    const response = await request(app).get(`/product-lists/user/${nonExistentUserId}`);
+  it('Deve retornar 400 se os dados de atualização estiverem vazios', async () => {
+    const response = await request(app)
+      .put(`/product-lists/${listId}/items/${testProductId}`)
+      .send({});
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'Dados de atualização inválidos');
+  });
+
+  it('Deve retornar 404 se o item na lista não for encontrado', async () => {
+    const response = await request(app)
+      .put(`/product-lists/${listId}/items/999999`)
+      .send({ quantity: 5, isTaken: true });
     expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty('error', 'Usuário não encontrado');
-  });
-
-  describe('PUT - /product-lists/:listId/items/:productId - Atualizar produto em uma lista de compras', () => {
-    let listId;
-
-    beforeEach(async () => {
-      const listResponse = await request(app)
-        .post('/product-lists')
-        .send({ userId: testUserId, listName: 'Lista de Teste' });
-      listId = listResponse.body.data.id;
-
-      await request(app)
-        .post(`/product-lists/${listId}/items`)
-        .send({ productId: testProductId, quantity: 2 });
-    });
-
-    it('Deve atualizar a quantidade de um produto e o status isTaken de uma lista com sucesso', async () => {
-      const updatePayload = { quantity: 5, isTaken: true };
-      const response = await request(app)
-        .put(`/product-lists/${listId}/items/${testProductId}`)
-        .send(updatePayload);
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('data');
-      expect(response.body.data).toHaveProperty('listId', listId);
-      expect(response.body.data).toHaveProperty('productId', testProductId);
-      expect(response.body.data).toHaveProperty('quantity', 5);
-      expect(response.body.data).toHaveProperty('isTaken', true);
-
-      const updatedItem = await prismaDatabase.listItem.findUnique({
-        where: { listId_productId: { listId, productId: testProductId } },
-      });
-      expect(updatedItem.quantity).toBe(5);
-      expect(updatedItem.isTaken).toBe(true);
-    });
-
-    it('Deve retornar 400 se os dados de atualização estiverem vazios', async () => {
-      const response = await request(app)
-        .put(`/product-lists/${listId}/items/${testProductId}`)
-        .send({});
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error', 'Dados de atualização inválidos');
-    });
-
-    it('Deve retornar 404 se o item na lista não for encontrado', async () => {
-      const response = await request(app)
-        .put(`/product-lists/${listId}/items/999999`)
-        .send({ quantity: 5, isTaken: true });
-      expect(response.status).toBe(404);
-      expect(response.body).toHaveProperty('error', 'Item da lista não foi encontrado');
-    });
-  });
-
-  describe('DELETE - /product-lists/:listId - Deve deletar uma lista inteira', () => {
-    let listIdToDelete;
-
-    beforeEach(async () => {
-      const listResponse = await request(app)
-        .post('/product-lists')
-        .send({ userId: testUserId, listName: 'Lista para Deletar' });
-      listIdToDelete = listResponse.body.data.id; // Usando o produto de teste criado no beforeAll
-
-      await request(app)
-        .post(`/product-lists/${listIdToDelete}/items`)
-        .send({ productId: testProductId, quantity: 2 });
-    });
-
-    it('Deve deletar uma lista de compras com sucesso', async () => {
-      const response = await request(app).delete(`/product-lists/${listIdToDelete}`);
-      expect(response.status).toBe(204);
-      expect(response.body).toEqual({});
-      const deletedList = await prismaDatabase.shoppingList.findUnique({
-        where: { id: listIdToDelete },
-      });
-      expect(deletedList).toBeNull();
-
-      const deletedItems = await prismaDatabase.listItem.findMany({
-        where: {
-          listId: listIdToDelete,
-          productId: testProductId,
-        },
-      });
-      expect(deletedItems).toHaveLength(0);
-    });
-
-    it('Deve retornar 404 se a lista de compras não existir', async () => {
-      const response = await request(app).delete('/product-lists/999999');
-      expect(response.status).toBe(404);
-      expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada');
-    });
+    expect(response.body).toHaveProperty('error', 'Item da lista não foi encontrado');
   });
 });
 
-describe('DELETE - /product-lists/:listId/items/:productId - Deletar um item de uma lista de compras', () => {
+describe('DELETE /product-lists/:listId/items/:productId - Deletar um item de uma lista de compras', () => {
   let listId;
 
   beforeEach(async () => {
@@ -301,5 +262,45 @@ describe('DELETE - /product-lists/:listId/items/:productId - Deletar um item de 
     const response = await request(app).delete(`/product-lists/${listId}/items/999999`);
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error', 'Item da lista não foi encontrado');
+  });
+});
+
+describe('DELETE /product-lists/:listId - Deletar uma lista inteira', () => {
+  let listIdToDelete;
+
+  beforeEach(async () => {
+    const listResponse = await request(app)
+      .post('/product-lists')
+      .send({ userId: testUserId, listName: 'Lista para Deletar' });
+    listIdToDelete = listResponse.body.data.id;
+
+    await request(app)
+      .post(`/product-lists/${listIdToDelete}/items`)
+      .send({ productId: testProductId, quantity: 2 });
+  });
+
+  it('Deve deletar uma lista de compras com sucesso', async () => {
+    const response = await request(app).delete(`/product-lists/${listIdToDelete}`);
+    expect(response.status).toBe(204);
+    expect(response.body).toEqual({});
+
+    const deletedList = await prismaDatabase.shoppingList.findUnique({
+      where: { id: listIdToDelete },
+    });
+    expect(deletedList).toBeNull();
+
+    const deletedItems = await prismaDatabase.listItem.findMany({
+      where: {
+        listId: listIdToDelete,
+        productId: testProductId,
+      },
+    });
+    expect(deletedItems).toHaveLength(0);
+  });
+
+  it('Deve retornar 404 se a lista de compras não existir', async () => {
+    const response = await request(app).delete('/product-lists/999999');
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada');
   });
 });
