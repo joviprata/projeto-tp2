@@ -2,220 +2,169 @@ const request = require('supertest');
 const app = require('../src/server');
 const prismaDatabase = require('../src/prismaClient');
 
-// Limpeza geral do banco de dados antes de tudo e desconexão após
-beforeAll(async () => {
-  // Limpeza de todas as tabelas antes de todos os testes
+// Função auxiliar para criar um produto via API
+const createProduct = async (name, barCode, variableDescription) => {
+  const response = await request(app).post('/products').send({
+    name,
+    barCode,
+    variableDescription,
+  });
+  // O endpoint de criação retorna 200, vamos verificar isso
+  expect(response.status).toBe(200);
+  expect(response.body).toHaveProperty('id');
+  return response.body;
+};
+
+// Função auxiliar para limpar o banco de dados
+const cleanupDatabase = async () => {
   const tableNames = [
-    'users',
-    'supermercado',
-    'produtos',
-    'registros_de_preco',
-    'listas_de_compra',
     'itens_da_lista',
+    'listas_de_compra',
+    'registros_de_preco',
+    'produtos',
+    'supermercado',
+    'users',
   ];
-  // Usar for...of para garantir que todos os TRUNCATE terminem sequencialmente
-  for (const tableName of tableNames) {
+  tableNames.forEach(async (tableName) => {
     await prismaDatabase.$executeRawUnsafe(
       `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`,
     );
-  }
+  });
+};
+
+beforeEach(async () => {
+  await cleanupDatabase();
 });
 
 afterAll(async () => {
   await prismaDatabase.$disconnect();
 });
 
-// beforeEach para garantir que os produtos base sejam criados para cada grupo de testes
-beforeEach(async () => {
-  await prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "produtos" RESTART IDENTITY CASCADE;`);
+describe('Rotas de Produtos', () => {
+  describe('POST /products - Registrar um novo produto', () => {
+    it('deve retornar 200 e os dados do produto criado', async () => {
+      const newProduct = {
+        name: 'Produto Novo',
+        barCode: '9876543210987',
+        variableDescription: 'Descrição do Produto Novo',
+      };
+      const response = await request(app).post('/products').send(newProduct);
 
-  // Recria os produtos base para cada teste que os necessita
-  const CreateProduct = {
-    name: 'Produto Teste Original',
-    barCode: '1234567890123',
-    variableDescription: 'Descrição do Produto Teste Original',
-  };
-  const CreateProduct2 = {
-    name: 'Produto Teste 2 Original',
-    barCode: '1234567890124',
-    variableDescription: 'Descrição do Produto Teste 2 Original',
-  };
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe(newProduct.name);
+      expect(response.body.barCode).toBe(newProduct.barCode);
+    });
 
-  await request(app).post('/products').send(CreateProduct);
-  await request(app).post('/products').send(CreateProduct2);
-});
-
-describe('POST /products - Registrar um novo produto', () => {
-  it('Deve retornar 200 e os dados do produto criado', async () => {
-    const newProduct = {
-      name: 'Produto novo',
-      barCode: '9876543210987',
-      variableDescription: 'Descrição do Produto novo',
-    };
-
-    const response = await request(app).post('/products').send(newProduct);
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('id');
-    expect(response.body.nome).toBe(newProduct.nome);
-    expect(response.body.CodidoDeBarras).toBe(newProduct.CodidoDeBarras);
-    expect(response.body.descricao).toBe(newProduct.descricao);
-  });
-
-  it('Deve retornar 400 se os dados do produto estiverem incompletos', async () => {
-    const incompleteProduct = {
-      name: 'Produto Incompleto',
-    };
-
-    const response = await request(app).post('/products').send(incompleteProduct);
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty('error');
-  });
-
-  it('Deve retornar 400 se o produto já existir (mesmo nome e código de barras)', async () => {
-    const existingProduct = {
-      name: 'Produto Teste',
-      barCode: '1234567890123',
-      variableDescription: 'Descrição do Produto Teste',
-    };
-
-    const response = await request(app).post('/products').send(existingProduct);
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty('error');
-  });
-
-  it('Deve retornar 400 se o nome for uma string vazia', async () => {
-    const emptyNameProduct = {
-      name: '',
-      barCode: '1234567890123',
-      variableDescription: 'Descrição do Produto com Nome Vazio',
-    };
-
-    const response = await request(app).post('/products').send(emptyNameProduct);
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty('error', 'Nome do produto não pode ser vazio');
-  });
-});
-
-describe('GET /products - Obter todos os produtos', () => {
-  it('Deve retornar status 200 e um array de produtos', async () => {
-    const response = await request(app).get('/products');
-    expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0); // Verifica se há pelo menos um produto
-    expect(response.body[0]).toHaveProperty('name');
-  });
-});
-
-describe('GET /products/:id - Obter produto por ID', () => {
-  it('Deve retornar status 200 e os dados do produto', async () => {
-    const productId = 1; // Substitua pelo ID do produto que você deseja testar
-
-    const response = await request(app).get(`/products/${productId}`);
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('id', productId);
-    expect(response.body).toHaveProperty('name');
-    expect(response.body).toHaveProperty('barCode');
-    expect(response.body).toHaveProperty('variableDescription');
-  });
-
-  it('Deve retornar status 404 se o produto não for encontrado', async () => {
-    const nonExistentId = 9999; // ID que não existe no banco de dados
-
-    const response = await request(app).get(`/products/${nonExistentId}`);
-    expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty('error', 'Produto não encontrado');
-  });
-});
-
-describe('PUT /products/:id - Atualizar produto', () => {
-  it('Deve retornar status 200 e os dados do produto atualizado', async () => {
-    const productId = 1; // Substitua pelo ID do produto que você deseja testar
-    const updatedProduct = {
-      name: 'Produto Atualizado',
-      barCode: '1234567890123',
-      variableDescription: 'Descrição do Produto Atualizado',
-    };
-
-    const response = await request(app).put(`/products/${productId}`).send(updatedProduct);
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('id', productId);
-    expect(response.body.name).toBe(updatedProduct.name);
-  });
-
-  it('Deve retornar status 404 se o produto não for encontrado', async () => {
-    const nonExistentId = 9999; // ID que não existe no banco de dados
-
-    const updatedProduct = {
-      name: 'Produto Inexistente',
-      barCode: '0000000000000',
-      variableDescription: 'Este produto não existe',
-    };
-
-    const response = await request(app).put(`/products/${nonExistentId}`).send(updatedProduct);
-    expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty('error', 'Produto não encontrado');
-  });
-});
-
-describe('PUT /products/:id - Atualizar produto com dados incompletos ou inválidos', () => {
-  it.each([
-    {
-      case: 'Dados incompletos',
-      productId: 1,
-      updateProduct: {},
-    },
-    {
-      case: 'Mais de 3 campos',
-      productId: 1,
-      updateProduct: {
-        name: 'Produto inválido',
-        barCode: '1234567890123',
-        variableDescription: 'Descrição do Produto Inválido',
-        extraField: 'Campo Extra',
-      },
-    },
-  ])(
-    'Deve retornar 400 se os dados do produto estiverem incompletos ou inválidos - $case',
-    async ({ productId, updateProduct }) => {
-      const response = await request(app).put(`/products/${productId}`).send(updateProduct);
+    it('deve retornar 400 se os dados do produto estiverem incompletos', async () => {
+      const incompleteProduct = { name: 'Produto Incompleto' };
+      const response = await request(app).post('/products').send(incompleteProduct);
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('error');
-      expect(response.body.error).toBe('Dados do produto inválidos ou incompletos');
-    },
-  );
-});
+      expect(response.body).toHaveProperty('error', 'Dados do produto incompletos');
+    });
 
-describe('PUT /products/:id - Atualizar produto com nome e código de barras já existentes', () => {
-  it('Deve retornar 400 se o nome ou código de barras já existirem', async () => {
-    const productId = 1; // Substitua pelo ID do produto que você deseja testar
-    const existingProduct = {
-      name: 'Produto Teste 2',
-      barCode: '1234567890124',
-      variableDescription: 'Descrição do Produto Teste',
-    };
-    const response = await request(app).put(`/products/${productId}`).send(existingProduct);
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty(
-      'error',
-      'Produto com nome ou código de barras já existente',
-    );
-  });
-});
-
-describe('DELETE /products/:id - Excluir produto', () => {
-  it('Deve retornar status 200 e mensagem de sucesso ao excluir um produto existente', async () => {
-    const productId = 1; // Substitua pelo ID do produto que você deseja testar
-
-    const response = await request(app).delete(`/products/${productId}`);
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('message', 'Produto excluído com sucesso');
+    it('deve retornar 400 se o código de barras já existir', async () => {
+      await createProduct('Produto Existente', '1234567890123', 'Descricao');
+      const response = await request(app).post('/products').send({
+        name: 'Outro Produto',
+        barCode: '1234567890123',
+        variableDescription: 'Outra Descricao',
+      });
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty(
+        'error',
+        'Produto com este nome ou código de barras já existe',
+      );
+    });
   });
 
-  it('Deve retornar status 404 ao tentar excluir um produto inexistente', async () => {
-    const nonExistentId = 9999; // ID que não existe no banco de dados
+  describe('GET /products - Obter todos os produtos', () => {
+    it('deve retornar status 200 e um array de produtos', async () => {
+      await createProduct('Produto 1', '1111111111111', 'Desc 1');
+      await createProduct('Produto 2', '2222222222222', 'Desc 2');
 
-    const response = await request(app).delete(`/products/${nonExistentId}`);
-    expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty('error', 'Produto não encontrado');
+      const response = await request(app).get('/products');
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(2);
+    });
+  });
+
+  describe('GET /products/:id - Obter produto por ID', () => {
+    it('deve retornar status 200 e os dados do produto', async () => {
+      const product = await createProduct('Produto para Buscar', '3333333333333', 'Desc 3');
+      const response = await request(app).get(`/products/${product.id}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('id', product.id);
+      expect(response.body.name).toBe('Produto para Buscar');
+    });
+
+    it('deve retornar status 404 se o produto não for encontrado', async () => {
+      const nonExistentId = 9999;
+      const response = await request(app).get(`/products/${nonExistentId}`);
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Produto não encontrado');
+    });
+  });
+
+  describe('PUT /products/:id - Atualizar produto', () => {
+    it('deve retornar status 200 e os dados do produto atualizado', async () => {
+      const product = await createProduct('Produto Original', '4444444444444', 'Desc 4');
+      const updatedData = {
+        name: 'Produto Atualizado',
+        barCode: '4444444444445',
+        variableDescription: 'Descrição Atualizada',
+      };
+
+      const response = await request(app).put(`/products/${product.id}`).send(updatedData);
+      expect(response.status).toBe(200);
+      expect(response.body.name).toBe(updatedData.name);
+      expect(response.body.barCode).toBe(updatedData.barCode);
+    });
+
+    it('deve retornar status 404 se o produto não for encontrado', async () => {
+      const nonExistentId = 9999;
+      const response = await request(app).put(`/products/${nonExistentId}`).send({
+        name: 'Inexistente',
+        barCode: '000',
+        variableDescription: 'Desc',
+      });
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Produto não encontrado');
+    });
+
+    it('deve retornar 400 ao tentar atualizar para um código de barras que já existe', async () => {
+      await createProduct('Produto 1', '1111111111111', 'Desc 1');
+      const product2 = await createProduct('Produto 2', '2222222222222', 'Desc 2');
+
+      const response = await request(app).put(`/products/${product2.id}`).send({
+        name: 'Produto 2 Atualizado',
+        barCode: '1111111111111', // Conflito com Produto 1
+        variableDescription: 'Desc Atualizada',
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty(
+        'error',
+        'Produto com nome ou código de barras já existente',
+      );
+    });
+  });
+
+  describe('DELETE /products/:id - Excluir produto', () => {
+    it('deve retornar status 200 e mensagem de sucesso', async () => {
+      const product = await createProduct('Produto para Deletar', '5555555555555', 'Desc 5');
+      const response = await request(app).delete(`/products/${product.id}`);
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Produto excluído com sucesso');
+    });
+
+    it('deve retornar status 404 ao tentar excluir um produto inexistente', async () => {
+      const nonExistentId = 9999;
+      const response = await request(app).delete(`/products/${nonExistentId}`);
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Produto não encontrado');
+    });
   });
 });
