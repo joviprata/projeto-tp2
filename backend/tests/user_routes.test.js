@@ -198,15 +198,13 @@ describe('PUT /users/:id - Atualizar usuário', () => {
 
   // Conflitos de email
   describe('Atualizar usuário com email já existente', () => {
-    let conflictingUserId;
     beforeAll(async () => {
       // Cria um usuário para causar conflito
-      const createResponse = await request(app).post('/auth/register/user').send({
+      await request(app).post('/auth/register/user').send({
         name: 'Usuário Conflitante',
         email: 'conflito@email.com',
         password: 'senha123',
       });
-      conflictingUserId = createResponse.body.userId;
     });
 
     it('Deve retornar 400 se o email já existir em outro usuário', async () => {
@@ -215,7 +213,6 @@ describe('PUT /users/:id - Atualizar usuário', () => {
         email: 'conflito@email.com', // Email do usuário criado no beforeAll
         password: 'senha123',
       };
-
       const response = await request(app)
         .put(`/users/${existingUserId}`) // Atualizando o usuário original, não o conflitante
         .send(conflictingData);

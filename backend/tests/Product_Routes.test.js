@@ -14,11 +14,11 @@ beforeAll(async () => {
     'itens_da_lista',
   ];
   // Usar for...of para garantir que todos os TRUNCATE terminem sequencialmente
-  for (const tableName of tableNames) {
-    await prismaDatabase.$executeRawUnsafe(
-      `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`,
-    );
-  }
+  await Promise.all(
+    tableNames.map((tableName) =>
+      prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`),
+    ),
+  );
 });
 
 afterAll(async () => {

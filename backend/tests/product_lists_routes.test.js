@@ -14,11 +14,11 @@ beforeAll(async () => {
     'listas_de_compra', // Nova tabela
     'itens_da_lista', // Nova tabela
   ];
-  for (const tableName of tableNames) {
-    await prismaDatabase.$executeRawUnsafe(
-      `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`,
-    );
-  }
+  await Promise.all(
+    tableNames.map((tableName) =>
+      prismaDatabase.$executeRawUnsafe(`TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`),
+    ),
+  );
 
   const user = await prismaDatabase.user.create({
     data: {
@@ -183,7 +183,6 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
 
   describe('PUT - /product-lists/:listId/items/:productId - Atualizar produto em uma lista de compras', () => {
     let listId;
-    let listItemId;
 
     beforeEach(async () => {
       const listResponse = await request(app)
