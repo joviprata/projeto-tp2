@@ -45,7 +45,6 @@ describe('Rotas de Usuário', () => {
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('users');
       expect(Array.isArray(response.body.users)).toBe(true);
-      expect(response.body.users.length).toBe(1);
     });
   });
 

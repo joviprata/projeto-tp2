@@ -5,14 +5,48 @@ const prismaDatabase = require('../src/prismaClient');
 let testUserId; // Para armazenar o ID de um usuário de teste
 let testProductId; // Para armazenar o ID de um produto de teste
 
-beforeAll(async () => {
+const createTestUser = async () => {
+  const uniqueEmail = `lista_${Date.now()}@test.com`; // Generate a unique email
+  const user = await prismaDatabase.user.create({
+    data: {
+      name: 'Cliente Teste Lista',
+      email: uniqueEmail,
+      password: 'senha123',
+      role: 'USER',
+    },
+  });
+  return user.id;
+};
+
+const createTestProduct = async () => {
+  const product = await prismaDatabase.product.create({
+    data: {
+      barCode: `1234567890123_${Date.now()}`,
+      name: 'Arroz Teste',
+      variableDescription: '5kg',
+    }, // Unique barcode
+  });
+  return product.id;
+};
+
+const createShoppingList = async (userId, listName) => {
+  const response = await request(app).post('/product-lists').send({ userId, listName });
+  if (response.status === 201) {
+    return response.body.data.id;
+  }
+  throw new Error(
+    `Failed to create shopping list: Status ${response.status}, Error: ${response.body.error || 'Unknown error'}`,
+  );
+};
+
+beforeEach(async () => {
   const tableNames = [
     'users',
     'supermercado',
     'produtos',
     'registros_de_preco',
-    'listas_de_compra', // Nova tabela
-    'itens_da_lista', // Nova tabela
+    'listas_de_compra',
+    'itens_da_lista',
   ];
   await Promise.all(
     tableNames.map((tableName) =>
@@ -20,33 +54,12 @@ beforeAll(async () => {
     ),
   );
 
-  const user = await prismaDatabase.user.create({
-    data: {
-      name: 'Cliente Teste Lista',
-      email: 'lista@test.com',
-      password: 'senha123',
-      role: 'USER',
-    },
-  });
-  testUserId = user.id;
-
-  const product = await prismaDatabase.product.create({
-    data: { barCode: '1234567890123', name: 'Arroz Teste', variableDescription: '5kg' },
-  });
-  testProductId = product.id;
+  testUserId = await createTestUser();
+  testProductId = await createTestProduct();
 });
 
 afterAll(async () => {
   await prismaDatabase.$disconnect();
-});
-
-beforeEach(async () => {
-  await prismaDatabase.$executeRawUnsafe(
-    `TRUNCATE TABLE "listas_de_compra" RESTART IDENTITY CASCADE;`,
-  );
-  await prismaDatabase.$executeRawUnsafe(
-    `TRUNCATE TABLE "itens_da_lista" RESTART IDENTITY CASCADE;`,
-  );
 });
 
 describe('POST /product-lists - Criar uma nova lista de compras', () => {
@@ -92,7 +105,7 @@ describe('POST /product-lists - Criar uma nova lista de compras', () => {
     const gerenteUser = await prismaDatabase.user.create({
       data: {
         name: 'Gerente Teste',
-        email: 'gerenteteste@email.com',
+        email: `gerenteteste_${Date.now()}@email.com`, // Unique email for manager
         password: 'senha123',
         role: 'GERENTE',
       },
@@ -117,10 +130,7 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
   });
 
   it('Deve retornar as listas do usuário com seus itens e detalhes do produto', async () => {
-    const listResponse = await request(app)
-      .post('/product-lists')
-      .send({ userId: testUserId, listName: 'Lista de Compras' });
-    const listId = listResponse.body.data.id;
+    const listId = await createShoppingList(testUserId, 'Lista de Compras'); // This helper now throws on failure
 
     await request(app)
       .post(`/product-lists/${listId}/items`)
@@ -148,10 +158,7 @@ describe('GET /product-lists/user/:userId - Obter listas de compras por ID do us
 describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma lista de compras', () => {
   let listId;
   beforeEach(async () => {
-    const listResponse = await request(app)
-      .post('/product-lists')
-      .send({ userId: testUserId, listName: 'Lista de Teste' });
-    listId = listResponse.body.data.id;
+    listId = await createShoppingList(testUserId, 'Lista de Teste'); // This helper now throws on failure
   });
 
   it('Deve adicionar um produto à lista de compras', async () => {
@@ -160,8 +167,8 @@ describe('POST /product-lists/:listId/items - Adicionar/atualizar produto em uma
       .send({ productId: testProductId, quantity: 2 });
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('data');
-    expect(response.body.data.listId).toBe(listId);
-    expect(response.body.data.productId).toBe(testProductId);
+    expect(response.body.data).toHaveProperty('listId', listId);
+    expect(response.body.data).toHaveProperty('productId', testProductId);
     expect(response.body.data.quantity).toBe(2);
   });
 
@@ -186,11 +193,7 @@ describe('PUT /product-lists/:listId/items/:productId - Atualizar produto em uma
   let listId;
 
   beforeEach(async () => {
-    const listResponse = await request(app)
-      .post('/product-lists')
-      .send({ userId: testUserId, listName: 'Lista de Teste' });
-    listId = listResponse.body.data.id;
-
+    listId = await createShoppingList(testUserId, 'Lista de Teste'); // This helper now throws on failure
     await request(app)
       .post(`/product-lists/${listId}/items`)
       .send({ productId: testProductId, quantity: 2 });
@@ -237,11 +240,7 @@ describe('DELETE /product-lists/:listId/items/:productId - Deletar um item de um
   let listId;
 
   beforeEach(async () => {
-    const listResponse = await request(app)
-      .post('/product-lists')
-      .send({ userId: testUserId, listName: 'Lista para deletar produto' });
-    listId = listResponse.body.data.id;
-
+    listId = await createShoppingList(testUserId, 'Lista para deletar produto'); // This helper now throws on failure
     await request(app)
       .post(`/product-lists/${listId}/items`)
       .send({ productId: testProductId, quantity: 2 });
@@ -269,11 +268,7 @@ describe('DELETE /product-lists/:listId - Deletar uma lista inteira', () => {
   let listIdToDelete;
 
   beforeEach(async () => {
-    const listResponse = await request(app)
-      .post('/product-lists')
-      .send({ userId: testUserId, listName: 'Lista para Deletar' });
-    listIdToDelete = listResponse.body.data.id;
-
+    listIdToDelete = await createShoppingList(testUserId, 'Lista para Deletar'); // This helper now throws on failure
     await request(app)
       .post(`/product-lists/${listIdToDelete}/items`)
       .send({ productId: testProductId, quantity: 2 });

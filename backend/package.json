@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx prisma migrate deploy && nodemon src/server.js",
-    "test": "jest tests/all.test.js --watchAll",
+    "test": "jest tests/all.test.js ",
     "coverage": "jest --coverage",
     "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint .",
     "lint:fix": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint . --fix"
