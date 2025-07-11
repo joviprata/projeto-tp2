@@ -1,45 +1,64 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable no-undef */
+
 'use client';
 
 import Image from 'next/image';
-import styles from './page.module.css';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { React, useState } from 'react';
 import axios from 'axios';
+import styles from './page.module.css';
 
 export default function Home() {
   const router = useRouter();
 
-  const makeAuth = async (e) => {
-    try {
-      console.log(email);
-      console.log(senha);
-      const response = await axios.post('http://localhost:3001/auth/login', {
-        email: email,
-        password: senha,
-      });
-      console.log(response.status);
-      if (response.status === 200 && response.data.role === 'GERENTE') {
-        localStorage.setItem('userId', response.data.userId);
-        localStorage.setItem('role', response.data.role);
-        console.log('Login realizado com sucesso!');
-        router.push('/homeCliente');
-      }
-      if (response.status === 401) {
-        console.log('Usuário ou senha inválidos');
-        alert('Usuário ou senha inválidos');
-      }
-    } catch (error) {
-      console.error('Erro ao fazer login:', error);
-    }
-  };
-
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const makeAuth = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:3001/auth/login', {
+        email,
+        password: senha,
+      });
+
+      if (response.status === 200) {
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('role', response.data.role);
+
+        if (response.data.role === 'GERENTE') {
+          router.push('/homeProduct');
+        } else {
+          router.push('/homeCliente');
+        }
+      }
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          setErrorMessage('Credenciais inválidas');
+        } else {
+          setErrorMessage('Erro no servidor. Tente novamente mais tarde.');
+        }
+      } else {
+        setErrorMessage('Erro de conexão. Verifique sua internet.');
+      }
+
+      // Efeito visual de erro
+      const form = document.getElementById('loginForm');
+      form.classList.add(styles.shake);
+      setTimeout(() => {
+        form.classList.remove(styles.shake);
+      }, 500);
+    }
+  };
 
   const cadRedirect = (e) => {
     e.preventDefault();
     router.push('/cadastro');
   };
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -54,29 +73,48 @@ export default function Home() {
       </header>
 
       <div className={styles.formContainer}>
-        <input
-          className={styles.input}
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className={styles.input}
-          type="password"
-          placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-        />
-        <button className={styles.button} onClick={makeAuth}>
-          Fazer login
-        </button>
-        <p className={styles.bruno}>
-          Não possui conta?{' '}
-          <a href="/cadastro" onClick={cadRedirect}>
-            clique aqui
-          </a>
-        </p>
+        <form id="loginForm" onSubmit={makeAuth} className={styles.form}>
+          <label htmlFor="email-input" className={styles.label}>
+            E-mail
+          </label>
+          <input
+            className={styles.input}
+            id="email-input"
+            type="email"
+            placeholder="E-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <label htmlFor="password-input" className={styles.label}>
+            Senha
+          </label>
+          <input
+            className={styles.input}
+            id="password-input"
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required
+          />
+
+          {errorMessage && (
+            <div className={styles.errorMessage}>{errorMessage}</div>
+          )}
+
+          <button type="submit" className={styles.button}>
+            Fazer login
+          </button>
+
+          <p className={styles.bruno}>
+            Não possui conta?{' '}
+            <a href="/cadastro" onClick={cadRedirect}>
+              clique aqui
+            </a>
+          </p>
+        </form>
       </div>
     </div>
   );

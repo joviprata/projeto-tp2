@@ -11,4 +11,5 @@ router.get('/', supermarketController.getAllSupermarkets);
 
 router.delete('/:id', supermarketController.deleteSupermarket);
 
+router.put('/manager/:id', supermarketController.putSupermarketByManagerId);
 module.exports = router;

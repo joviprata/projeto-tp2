@@ -13,6 +13,11 @@
   color: white;
 }
 
+.headerIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 .logo-area {
   display: flex;
   align-items: center;

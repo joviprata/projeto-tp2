@@ -1,3 +1,4 @@
+/* page.module.css */
 .container {
   background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #b3d9ff 100%);
   height: 100vh;
@@ -15,7 +16,7 @@
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
-  box-shadow: 0 4pxs 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -40,6 +41,24 @@
 
 .formContainer:hover {
   transform: scale(1.02);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
 }
 
 .input {
@@ -92,57 +111,60 @@
   font-size: 0.9rem;
   color: white;
   text-align: center;
+  margin-top: 10px;
 }
 
 .bruno a {
   color: white;
   text-decoration: underline;
-}
-
-.checkboxContainer {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  cursor: pointer;
-  color: white;
-  font-size: 1rem;
-  position: relative;
-}
-
-.checkboxInput {
-  opacity: 0;
-  position: absolute;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  z-index: 2;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.checkboxCustom {
-  width: 20px;
-  height: 20px;
-  border: 2px solid white;
-  border-radius: 50%;
-  display: inline-block;
-  position: relative;
-  box-sizing: border-box;
+.errorMessage {
+  color: #ff6b6b;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  animation: fadeIn 0.3s ease;
 }
 
-.checkboxInput:checked + .checkboxCustom::after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 8px;
-  height: 8px;
-  background: #2563eb;
-  border-radius: 50%;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.checkboxText {
-  margin-left: 0.5rem;
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-8px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(8px);
+  }
 }
 
 /* Responsividade */
@@ -162,5 +184,10 @@
   .input,
   .button {
     font-size: 0.9rem;
+    padding: 0.8rem;
+  }
+
+  .label {
+    font-size: 0.8rem;
   }
 }

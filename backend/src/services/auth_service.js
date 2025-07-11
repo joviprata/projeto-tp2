@@ -21,7 +21,6 @@ const login = async ({ email, password }) => {
         error: 'Senha inválida',
       };
     }
-
     return {
       status: 200,
       message: 'Login realizado com sucesso',

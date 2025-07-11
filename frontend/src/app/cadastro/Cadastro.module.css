@@ -151,6 +151,39 @@
   box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.5);
 }
 
+/* New styles for messages */
+.message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 640px) {
   .header {
@@ -170,7 +203,66 @@
     gap: 1rem;
   }
 
-  .input, .button {
+  .input,
+  .button {
     font-size: 0.9rem;
   }
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.checkboxInput {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkboxCustom {
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevent it from shrinking */
+  margin-right: 10px;
+  position: relative; /* For the checkmark */
+}
+
+.checkboxInput:checked + .checkboxCustom {
+  background-color: #2196f3;
+}
+
+.checkboxCustom:after {
+  content: '';
+  position: absolute;
+  display: none;
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.checkboxInput:checked + .checkboxCustom:after {
+  display: block;
+}
+
+.checkboxText {
+  color: white;
+  font-size: 0.95rem;
+  line-height: 1.3;
 }
