@@ -30,12 +30,14 @@ UserIcon.propTypes = {
 export default function Produtos() {
   const router = useRouter();
 
-  const produtos = Array(15).fill({
-    nome: 'Nome Produto 123',
+  // Gerar IDs únicos para cada produto
+  const produtos = Array.from({ length: 15 }, (_, i) => ({
+    id: `prod-${i + 1}`, // ID único para cada produto
+    nome: `Nome Produto ${i + 1}`,
     descricao:
       'Descrição do produto descrição do produto descrição do produto descrição do produto...',
-    preco: 'R$ 1000,00',
-  });
+    preco: `R$ ${(1000 + i * 100).toLocaleString('pt-BR')}`,
+  }));
 
   const handleEditarSupermarket = (e) => {
     e.preventDefault();
@@ -55,8 +57,10 @@ export default function Produtos() {
         </div>
         <div className={styles.headerActions}>
           <button
+            type="button" // Adicionado type="button"
             className={styles.headerButton}
             onClick={handleEditarSupermarket}
+            aria-label="Editar supermercado"
           >
             <UserIcon className={styles.headerIcon} />
           </button>
@@ -65,8 +69,10 @@ export default function Produtos() {
 
       <h2 className={styles.subtitulo}>Meus Produtos:</h2>
       <div className={styles['produtos-grid']}>
-        {produtos.map((produto, index) => (
-          <div key={index} className={styles.card}>
+        {produtos.map((produto) => (
+          <div key={produto.id} className={styles.card}>
+            {' '}
+            {/* Usando ID único */}
             <div className={styles['card-top']}>{produto.nome}</div>
             <div className={styles['card-body']}>
               <p className={styles.descricao}>{produto.descricao}</p>
