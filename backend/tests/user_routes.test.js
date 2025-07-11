@@ -121,7 +121,6 @@ describe('Rotas de Usuário', () => {
         }),
       );
     });
-
     it('deve retornar 404 se o usuário a ser atualizado não for encontrado', async () => {
       const nonExistentId = 9999;
       const response = await request(app).put(`/users/${nonExistentId}`).send({
@@ -140,6 +139,7 @@ describe('Rotas de Usuário', () => {
         email: 'conflito@email.com',
         password: 'senha123',
       };
+
       const response = await request(app).put(`/users/${existingUserId}`).send(conflictingData);
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('message', 'Email já está em uso');
