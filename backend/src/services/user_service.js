@@ -42,14 +42,20 @@ const updateUser = async (id, userData) => {
     // Validações de campos obrigatórios
     if (
       userData.name === undefined ||
-      userData.email === undefined ||
-      userData.password === undefined
+      userData.email === undefined
     ) {
-      return { status: 400, message: 'Campo(s) invalido(s)' };
+      return { status: 400, message: 'Nome e email são obrigatórios' };
     }
 
-    if (userData.name === '' || userData.email === '' || userData.password === '') {
-      return { status: 400, message: 'Campo(s) invalido(s)' };
+    if (userData.name === '' || userData.email === '') {
+      return { status: 400, message: 'Nome e email não podem estar vazios' };
+    }
+
+    // Senha é opcional na atualização (se não for fornecida, mantém a atual)
+    if (userData.password === undefined) {
+      delete userData.password;
+    } else if (userData.password === '') {
+      return { status: 400, message: 'Senha não pode estar vazia' };
     }
 
     // Verifica se usuário existe
