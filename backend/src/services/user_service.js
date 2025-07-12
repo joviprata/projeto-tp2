@@ -40,10 +40,7 @@ const updateUser = async (id, userData) => {
     }
 
     // Validações de campos obrigatórios
-    if (
-      userData.name === undefined ||
-      userData.email === undefined
-    ) {
+    if (userData.name === undefined || userData.email === undefined) {
       return { status: 400, message: 'Nome e email são obrigatórios' };
     }
 

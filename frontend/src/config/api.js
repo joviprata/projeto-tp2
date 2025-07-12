@@ -12,7 +12,12 @@ const api = axios.create({
 // Interceptor para logs de debug
 api.interceptors.request.use(
   (config) => {
-    console.log('🚀 Requisição:', config.method?.toUpperCase(), config.url, config.data);
+    console.log(
+      '🚀 Requisição:',
+      config.method.toUpperCase(),
+      config.url,
+      config.data
+    );
     return config;
   },
   (error) => {
@@ -27,9 +32,13 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('❌ Erro na resposta:', error.response?.status, error.response?.data);
+    console.error(
+      '❌ Erro na resposta:',
+      error.response.status,
+      error.response.data
+    );
     return Promise.reject(error);
   }
 );
 
-export default api; 
+export default api;
