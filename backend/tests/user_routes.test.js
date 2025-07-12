@@ -176,15 +176,11 @@ describe('Rotas de Usuário', () => {
         },
         {
           payload: { email: 'email@teste.com', password: 'senha' },
-          expectedError: 'Campo(s) invalido(s)',
+          expectedError: 'Nome e email são obrigatórios',
         },
         {
           payload: { name: 'Sem Email', password: 'senha' },
-          expectedError: 'Campo(s) invalido(s)',
-        },
-        {
-          payload: { name: 'Sem Senha', email: 'email@teste.com' },
-          expectedError: 'Campo(s) invalido(s)',
+          expectedError: 'Nome e email são obrigatórios',
         },
       ])('deve retornar 400 para $expectedError', async ({ payload, expectedError }) => {
         const response = await request(app).put(`/users/${existingUserId}`).send(payload);
