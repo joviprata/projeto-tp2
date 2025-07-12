@@ -53,6 +53,8 @@ function App() {
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [existingProductPreview, setExistingProductPreview] =
+    useState<Product | null>(null);
 
   // Buscar produtos e supermercados do backend
   useEffect(() => {
@@ -220,6 +222,7 @@ function App() {
   };
 
   const handleTitleClick = () => {
+    console.log('Título clicado - está visível!');
     router.push('/homeCliente');
   };
 
@@ -287,12 +290,44 @@ function App() {
       supermarketId: '',
       userId: 1,
     });
+    setExistingProductPreview(null);
     setShowNewProductModal(true);
   };
 
   const closeNewProductModal = () => {
     setShowNewProductModal(false);
     setSubmitting(false);
+    setExistingProductPreview(null);
+  };
+
+  // Função para verificar se produto existe pelo código de barras
+  const checkExistingProduct = async (barCode: string) => {
+    if (barCode.length < 8) {
+      setExistingProductPreview(null);
+      return;
+    }
+
+    try {
+      const searchResponse = await api.get('/products');
+      const existingProduct = searchResponse.data.find(
+        (product: Product) => product.barCode === barCode
+      );
+
+      if (existingProduct) {
+        setExistingProductPreview(existingProduct);
+        // Preencher automaticamente nome e descrição se encontrar produto
+        setNewProduct((prev) => ({
+          ...prev,
+          name: existingProduct.name,
+          variableDescription: existingProduct.variableDescription || '',
+        }));
+      } else {
+        setExistingProductPreview(null);
+      }
+    } catch (err) {
+      console.log('Erro ao verificar produto existente:', err);
+      setExistingProductPreview(null);
+    }
   };
 
   const handleCreateProductAndPrice = async (e: React.FormEvent) => {
@@ -315,21 +350,56 @@ function App() {
     try {
       setSubmitting(true);
 
-      // Primeiro, criar o produto
-      const productResponse = await api.post('/products', {
-        name: newProduct.name,
-        barCode: newProduct.barCode,
-        variableDescription: newProduct.variableDescription || undefined,
-      });
+      // Primeiro, verificar se o produto já existe pelo código de barras
+      let existingProduct = null;
+      try {
+        const searchResponse = await api.get('/products');
+        existingProduct = searchResponse.data.find(
+          (product: Product) => product.barCode === newProduct.barCode
+        );
+      } catch (err) {
+        console.log('Erro ao buscar produtos existentes:', err);
+      }
 
-      const createdProduct = productResponse.data;
+      let productToUse = existingProduct;
 
-      // Depois, criar o registro de preço
+      // Se o produto não existe, criar um novo
+      if (!existingProduct) {
+        const productResponse = await api.post('/products', {
+          name: newProduct.name,
+          barCode: newProduct.barCode,
+          variableDescription: newProduct.variableDescription || undefined,
+        });
+        productToUse = productResponse.data;
+      } else {
+        // Verificar se já existe um registro de preço para este produto neste supermercado
+        try {
+          const priceRecordsResponse = await api.get('/price-records');
+          const existingPriceRecord = priceRecordsResponse.data.find(
+            (record: any) =>
+              record.productId === existingProduct.id &&
+              record.supermarketId === parseInt(newProduct.supermarketId)
+          );
+
+          if (existingPriceRecord) {
+            showNotification(
+              'error',
+              'Registro já existe',
+              'Já existe um registro de preço para este produto neste supermercado.'
+            );
+            return;
+          }
+        } catch (err) {
+          console.log('Erro ao verificar registros de preço:', err);
+        }
+      }
+
+      // Criar o registro de preço
       await api.post('/price-records', {
         price: parseFloat(
           newProduct.price.replace('R$', '').replace(',', '.').trim()
         ),
-        productId: createdProduct.id,
+        productId: productToUse.id,
         supermarketId: parseInt(newProduct.supermarketId),
         userId: newProduct.userId,
         available: true,
@@ -341,11 +411,20 @@ function App() {
       setProducts(updatedProducts.data);
 
       closeNewProductModal();
-      showNotification(
-        'success',
-        'Produto criado!',
-        'Produto e registro de preço criados com sucesso!'
-      );
+
+      if (existingProduct) {
+        showNotification(
+          'success',
+          'Preço adicionado!',
+          `Registro de preço criado para o produto "${existingProduct.name}" no supermercado selecionado.`
+        );
+      } else {
+        showNotification(
+          'success',
+          'Produto criado!',
+          'Produto e registro de preço criados com sucesso!'
+        );
+      }
     } catch (err) {
       console.error('Erro ao criar produto e preço:', err);
       showNotification(
@@ -398,7 +477,11 @@ function App() {
             <div className={styles.brandIcon} onClick={handleLogoClick}>
               <Logo />
             </div>
-            <h1 className={styles.brandTitle} onClick={handleTitleClick}>
+            <h1
+              className={styles.brandTitle}
+              onClick={handleTitleClick}
+              style={{ color: 'white', fontSize: '1.25rem', fontWeight: '700' }}
+            >
               Global Market
             </h1>
           </div>
@@ -460,9 +543,42 @@ function App() {
             onSubmit={handleCreateProductAndPrice}
           >
             <div className={styles['price-modal-header']}>
-              Adicionar Novo Produto e Preço
+              {existingProductPreview
+                ? 'Adicionar Preço ao Produto Existente'
+                : 'Adicionar Novo Produto'}
             </div>
             <div className={styles['price-modal-content']}>
+              {existingProductPreview && (
+                <div className={styles['existing-product-info']}>
+                  <p className={styles['existing-product-label']}>
+                    Produto encontrado:
+                  </p>
+                  <p className={styles['existing-product-name']}>
+                    {existingProductPreview.name}
+                  </p>
+                  <p className={styles['existing-product-description']}>
+                    {existingProductPreview.variableDescription ||
+                      'Sem descrição adicional'}
+                  </p>
+                </div>
+              )}
+
+              <label className={styles['price-modal-label']}>
+                Código de barras *
+              </label>
+              <input
+                className={styles['price-modal-input']}
+                type="text"
+                value={newProduct.barCode}
+                onChange={(e) => {
+                  const barCode = e.target.value;
+                  setNewProduct({ ...newProduct, barCode });
+                  checkExistingProduct(barCode);
+                }}
+                placeholder="Ex: 123456789012"
+                required
+              />
+
               <label className={styles['price-modal-label']}>
                 Nome do produto *
               </label>
@@ -475,20 +591,7 @@ function App() {
                 }
                 placeholder="Ex: Leite Integral"
                 required
-              />
-
-              <label className={styles['price-modal-label']}>
-                Código de barras *
-              </label>
-              <input
-                className={styles['price-modal-input']}
-                type="text"
-                value={newProduct.barCode}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, barCode: e.target.value })
-                }
-                placeholder="Ex: 123456789012"
-                required
+                disabled={!!existingProductPreview}
               />
 
               <label className={styles['price-modal-label']}>
@@ -505,6 +608,7 @@ function App() {
                   })
                 }
                 placeholder="Ex: 1L, 500g, etc."
+                disabled={!!existingProductPreview}
               />
 
               <label className={styles['price-modal-label']}>Preço *</label>
@@ -548,7 +652,11 @@ function App() {
                   className={styles['price-modal-btn']}
                   disabled={submitting}
                 >
-                  {submitting ? 'Criando...' : 'Criar Produto e Preço'}
+                  {submitting
+                    ? 'Salvando...'
+                    : existingProductPreview
+                      ? 'Adicionar Preço'
+                      : 'Criar Produto e Preço'}
                 </button>
                 <button
                   type="button"
