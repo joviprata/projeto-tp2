@@ -33,7 +33,9 @@ export default function ListaDetalhesPage() {
     return (
       <div className={styles.container}>
         <h2>Lista não encontrada</h2>
-        <button onClick={() => router.back()}>Voltar</button>
+        <button type="button" onClick={() => router.back()}>
+          Voltar
+        </button>
       </div>
     );
   }
@@ -43,11 +45,15 @@ export default function ListaDetalhesPage() {
       <h1 className={styles.title}>{lista.name}</h1>
       <h3>Produtos:</h3>
       <ul>
-        {lista.products.map((prod, idx) => (
-          <li key={idx}>{prod}</li>
+        {lista.products.map((prod) => (
+          <li key={prod}>{prod}</li>
         ))}
       </ul>
-      <button onClick={() => router.back()} className={styles.button}>
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className={styles.button}
+      >
         Voltar
       </button>
     </div>
