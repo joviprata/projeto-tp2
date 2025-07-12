@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const swaggerUi = require('swagger-ui-express');
 const logger = require('./config/logger');
 const productRoutes = require('./routes/product_routes');
 const authRoutes = require('./routes/auth_route');
@@ -8,6 +9,7 @@ const supermarketRoutes = require('./routes/supermarket_route');
 const userRoutes = require('./routes/user_route');
 const productListRoutes = require('./routes/product_lists_route');
 const priceRecordsRoutes = require('./routes/price_records_route');
+const swaggerSpec = require('./config/swaggerConfig');
 
 const app = express();
 app.use(express.json());
@@ -24,6 +26,7 @@ app.use('/products', productRoutes);
 app.use('/users', userRoutes);
 app.use('/product-lists', productListRoutes);
 app.use('/price-records', priceRecordsRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {
   res.send('Projeto Rodando');
