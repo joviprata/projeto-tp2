@@ -52,9 +52,9 @@ afterAll(async () => {
   await prismaDatabase.$disconnect();
 });
 
-describe('Price Records Routes', () => {
+describe('Rotas de Registros de Preço', () => {
   describe('POST /price-records', () => {
-    it('should create a new price record', async () => {
+    it('deve criar um novo registro de preço', async () => {
       const response = await request(app).post('/price-records').send({
         price: 9.99,
         productId: testProduct.id,
@@ -67,7 +67,7 @@ describe('Price Records Routes', () => {
       expect(response.body.price).toBe('9.99');
     });
 
-    it('should return 400 for incomplete data', async () => {
+    it('deve retornar 400 para dados incompletos', async () => {
       const response = await request(app).post('/price-records').send({ price: 9.99 });
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Dados incompletos para criar o registro de preço.');
@@ -75,7 +75,7 @@ describe('Price Records Routes', () => {
   });
 
   describe('GET /price-records', () => {
-    it('should return all price records', async () => {
+    it('deve retornar todos os registros de preço', async () => {
       await prismaDatabase.priceRecord.create({
         data: {
           price: 9.99,
@@ -93,7 +93,7 @@ describe('Price Records Routes', () => {
   });
 
   describe('GET /price-records/:id', () => {
-    it('should return a price record by id', async () => {
+    it('deve retornar um registro de preço pelo id', async () => {
       const priceRecord = await prismaDatabase.priceRecord.create({
         data: {
           price: 9.99,
@@ -108,7 +108,7 @@ describe('Price Records Routes', () => {
       expect(response.body.id).toBe(priceRecord.id);
     });
 
-    it('should return 404 for a non-existent id', async () => {
+    it('deve retornar 404 para um id inexistente', async () => {
       const response = await request(app).get('/price-records/999');
       expect(response.status).toBe(404);
       expect(response.body.error).toBe('Registro de preço não encontrado.');
@@ -116,7 +116,7 @@ describe('Price Records Routes', () => {
   });
 
   describe('PUT /price-records/:id', () => {
-    it('should update a price record', async () => {
+    it('deve atualizar um registro de preço', async () => {
       const priceRecord = await prismaDatabase.priceRecord.create({
         data: {
           price: 9.99,
@@ -137,7 +137,7 @@ describe('Price Records Routes', () => {
   });
 
   describe('DELETE /price-records/:id', () => {
-    it('should delete a price record', async () => {
+    it('deve deletar um registro de preço', async () => {
       const priceRecord = await prismaDatabase.priceRecord.create({
         data: {
           price: 9.99,
@@ -153,7 +153,7 @@ describe('Price Records Routes', () => {
   });
 
   describe('GET /price-records/supermarket/:supermarketId', () => {
-    it('should return price records by supermarket id', async () => {
+    it('deve retornar registros de preço pelo id do supermercado', async () => {
       await prismaDatabase.priceRecord.create({
         data: {
           price: 9.99,
@@ -172,7 +172,7 @@ describe('Price Records Routes', () => {
   });
 
   describe('GET /price-records/product/:productId', () => {
-    it('should return price records by product id', async () => {
+    it('deve retornar registros de preço pelo id do produto', async () => {
       await prismaDatabase.priceRecord.create({
         data: {
           price: 9.99,
