@@ -26,6 +26,22 @@ interface Notification {
   message: string;
 }
 
+interface ShoppingList {
+  id: number;
+  listName: string;
+  creationDate: string;
+  userId: number;
+  items?: ListItem[];
+}
+
+interface ListItem {
+  listId: number;
+  productId: number;
+  quantity: number;
+  isTaken: boolean;
+  product?: Product;
+}
+
 function App() {
   const router = useRouter();
   const [priceFilter, setPriceFilter] = useState('');
@@ -55,6 +71,24 @@ function App() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [existingProductPreview, setExistingProductPreview] =
     useState<Product | null>(null);
+
+  // Estados para o sistema de listas de compras
+  const [showListModal, setShowListModal] = useState(false);
+  const [selectedProductToAdd, setSelectedProductToAdd] =
+    useState<Product | null>(null);
+  const [userLists, setUserLists] = useState<ShoppingList[]>([]);
+  const [selectedList, setSelectedList] = useState<string>('');
+  const [newListName, setNewListName] = useState('');
+  const [productQuantity, setProductQuantity] = useState(1);
+  const [isCreatingNewList, setIsCreatingNewList] = useState(false);
+  const [submittingToList, setSubmittingToList] = useState(false);
+
+  // Definir userId padrão no localStorage se não existir
+  useEffect(() => {
+    if (!localStorage.getItem('userId')) {
+      localStorage.setItem('userId', '2'); // Usar userId 2 como cliente padrão
+    }
+  }, []);
 
   // Buscar produtos e supermercados do backend
   useEffect(() => {
@@ -89,8 +123,20 @@ function App() {
       }
     };
 
+    const fetchUserLists = async () => {
+      try {
+        const userId = localStorage.getItem('userId') || '2'; // Usar userId 2 para cliente
+        const response = await api.get(`/product-lists/user/${userId}`);
+        setUserLists(response.data.data || []);
+      } catch (err) {
+        console.error('Erro ao buscar listas do usuário:', err);
+        setUserLists([]);
+      }
+    };
+
     fetchProducts();
     fetchSupermarkets();
+    fetchUserLists();
   }, []);
 
   // Logo component
@@ -231,7 +277,7 @@ function App() {
   };
 
   const handleCartClick = () => {
-    router.push('/shopCart');
+    router.push('/myLists');
   };
 
   const formatPrice = (price: number) => {
@@ -242,7 +288,15 @@ function App() {
   };
 
   const handleAddShopList = (productId: number) => {
-    console.log(`Adding product ${productId} to cart`);
+    const product = products.find((p) => p.id === productId);
+    if (product) {
+      setSelectedProductToAdd(product);
+      setShowListModal(true);
+      setSelectedList('');
+      setNewListName('');
+      setProductQuantity(1);
+      setIsCreatingNewList(false);
+    }
   };
 
   // Sistema de notificações
@@ -434,6 +488,102 @@ function App() {
       );
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Funções do modal de listas de compras
+  const closeListModal = () => {
+    setShowListModal(false);
+    setSelectedProductToAdd(null);
+    setSelectedList('');
+    setNewListName('');
+    setProductQuantity(1);
+    setIsCreatingNewList(false);
+    setSubmittingToList(false);
+  };
+
+  const handleListSelectionChange = (value: string) => {
+    if (value === 'new') {
+      setIsCreatingNewList(true);
+      setSelectedList('');
+    } else {
+      setIsCreatingNewList(false);
+      setSelectedList(value);
+    }
+  };
+
+  const handleAddToList = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedProductToAdd) return;
+
+    try {
+      setSubmittingToList(true);
+
+      let listId = selectedList;
+
+      // Se está criando uma nova lista
+      if (isCreatingNewList) {
+        if (!newListName.trim()) {
+          showNotification(
+            'error',
+            'Nome da lista obrigatório',
+            'Por favor, insira um nome para a nova lista.'
+          );
+          return;
+        }
+
+        const userId = localStorage.getItem('userId') || '2';
+        const newListResponse = await api.post('/product-lists', {
+          listName: newListName,
+          userId: parseInt(userId),
+        });
+
+        listId = newListResponse.data.data.id.toString();
+
+        // Atualizar a lista de listas do usuário
+        const updatedListsResponse = await api.get(
+          `/product-lists/user/${userId}`
+        );
+        setUserLists(updatedListsResponse.data.data || []);
+      }
+
+      if (!listId) {
+        showNotification(
+          'error',
+          'Lista não selecionada',
+          'Por favor, selecione uma lista ou crie uma nova.'
+        );
+        return;
+      }
+
+      // Adicionar produto à lista
+      await api.post(`/product-lists/${listId}/items`, {
+        productId: selectedProductToAdd.id,
+        quantity: productQuantity,
+      });
+
+      closeListModal();
+
+      const listName = isCreatingNewList
+        ? newListName
+        : userLists.find((list) => list.id.toString() === listId)?.listName ||
+          'lista';
+
+      showNotification(
+        'success',
+        'Produto adicionado!',
+        `"${selectedProductToAdd.name}" foi adicionado à ${listName}.`
+      );
+    } catch (err) {
+      console.error('Erro ao adicionar produto à lista:', err);
+      showNotification(
+        'error',
+        'Erro ao adicionar produto',
+        'Não foi possível adicionar o produto à lista. Tente novamente.'
+      );
+    } finally {
+      setSubmittingToList(false);
     }
   };
 
@@ -663,6 +813,100 @@ function App() {
                   className={`${styles['price-modal-btn']} ${styles['cancel']}`}
                   onClick={closeNewProductModal}
                   disabled={submitting}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Modal de Adicionar à Lista */}
+      {showListModal && selectedProductToAdd && (
+        <div className={styles['price-modal-overlay']}>
+          <form
+            className={styles['new-product-modal']}
+            onSubmit={handleAddToList}
+          >
+            <div className={styles['price-modal-header']}>
+              Adicionar à Lista de Compras
+            </div>
+            <div className={styles['price-modal-content']}>
+              <div className={styles['existing-product-info']}>
+                <p className={styles['existing-product-label']}>
+                  Produto selecionado:
+                </p>
+                <p className={styles['existing-product-name']}>
+                  {selectedProductToAdd.name}
+                </p>
+                <p className={styles['existing-product-description']}>
+                  {selectedProductToAdd.variableDescription ||
+                    'Sem descrição adicional'}
+                </p>
+              </div>
+
+              <label className={styles['price-modal-label']}>
+                Quantidade *
+              </label>
+              <input
+                className={styles['price-modal-input']}
+                type="number"
+                min="1"
+                value={productQuantity}
+                onChange={(e) =>
+                  setProductQuantity(parseInt(e.target.value) || 1)
+                }
+                required
+              />
+
+              <label className={styles['price-modal-label']}>
+                Selecionar Lista *
+              </label>
+              <select
+                className={styles['price-modal-input']}
+                value={isCreatingNewList ? 'new' : selectedList}
+                onChange={(e) => handleListSelectionChange(e.target.value)}
+                required
+              >
+                <option value="">Selecione uma lista</option>
+                {userLists.map((list) => (
+                  <option key={list.id} value={list.id.toString()}>
+                    {list.listName}
+                  </option>
+                ))}
+                <option value="new">+ Criar nova lista</option>
+              </select>
+
+              {isCreatingNewList && (
+                <>
+                  <label className={styles['price-modal-label']}>
+                    Nome da nova lista *
+                  </label>
+                  <input
+                    className={styles['price-modal-input']}
+                    type="text"
+                    value={newListName}
+                    onChange={(e) => setNewListName(e.target.value)}
+                    placeholder="Ex: Compras da semana"
+                    required
+                  />
+                </>
+              )}
+
+              <div className={styles['price-modal-actions']}>
+                <button
+                  type="submit"
+                  className={styles['price-modal-btn']}
+                  disabled={submittingToList}
+                >
+                  {submittingToList ? 'Adicionando...' : 'Adicionar à Lista'}
+                </button>
+                <button
+                  type="button"
+                  className={`${styles['price-modal-btn']} ${styles['cancel']}`}
+                  onClick={closeListModal}
+                  disabled={submittingToList}
                 >
                   Cancelar
                 </button>
