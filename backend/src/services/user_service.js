@@ -40,10 +40,7 @@ const updateUser = async (id, userData) => {
     }
 
     // Validações de campos obrigatórios
-    if (
-      userData.name === undefined ||
-      userData.email === undefined
-    ) {
+    if (userData.name === undefined || userData.email === undefined) {
       return { status: 400, message: 'Nome e email são obrigatórios' };
     }
 
@@ -53,7 +50,7 @@ const updateUser = async (id, userData) => {
 
     // Senha é opcional na atualização (se não for fornecida, mantém a atual)
     if (userData.password === undefined) {
-      delete userData.password;
+      // If password is undefined, it means it's not being updated, so no action needed.
     } else if (userData.password === '') {
       return { status: 400, message: 'Senha não pode estar vazia' };
     }
@@ -97,7 +94,6 @@ const updateUser = async (id, userData) => {
     // Retorna todos os dados incluindo a senha
     return { status: 200, data: updatedUser };
   } catch (error) {
-    // Trata erro de email único (backup para caso a verificação manual falhe)
     if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
       return { status: 400, message: 'Email já está em uso' };
     }
