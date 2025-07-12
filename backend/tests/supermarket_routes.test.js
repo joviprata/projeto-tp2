@@ -15,6 +15,38 @@ const createSupermarket = async () => {
   const { supermarketId } = response.body;
   return supermarketId;
 };
+const createSupermarketWithParams = async (name, email, password, address) => {
+  const supermarketData = {
+    name,
+    email,
+    password,
+    address,
+  };
+
+  const response = await request(app).post('/auth/register/manager').send(supermarketData);
+
+  const { supermarketId } = response.body;
+  return supermarketId;
+};
+const createUser = async (name, email, password) => {
+  const response = await request(app).post('/auth/register/user').send({
+    name,
+    email,
+    password,
+  });
+  expect(response.status).toBe(201);
+  return response.body.userId;
+};
+
+const createShoppingList = async (userId, listName) => {
+  const response = await request(app).post('/product-lists').send({ userId, listName });
+  if (response.status === 201) {
+    return response.body.data.id;
+  }
+  throw new Error(
+    `Failed to create shopping list: Status ${response.status}, Error: ${response.body.error || 'Unknown error'}`,
+  );
+};
 
 beforeEach(async () => {
   const tableNames = [
@@ -162,5 +194,112 @@ describe('DELETE /supermarkets/:id - Deletar supermercado', () => {
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('error');
     expect(response.body.error).toBe('Supermercado não encontrado');
+  });
+});
+
+describe('GET /supermarkets/cheapest/:listId - Obter supermercados com os preços mais baixos para uma lista', () => {
+  it('deve retornar supermercados ordenados pelo preço total da lista', async () => {
+    const userId = await createUser('User 1', 'user1@test.com', 'password123');
+    const supermarket1Id = await createSupermarketWithParams(
+      'Supermercado 1',
+      'email1@test.com',
+      'password1',
+      'Endereço 1',
+    );
+    const supermarket2Id = await createSupermarketWithParams(
+      'Supermercado 2',
+      'email2@test.com',
+      'password2',
+      'Endereço 2',
+    );
+
+    const product1 = await prismaDatabase.product.create({
+      data: { barCode: '111', name: 'Product A' },
+    });
+    const product2 = await prismaDatabase.product.create({
+      data: { barCode: '222', name: 'Product B' },
+    });
+
+    await prismaDatabase.priceRecord.createMany({
+      data: [
+        {
+          productId: product1.id,
+          supermarketId: supermarket1Id,
+          price: 10.0,
+          userId,
+          available: true,
+        },
+        {
+          productId: product2.id,
+          supermarketId: supermarket1Id,
+          price: 5.0,
+          userId,
+          available: true,
+        },
+        {
+          productId: product1.id,
+          supermarketId: supermarket2Id,
+          price: 9.0,
+          userId,
+          available: true,
+        },
+        {
+          productId: product2.id,
+          supermarketId: supermarket2Id,
+          price: 6.0,
+          userId,
+          available: true,
+        },
+      ],
+    });
+
+    const listId = await createShoppingList(userId, 'Minha Lista');
+    await prismaDatabase.listItem.createMany({
+      data: [
+        { listId, productId: product1.id, quantity: 1 },
+        { listId, productId: product2.id, quantity: 1 },
+      ],
+    });
+
+    const response = await request(app).get(`/supermarkets/cheapest/${listId}`);
+    expect(response.status).toBe(200);
+    expect(response.body.supermarkets.length).toBeGreaterThan(0);
+    expect(response.body.supermarkets[0].totalPrice).toBeLessThanOrEqual(
+      response.body.supermarkets[1].totalPrice,
+    );
+  });
+
+  it('deve retornar status 404 se a lista não for encontrada ou estiver vazia', async () => {
+    const response = await request(app).get('/supermarkets/cheapest/999');
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada ou vazia');
+  });
+
+  it('deve retornar status 404 se nenhum supermercado tiver todos os produtos', async () => {
+    const userId = await createUser('User 2', 'user2@test.com', 'password123');
+    const supermarketId = await createSupermarket();
+
+    const product1 = await prismaDatabase.product.create({ data: { barCode: '333', name: 'P1' } });
+    const product2 = await prismaDatabase.product.create({ data: { barCode: '444', name: 'P2' } });
+
+    await prismaDatabase.priceRecord.create({
+      data: { productId: product1.id, supermarketId, price: 10, userId, available: true },
+    });
+
+    const listId = await createShoppingList(userId, 'Lista parcial');
+    await prismaDatabase.listItem.createMany({
+      data: [
+        { listId, productId: product1.id, quantity: 1 },
+        { listId, productId: product2.id, quantity: 1 },
+      ],
+    });
+
+    const response = await request(app).get(`/supermarkets/cheapest/${listId}`);
+    expect(response.status).toBe(404);
+
+    expect(response.body).toHaveProperty(
+      'error',
+      'Nenhum supermercado encontrado com todos os produtos da lista',
+    );
   });
 });

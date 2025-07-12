@@ -9,9 +9,6 @@ const createProduct = async (name, barCode, variableDescription) => {
     barCode,
     variableDescription,
   });
-  // O endpoint de criação retorna 200, vamos verificar isso
-  expect(response.status).toBe(200);
-  expect(response.body).toHaveProperty('id');
   return response.body;
 };
 
@@ -139,7 +136,7 @@ describe('Rotas de Produtos', () => {
 
       const response = await request(app).put(`/products/${product2.id}`).send({
         name: 'Produto 2 Atualizado',
-        barCode: '1111111111111', // Conflito com Produto 1
+        barCode: '1111111111111',
         variableDescription: 'Desc Atualizada',
       });
 

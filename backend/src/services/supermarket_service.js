@@ -100,10 +100,75 @@ const putSupermarketByManagerId = async (Id, supermarketData) => {
   }
 };
 
+const getCheapestSupermarket = async (listId) => {
+  try {
+    const shoppingListItems = await prismaDatabase.listItem.findMany({
+      where: { listId: parseInt(listId, 10) },
+      select: { productId: true, quantity: true },
+    });
+
+    if (shoppingListItems.length === 0) {
+      return { status: 404, error: 'Lista de compras não encontrada ou vazia' };
+    }
+
+    const productIds = shoppingListItems.map((item) => item.productId);
+    const priceRecords = await prismaDatabase.priceRecord.findMany({
+      where: { productId: { in: productIds }, available: true },
+      include: { supermarket: true, product: true },
+      orderBy: { price: 'asc' },
+    });
+
+    const supermarketsMap = new Map();
+    shoppingListItems.forEach((item) => {
+      const relevant = priceRecords.filter((p) => p.productId === item.productId);
+      relevant.forEach((record) => {
+        const { id } = record.supermarket;
+        if (!supermarketsMap.has(id)) {
+          supermarketsMap.set(id, {
+            id,
+            name: record.supermarket.name,
+            address: record.supermarket.address,
+            totalPrice: 0,
+            products: [],
+          });
+        }
+        const sm = supermarketsMap.get(id);
+        sm.products.push({
+          productId: record.productId,
+          productName: record.product.name,
+          price: record.price,
+          quantity: item.quantity,
+          subtotal: item.quantity * record.price,
+        });
+        sm.totalPrice += item.quantity * record.price;
+      });
+    });
+
+    const result = Array.from(supermarketsMap.values()).filter((sm) => {
+      const ids = new Set(sm.products.map((p) => p.productId));
+      return productIds.every((pid) => ids.has(pid));
+    });
+
+    result.sort((a, b) => a.totalPrice - b.totalPrice);
+
+    if (result.length === 0) {
+      return {
+        status: 404,
+        error: 'Nenhum supermercado encontrado com todos os produtos da lista',
+      };
+    }
+
+    return { status: 200, supermarkets: result };
+  } catch {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
+};
+
 module.exports = {
   getAllSupermarkets,
   updateSupermarket,
   getSupermarketById,
   deleteSupermarket,
   putSupermarketByManagerId,
+  getCheapestSupermarket,
 };
