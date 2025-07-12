@@ -4,8 +4,7 @@ const getAllUsers = async () => {
   try {
     const users = await prismaDatabase.user.findMany();
     return { status: 200, users };
-  } catch (error) {
-    console.error('Erro ao buscar usuários:', error);
+  } catch {
     return { status: 500, message: 'Erro interno do servidor' };
   }
 };
@@ -22,8 +21,7 @@ const getUserById = async (id) => {
       status: 200,
       data: user,
     };
-  } catch (error) {
-    console.error('Erro ao buscar usuário:', error);
+  } catch {
     return { status: 500, error: 'Erro interno do servidor' };
   }
 };

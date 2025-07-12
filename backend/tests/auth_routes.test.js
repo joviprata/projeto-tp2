@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../src/server');
 const prismaDatabase = require('../src/prismaClient');
 
-beforeAll(async () => {
+beforeEach(async () => {
   const tableNames = [
     'users',
     'supermercado',
@@ -17,7 +17,21 @@ beforeAll(async () => {
     );
   });
 });
+
 afterAll(async () => {
+  const tableNames = [
+    'users',
+    'supermercado',
+    'produtos',
+    'registros_de_preco',
+    'listas_de_compra',
+    'itens_da_lista',
+  ];
+  tableNames.forEach(async (tableName) => {
+    await prismaDatabase.$executeRawUnsafe(
+      `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`,
+    );
+  });
   await prismaDatabase.$disconnect();
 });
 describe('POST /auth/register/manager - Validação de campos obrigatórios', () => {
@@ -399,10 +413,7 @@ describe('POST /auth/register/user - validaçao de criaçao duplicada', () => {
       password: 'senha123',
     };
 
-    // Primeiro registro
     await request(app).post('/auth/register/user').send(payload);
-
-    // Tentativa de registro duplicado
     const response = await request(app).post('/auth/register/user').send(payload);
 
     expect(response.status).toBe(409);

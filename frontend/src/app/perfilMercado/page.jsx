@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +9,6 @@ import styles from './page.module.css';
 
 export default function Perfil() {
   const router = useRouter();
-  // Valores iniciais simulados (poderiam vir de uma API)
   const [id, setId] = useState(null);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -15,7 +16,6 @@ export default function Perfil() {
   const [endereco, setEndereco] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Acessa o localStorage apenas após o componente estar montado
   useEffect(() => {
     const storedId = localStorage.getItem('userId');
     if (storedId) {
@@ -23,7 +23,6 @@ export default function Perfil() {
     }
   }, []);
 
-  // Função para lidar com mudanças nos campos
   const handleChange = (setter) => (e) => {
     setter(e.target.value);
   };
@@ -31,11 +30,6 @@ export default function Perfil() {
   const makeUpdate = async (e) => {
     e.preventDefault();
     try {
-      console.log('id: ', id);
-      console.log('nome: ', nome);
-      console.log('email: ', email);
-      console.log('senha: ', senha);
-      console.log('endereco: ', endereco);
       const response = await axios.put(
         `http://localhost:3001/supermarkets/manager/${id}`,
         {
@@ -45,13 +39,10 @@ export default function Perfil() {
           address: endereco,
         }
       );
-      console.log(response.status);
       if (response.status === 200) {
-        console.log('Edição realizada com sucesso!');
         router.push('/homeProduct');
       }
       if (response.status === 401) {
-        console.log('Usuário ou senha inválidos');
         alert('Usuário ou senha inválidos');
       }
     } catch (error) {

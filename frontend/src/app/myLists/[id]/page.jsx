@@ -7,19 +7,19 @@ import styles from '../page.module.css';
 const listas = [
   {
     id: 1,
-    name: "Lista 1",
-    products: ["P1", "P2"],
+    name: 'Lista 1',
+    products: ['P1', 'P2'],
   },
   {
     id: 2,
-    name: "Lista 2",
-    products: ["P1", "P2", "P3"],
+    name: 'Lista 2',
+    products: ['P1', 'P2', 'P3'],
   },
   {
     id: 3,
-    name: "Lista 3",
-    products: ["P1", "P2", "P3", "P4"],
-  }
+    name: 'Lista 3',
+    products: ['P1', 'P2', 'P3', 'P4'],
+  },
 ];
 
 export default function ListaDetalhesPage() {
@@ -47,7 +47,9 @@ export default function ListaDetalhesPage() {
           <li key={idx}>{prod}</li>
         ))}
       </ul>
-      <button onClick={() => router.back()} className={styles.button}>Voltar</button>
+      <button onClick={() => router.back()} className={styles.button}>
+        Voltar
+      </button>
     </div>
   );
 }
