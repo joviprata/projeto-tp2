@@ -11,6 +11,28 @@ interface Product {
   barCode: string;
   variableDescription?: string;
   createdAt: string;
+  pricesBySupermarket?: PriceBySupermarket[];
+}
+
+interface PriceBySupermarket {
+  supermarket: {
+    id: number;
+    name: string;
+    address?: string;
+  };
+  priceRecords: PriceRecord[];
+}
+
+interface PriceRecord {
+  id: number;
+  price: number;
+  recordDate: string;
+  available: boolean;
+  verified: boolean;
+  user: {
+    id: number;
+    name: string;
+  };
 }
 
 interface Supermarket {
@@ -95,7 +117,7 @@ function App() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/products');
+        const response = await api.get('/products/with-price-records');
         setProducts(response.data);
         setError(null);
       } catch (err) {
@@ -425,27 +447,6 @@ function App() {
           variableDescription: newProduct.variableDescription || undefined,
         });
         productToUse = productResponse.data;
-      } else {
-        // Verificar se já existe um registro de preço para este produto neste supermercado
-        try {
-          const priceRecordsResponse = await api.get('/price-records');
-          const existingPriceRecord = priceRecordsResponse.data.find(
-            (record: any) =>
-              record.productId === existingProduct.id &&
-              record.supermarketId === parseInt(newProduct.supermarketId)
-          );
-
-          if (existingPriceRecord) {
-            showNotification(
-              'error',
-              'Registro já existe',
-              'Já existe um registro de preço para este produto neste supermercado.'
-            );
-            return;
-          }
-        } catch (err) {
-          console.log('Erro ao verificar registros de preço:', err);
-        }
       }
 
       // Criar o registro de preço
@@ -461,7 +462,7 @@ function App() {
       });
 
       // Atualizar a lista de produtos
-      const updatedProducts = await api.get('/products');
+      const updatedProducts = await api.get('/products/with-price-records');
       setProducts(updatedProducts.data);
 
       closeNewProductModal();
@@ -470,7 +471,7 @@ function App() {
         showNotification(
           'success',
           'Preço adicionado!',
-          `Registro de preço criado para o produto "${existingProduct.name}" no supermercado selecionado.`
+          `Novo registro de preço criado para o produto "${existingProduct.name}" no supermercado selecionado.`
         );
       } else {
         showNotification(
@@ -989,6 +990,78 @@ function App() {
                         <strong>Código:</strong> {product.barCode}
                       </p>
                     </div>
+
+                    {/* Seção de preços por supermercado */}
+                    {product.pricesBySupermarket &&
+                      product.pricesBySupermarket.length > 0 && (
+                        <div className={styles.pricesSection}>
+                          <h4 className={styles.pricesTitle}>
+                            Melhores preços (até 3):
+                          </h4>
+                          {product.pricesBySupermarket.map(
+                            (supermarketGroup) => (
+                              <div
+                                key={supermarketGroup.supermarket.id}
+                                className={styles.supermarketGroup}
+                              >
+                                <div className={styles.supermarketHeader}>
+                                  <h5 className={styles.supermarketName}>
+                                    {supermarketGroup.supermarket.name}
+                                  </h5>
+                                  {supermarketGroup.supermarket.address && (
+                                    <p className={styles.supermarketAddress}>
+                                      {supermarketGroup.supermarket.address}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className={styles.priceRecords}>
+                                  {supermarketGroup.priceRecords.map((record) => (
+                                      <div
+                                        key={record.id}
+                                        className={styles.priceRecord}
+                                      >
+                                        <div className={styles.priceInfo}>
+                                          <span className={styles.price}>
+                                            {formatPrice(Number(record.price))}
+                                          </span>
+                                          <span className={styles.priceDate}>
+                                            {new Date(
+                                              record.recordDate
+                                            ).toLocaleDateString('pt-BR')}
+                                          </span>
+                                        </div>
+                                        <div className={styles.priceStatus}>
+                                          {record.verified && (
+                                            <span className={styles.verified}>
+                                              ✓ Verificado
+                                            </span>
+                                          )}
+                                          {!record.available && (
+                                            <span
+                                              className={styles.unavailable}
+                                            >
+                                              Indisponível
+                                            </span>
+                                          )}
+                                        </div>
+                                        <span className={styles.priceUser}>
+                                          por {record.user.name}
+                                        </span>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      )}
+
+                    {(!product.pricesBySupermarket ||
+                      product.pricesBySupermarket.length === 0) && (
+                      <div className={styles.noPrices}>
+                        <p>Nenhum preço registrado ainda.</p>
+                      </div>
+                    )}
 
                     <button
                       onClick={() => handleAddShopList(product.id)}

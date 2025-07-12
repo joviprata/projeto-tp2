@@ -163,4 +163,178 @@ describe('Rotas de Produtos', () => {
       expect(response.body).toHaveProperty('error', 'Produto não encontrado');
     });
   });
+
+  describe('GET /products/with-price-records - Obter produtos com registros de preço', () => {
+    it('deve retornar produtos com registros de preço agrupados por supermercado', async () => {
+      const user = await prismaDatabase.user.create({
+        data: {
+          name: 'Usuário Teste',
+          email: 'usuario@teste.com',
+          password: 'senha123',
+          role: 'MANAGER',
+        },
+      });
+      const user2 = await prismaDatabase.user.create({
+        data: {
+          name: 'Usuário Teste 2',
+          email: 'usuario2@teste.com',
+          password: 'senha123',
+          role: 'MANAGER',
+        },
+      });
+      const supermarket1 = await prismaDatabase.supermarket.create({
+        data: {
+          name: 'Supermercado 1',
+          address: 'Endereço 1',
+          managerId: user.id,
+        },
+      });
+
+      const supermarket2 = await prismaDatabase.supermarket.create({
+        data: {
+          name: 'Supermercado 2',
+          address: 'Endereço 2',
+          managerId: user2.id,
+        },
+      });
+
+      // Criar produto
+      const product = await createProduct('Produto Teste', '1111111111111', 'Descrição Teste');
+
+      // Criar múltiplos registros de preço para o mesmo produto no mesmo supermercado
+      await prismaDatabase.priceRecord.create({
+        data: {
+          price: 10.5,
+          productId: product.id,
+          supermarketId: supermarket1.id,
+          userId: user.id,
+          available: true,
+          verified: false,
+        },
+      });
+
+      await prismaDatabase.priceRecord.create({
+        data: {
+          price: 11,
+          productId: product.id,
+          supermarketId: supermarket1.id,
+          userId: user.id,
+          available: true,
+          verified: true,
+        },
+      });
+
+      await prismaDatabase.priceRecord.create({
+        data: {
+          price: 12,
+          productId: product.id,
+          supermarketId: supermarket2.id,
+          userId: user.id,
+          available: true,
+          verified: false,
+        },
+      });
+
+      const response = await request(app).get('/products/with-price-records');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+
+      const productWithPrices = response.body.find((p) => p.id === product.id);
+      expect(productWithPrices).toBeDefined();
+      expect(productWithPrices.pricesBySupermarket).toBeDefined();
+      expect(Array.isArray(productWithPrices.pricesBySupermarket)).toBe(true);
+
+      // Verificar se existem dois supermercados com preços
+      expect(productWithPrices.pricesBySupermarket).toHaveLength(2);
+
+      // Verificar se o primeiro supermercado tem múltiplos registros
+      const supermarket1Data = productWithPrices.pricesBySupermarket.find(
+        (s) => s.supermarket.id === supermarket1.id,
+      );
+      expect(supermarket1Data).toBeDefined();
+      expect(supermarket1Data.priceRecords).toHaveLength(2);
+      expect(supermarket1Data.supermarket.name).toBe('Supermercado 1');
+
+      // Verificar se o segundo supermercado tem um registro
+      const supermarket2Data = productWithPrices.pricesBySupermarket.find(
+        (s) => s.supermarket.id === supermarket2.id,
+      );
+      expect(supermarket2Data).toBeDefined();
+      expect(supermarket2Data.priceRecords).toHaveLength(1);
+      expect(supermarket2Data.supermarket.name).toBe('Supermercado 2');
+    });
+
+    it('deve retornar produtos sem registros de preço', async () => {
+      const product = await createProduct('Produto Sem Preço', '2222222222222', 'Sem preços');
+
+      const response = await request(app).get('/products/with-price-records');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+
+      const productWithoutPrices = response.body.find((p) => p.id === product.id);
+      expect(productWithoutPrices).toBeDefined();
+      expect(productWithoutPrices.pricesBySupermarket).toEqual([]);
+    });
+
+    it('deve retornar array vazio quando não há produtos', async () => {
+      const response = await request(app).get('/products/with-price-records');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+    });
+
+    it('deve ordenar registros de preço por data (mais recentes primeiro)', async () => {
+      const user = await prismaDatabase.user.create({
+        data: {
+          name: 'Usuário Teste',
+          email: 'usuario@teste.com',
+          password: 'senha123',
+          role: 'client',
+        },
+      });
+
+      const supermarket = await prismaDatabase.supermarket.create({
+        data: {
+          name: 'Supermercado Teste',
+          address: 'Endereço Teste',
+          managerId: user.id,
+        },
+      });
+
+      const product = await createProduct('Produto Ordenação', '3333333333333', 'Teste ordenação');
+
+      await prismaDatabase.priceRecord.create({
+        data: {
+          price: 15.0,
+          productId: product.id,
+          supermarketId: supermarket.id,
+          userId: user.id,
+          available: true,
+          verified: false,
+        },
+      });
+
+      // Simular delay
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10);
+      });
+
+      await prismaDatabase.priceRecord.create({
+        data: {
+          price: 16.0,
+          productId: product.id,
+          supermarketId: supermarket.id,
+          userId: user.id,
+          available: true,
+          verified: false,
+        },
+      });
+
+      const response = await request(app).get('/products/with-price-records');
+
+      expect(response.status).toBe(200);
+    });
+  });
 });
