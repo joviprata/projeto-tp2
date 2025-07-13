@@ -1044,7 +1044,7 @@ function App() {
                       product.pricesBySupermarket.length > 0 && (
                         <div className={styles.pricesSection}>
                           <h4 className={styles.pricesTitle}>
-                            Melhores preços (até 3):
+                            Melhores preços
                           </h4>
                           {product.pricesBySupermarket.map(
                             (supermarketGroup) => (

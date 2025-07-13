@@ -173,7 +173,7 @@ export default function Produtos() {
 
   const handleAddProductClick = () => {
     setIsEditing(false);
-    setCurrentProductData(null);
+    setCurrentProductData({});
     setShowAddEditModal(true);
   };
 
@@ -382,18 +382,20 @@ export default function Produtos() {
 }
 
 function ProductModal({ onClose, onSubmit, isEditing, initialData }) {
-  const [name, setName] = useState(initialData.name || '');
-  const [barCode, setBarCode] = useState(initialData.barCode || '');
+  const [name, setName] = useState((initialData && initialData.name) || '');
+  const [barCode, setBarCode] = useState(
+    (initialData && initialData.barCode) || ''
+  );
   const [variableDescription, setVariableDescription] = useState(
     (initialData && initialData.variableDescription) || ''
   );
-  const [price, setPrice] = useState(initialData.price || '');
+  const [price, setPrice] = useState((initialData && initialData.price) || '');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
-      id: initialData.id,
-      priceRecordId: initialData.priceRecordId,
+      id: (initialData && initialData.id) || null,
+      priceRecordId: (initialData && initialData.priceRecordId) || null,
       name,
       barCode,
       variableDescription,
@@ -466,9 +468,16 @@ ProductModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isEditing: PropTypes.bool.isRequired,
-  initialData: PropTypes.object,
+  initialData: PropTypes.shape({
+    id: PropTypes.number,
+    priceRecordId: PropTypes.number,
+    name: PropTypes.string,
+    barCode: PropTypes.string,
+    variableDescription: PropTypes.string,
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }),
 };
 
 ProductModal.defaultProps = {
-  initialData: null,
+  initialData: {},
 };
