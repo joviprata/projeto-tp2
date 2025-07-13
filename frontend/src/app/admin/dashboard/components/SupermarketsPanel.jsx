@@ -61,19 +61,12 @@ export default function SupermarketsPanel() {
           address: formData.address,
         });
       } else {
-        // Criar manager primeiro
-        const managerResponse = await api.post('/users', {
-          name: formData.managerName,
+        // Usar a rota correta para criar gerente + supermercado
+        await api.post('/auth/register/manager', {
+          name: formData.name, // Nome do supermercado (que também será usado para o gerente)
           email: formData.managerEmail,
           password: formData.managerPassword,
-          userType: 'manager',
-        });
-
-        // Criar supermercado
-        await api.post('/supermarkets', {
-          name: formData.name,
           address: formData.address,
-          managerId: managerResponse.data.id,
         });
       }
       await fetchSupermarkets();

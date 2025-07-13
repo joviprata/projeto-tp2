@@ -18,7 +18,6 @@ export default function UsersPanel() {
     name: '',
     email: '',
     password: '',
-    userType: 'client',
   });
 
   useEffect(() => {
@@ -45,7 +44,13 @@ export default function UsersPanel() {
       if (editingUser) {
         await api.put(`/users/${editingUser.id}`, formData);
       } else {
-        await api.post('/users', formData);
+        // Usar a rota correta para criar usuários
+        const userData = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        };
+        await api.post('/auth/register/user', userData);
       }
       await fetchUsers();
       handleCloseModal();
@@ -75,7 +80,6 @@ export default function UsersPanel() {
       name: user.name,
       email: user.email,
       password: '',
-      userType: user.userType,
     });
     setShowModal(true);
   };
@@ -87,7 +91,6 @@ export default function UsersPanel() {
       name: '',
       email: '',
       password: '',
-      userType: 'client',
     });
   };
 
@@ -97,6 +100,19 @@ export default function UsersPanel() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const getRoleText = (role) => {
+    switch (role) {
+      case 'USER':
+        return 'Cliente';
+      case 'GERENTE':
+        return 'Gerente';
+      case 'ADMIN':
+        return 'Admin';
+      default:
+        return role;
+    }
   };
 
   const handleSort = (field) => {
@@ -124,9 +140,9 @@ export default function UsersPanel() {
           aValue = a.email.toLowerCase();
           bValue = b.email.toLowerCase();
           break;
-        case 'userType':
-          aValue = a.userType.toLowerCase();
-          bValue = b.userType.toLowerCase();
+        case 'role':
+          aValue = a.role.toLowerCase();
+          bValue = b.role.toLowerCase();
           break;
         case 'createdAt':
           aValue = new Date(a.createdAt);
@@ -193,9 +209,9 @@ export default function UsersPanel() {
               </th>
               <th
                 className={styles.sortableHeader}
-                onClick={() => handleSort('userType')}
+                onClick={() => handleSort('role')}
               >
-                Tipo {getSortIcon('userType')}
+                Tipo {getSortIcon('role')}
               </th>
               <th
                 className={styles.sortableHeader}
@@ -213,8 +229,8 @@ export default function UsersPanel() {
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
-                  <span className={`${styles.badge} ${styles[user.userType]}`}>
-                    {user.userType === 'client' ? 'Cliente' : 'Manager'}
+                  <span className={`${styles.badge} ${styles[user.role]}`}>
+                    {getRoleText(user.role)}
                   </span>
                 </td>
                 <td>{new Date(user.createdAt).toLocaleDateString('pt-BR')}</td>
@@ -293,18 +309,6 @@ export default function UsersPanel() {
                   onChange={handleInputChange}
                   required={!editingUser}
                 />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="userType">Tipo de Usuário</label>
-                <select
-                  id="userType"
-                  name="userType"
-                  value={formData.userType}
-                  onChange={handleInputChange}
-                >
-                  <option value="client">Cliente</option>
-                  <option value="manager">Manager</option>
-                </select>
               </div>
               <div className={styles.modalActions}>
                 <button
