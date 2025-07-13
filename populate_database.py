@@ -93,7 +93,7 @@ def create_price_record(product_id, supermarket_id, price, user_id=1):
         "price": price,
         "userId": user_id,
         "available": True,
-        "verified": False
+        "verified": True
     }
     response = make_request("POST", url, data)
     if response:

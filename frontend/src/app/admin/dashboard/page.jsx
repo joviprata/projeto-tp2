@@ -10,6 +10,7 @@ import UsersPanel from './components/UsersPanel';
 import SupermarketsPanel from './components/SupermarketsPanel';
 import ProductsPanel from './components/ProductsPanel';
 import PriceRecordsPanel from './components/PriceRecordsPanel';
+import PendingRequestsPanel from './components/PendingRequestsPanel';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function AdminDashboard() {
     { id: 'supermarkets', label: 'Supermercados', icon: '🏪' },
     { id: 'products', label: 'Produtos', icon: '📦' },
     { id: 'priceRecords', label: 'Registros de Preço', icon: '💰' },
+    { id: 'pendingRequests', label: 'Solicitações', icon: '📋' },
   ];
 
   const renderActivePanel = () => {
@@ -53,7 +55,8 @@ export default function AdminDashboard() {
         return <ProductsPanel />;
       case 'priceRecords':
         return <PriceRecordsPanel />;
-
+      case 'pendingRequests':
+        return <PendingRequestsPanel />;
       default:
         return <UsersPanel />;
     }

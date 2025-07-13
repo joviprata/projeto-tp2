@@ -104,12 +104,37 @@ function App() {
   const [productQuantity, setProductQuantity] = useState(1);
   const [isCreatingNewList, setIsCreatingNewList] = useState(false);
   const [submittingToList, setSubmittingToList] = useState(false);
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
 
   // Definir userId padrão no localStorage se não existir
   useEffect(() => {
     if (!localStorage.getItem('userId')) {
       localStorage.setItem('userId', '2'); // Usar userId 2 como cliente padrão
     }
+  }, []);
+
+  // Carregar contagem de solicitações pendentes
+  useEffect(() => {
+    const loadPendingCount = () => {
+      try {
+        const allRequests = JSON.parse(
+          localStorage.getItem('pendingPriceRequests') || '[]'
+        );
+        const userId = localStorage.getItem('userId') || '2';
+        const userPendingRequests = allRequests.filter(
+          (request: any) => 
+            request.userId === parseInt(userId) && request.status === 'pending'
+        );
+        setPendingRequestsCount(userPendingRequests.length);
+      } catch (err) {
+        console.error('Erro ao carregar contagem de solicitações:', err);
+      }
+    };
+
+    loadPendingCount();
+    // Recarregar a contagem a cada 5 segundos para sincronizar
+    const interval = setInterval(loadPendingCount, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // Buscar produtos e supermercados do backend
@@ -226,6 +251,22 @@ function App() {
     </svg>
   );
 
+  const RequestsIcon = () => (
+    <svg
+      className={styles.headerIcon}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M15 17h5l-5 5v-5zM9 8h6M9 12h6M9 16h3m-9-8V6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2v-2"
+      />
+    </svg>
+  );
+
   const SearchIcon = () => (
     <svg
       className={styles.searchIcon}
@@ -326,6 +367,10 @@ function App() {
 
   const handleAdminClick = () => {
     router.push('/admin/login');
+  };
+
+  const handleRequestsClick = () => {
+    router.push('/requests');
   };
 
   const formatPrice = (price: number) => {
@@ -452,66 +497,58 @@ function App() {
     try {
       setSubmitting(true);
 
-      // Primeiro, verificar se o produto já existe pelo código de barras
-      let existingProduct = null;
-      try {
-        const searchResponse = await api.get('/products');
-        existingProduct = searchResponse.data.find(
-          (product: Product) => product.barCode === newProduct.barCode
-        );
-      } catch (err) {
-        console.log('Erro ao buscar produtos existentes:', err);
-      }
+      // Buscar informações do supermercado e usuário para a solicitação
+      const supermarket = supermarkets.find(
+        (s) => s.id === parseInt(newProduct.supermarketId)
+      );
+      
+      const userId = localStorage.getItem('userId') || '2';
+      const userResponse = await api.get(`/users/${userId}`);
+      const userName = userResponse.data.name || 'Usuário';
 
-      let productToUse = existingProduct;
-
-      // Se o produto não existe, criar um novo
-      if (!existingProduct) {
-        const productResponse = await api.post('/products', {
-          name: newProduct.name,
-          barCode: newProduct.barCode,
-          variableDescription: newProduct.variableDescription || undefined,
-        });
-        productToUse = productResponse.data;
-      }
-
-      // Criar o registro de preço
-      await api.post('/price-records', {
+      // Criar solicitação pendente
+      const request = {
+        id: Date.now().toString(),
+        productName: newProduct.name,
+        barCode: newProduct.barCode,
+        variableDescription: newProduct.variableDescription || '',
         price: parseFloat(
           newProduct.price.replace('R$', '').replace(',', '.').trim()
         ),
-        productId: productToUse.id,
         supermarketId: parseInt(newProduct.supermarketId),
-        userId: newProduct.userId,
-        available: true,
-        verified: false,
-      });
+        supermarketName: supermarket?.name || 'Supermercado',
+        userId: parseInt(userId),
+        userName,
+        requestDate: new Date().toISOString(),
+        status: 'pending',
+      };
 
-      // Atualizar a lista de produtos
-      const updatedProducts = await api.get('/products/with-price-records');
-      setProducts(updatedProducts.data);
+      // Salvar no localStorage
+      const existingRequests = JSON.parse(
+        localStorage.getItem('pendingPriceRequests') || '[]'
+      );
+      existingRequests.push(request);
+      localStorage.setItem(
+        'pendingPriceRequests',
+        JSON.stringify(existingRequests)
+      );
+
+      // Atualizar contagem de solicitações pendentes
+      setPendingRequestsCount(prev => prev + 1);
 
       closeNewProductModal();
 
-      if (existingProduct) {
-        showNotification(
-          'success',
-          'Preço adicionado!',
-          `Novo registro de preço criado para o produto "${existingProduct.name}" no supermercado selecionado.`
-        );
-      } else {
-        showNotification(
-          'success',
-          'Produto criado!',
-          'Produto e registro de preço criados com sucesso!'
-        );
-      }
+      showNotification(
+        'success',
+        'Solicitação enviada!',
+        'Sua solicitação foi enviada para aprovação do administrador. Você pode acompanhar o status na área de solicitações.'
+      );
     } catch (err) {
-      console.error('Erro ao criar produto e preço:', err);
+      console.error('Erro ao criar solicitação:', err);
       showNotification(
         'error',
-        'Erro ao criar produto',
-        'Erro ao criar produto e preço. Tente novamente.'
+        'Erro ao enviar solicitação',
+        'Erro ao enviar solicitação. Tente novamente.'
       );
     } finally {
       setSubmitting(false);
@@ -666,6 +703,17 @@ function App() {
             <button className={styles.headerButton} onClick={handleAdminClick}>
               <AdminIcon />
             </button>
+            <button 
+              className={`${styles.headerButton} ${pendingRequestsCount > 0 ? styles.hasNotifications : ''}`} 
+              onClick={handleRequestsClick}
+            >
+              <RequestsIcon />
+              {pendingRequestsCount > 0 && (
+                <span className={styles.notificationBadge}>
+                  {pendingRequestsCount}
+                </span>
+              )}
+            </button>
             <button className={styles.headerButton} onClick={handleUserClick}>
               <UserIcon />
             </button>
@@ -724,8 +772,8 @@ function App() {
           >
             <div className={styles['price-modal-header']}>
               {existingProductPreview
-                ? 'Adicionar Preço ao Produto Existente'
-                : 'Adicionar Novo Produto'}
+                ? 'Solicitar Registro de Preço para Produto Existente'
+                : 'Solicitar Novo Produto e Preço'}
             </div>
             <div className={styles['price-modal-content']}>
               {existingProductPreview && (
@@ -833,10 +881,10 @@ function App() {
                   disabled={submitting}
                 >
                   {submitting
-                    ? 'Salvando...'
+                    ? 'Enviando...'
                     : existingProductPreview
-                      ? 'Adicionar Preço'
-                      : 'Criar Produto e Preço'}
+                      ? 'Solicitar Registro de Preço'
+                      : 'Solicitar Produto e Preço'}
                 </button>
                 <button
                   type="button"
@@ -965,7 +1013,7 @@ function App() {
             <button
               className={styles.addButton}
               onClick={openNewProductModal}
-              title="Adicionar novo produto e preço"
+              title="Solicitar novo produto e preço"
             >
               <PlusIcon />
             </button>
