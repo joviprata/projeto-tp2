@@ -107,6 +107,19 @@ const getCheapestSupermarket = async (req, res) => {
   }
 };
 
+const getSupermarketByManagerId = async (req, res) => {
+  try {
+    const { managerId } = req.params;
+    const results = await supermarketService.getSupermarketByManagerId(managerId);
+    if (results.status === 200) {
+      return res.status(200).json(results.supermarket);
+    }
+    return res.status(results.status).json({ error: results.error });
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+};
+
 module.exports = {
   getAllSupermarkets,
   updateSupermarket,
@@ -114,4 +127,5 @@ module.exports = {
   getSupermarketById,
   deleteSupermarket,
   getCheapestSupermarket,
+  getSupermarketByManagerId,
 };

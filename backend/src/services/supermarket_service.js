@@ -186,6 +186,20 @@ const getCheapestSupermarket = async (listId) => {
   }
 };
 
+const getSupermarketByManagerId = async (managerId) => {
+  try {
+    const supermarket = await prismaDatabase.supermarket.findUnique({
+      where: { managerId: parseInt(managerId, 10) },
+    });
+    if (!supermarket) {
+      return { status: 404, error: 'Supermercado não encontrado para o gerente fornecido' };
+    }
+    return { status: 200, supermarket };
+  } catch (error) {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
+};
+
 module.exports = {
   getAllSupermarkets,
   updateSupermarket,
@@ -193,4 +207,5 @@ module.exports = {
   deleteSupermarket,
   putSupermarketByManagerId,
   getCheapestSupermarket,
+  getSupermarketByManagerId,
 };
