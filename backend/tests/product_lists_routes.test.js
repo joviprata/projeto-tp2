@@ -299,3 +299,82 @@ describe('DELETE /product-lists/:listId - Deletar uma lista inteira', () => {
     expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada');
   });
 });
+
+describe('PUT /product-lists/:listId - Atualizar nome da lista', () => {
+  let listIdToUpdate;
+
+  beforeEach(async () => {
+    listIdToUpdate = await createShoppingList(testUserId, 'Lista Original');
+  });
+
+  it('Deve atualizar o nome da lista com sucesso', async () => {
+    const newListName = 'Lista Atualizada';
+    const response = await request(app)
+      .put(`/product-lists/${listIdToUpdate}`)
+      .send({ listName: newListName });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body).toHaveProperty('message', 'Lista de compras atualizada com sucesso');
+    expect(response.body.data).toHaveProperty('id', listIdToUpdate);
+    expect(response.body.data).toHaveProperty('listName', newListName);
+
+    // Verificar se a lista foi realmente atualizada no banco de dados
+    const updatedList = await prismaDatabase.shoppingList.findUnique({
+      where: { id: listIdToUpdate },
+    });
+    expect(updatedList.listName).toBe(newListName);
+  });
+
+  it('Deve retornar 400 se o nome da lista for vazio', async () => {
+    const response = await request(app)
+      .put(`/product-lists/${listIdToUpdate}`)
+      .send({ listName: '' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'O nome da lista é obrigatório');
+  });
+
+  it('Deve retornar 400 se o nome da lista for apenas espaços em branco', async () => {
+    const response = await request(app)
+      .put(`/product-lists/${listIdToUpdate}`)
+      .send({ listName: '   ' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'O nome da lista é obrigatório');
+  });
+
+  it('Deve retornar 400 se o listName não for fornecido', async () => {
+    const response = await request(app).put(`/product-lists/${listIdToUpdate}`).send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error', 'O nome da lista é obrigatório');
+  });
+
+  it('Deve retornar 404 se a lista não existir', async () => {
+    const response = await request(app)
+      .put('/product-lists/999999')
+      .send({ listName: 'Nome Atualizado' });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Lista de compras não encontrada');
+  });
+
+  it('Deve remover espaços em branco do início e fim do nome da lista', async () => {
+    const newListName = '  Lista com Espaços  ';
+    const expectedListName = 'Lista com Espaços';
+
+    const response = await request(app)
+      .put(`/product-lists/${listIdToUpdate}`)
+      .send({ listName: newListName });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toHaveProperty('listName', expectedListName);
+
+    // Verificar no banco de dados
+    const updatedList = await prismaDatabase.shoppingList.findUnique({
+      where: { id: listIdToUpdate },
+    });
+    expect(updatedList.listName).toBe(expectedListName);
+  });
+});

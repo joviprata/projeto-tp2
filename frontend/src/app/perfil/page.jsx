@@ -1,3 +1,6 @@
+/* eslint-disable no-undef */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -16,12 +19,11 @@ export default function Perfil() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [message, setMessage] = useState('');
 
-  // Carrega dados do usuário ao montar o componente
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const storedId = localStorage.getItem('userId');
-        
+
         if (!storedId || storedId === 'null' || storedId === 'undefined') {
           setMessage('Usuário não autenticado. Faça login novamente.');
           setLoading(false);
@@ -33,7 +35,7 @@ export default function Perfil() {
 
         setId(storedId);
         const response = await api.get(`/users/${storedId}`);
-        
+
         if (response.status === 200) {
           const userData = response.data;
           setNome(userData.name || '');
@@ -41,8 +43,7 @@ export default function Perfil() {
           setSenha(''); // Não carregamos a senha por segurança
         }
       } catch (error) {
-        console.error('Erro ao carregar dados do usuário:', error);
-        if (error.response?.status === 404) {
+        if (error.response && error.response.status === 404) {
           setMessage('Usuário não encontrado. Faça login novamente.');
           setTimeout(() => {
             router.push('/login');
@@ -69,7 +70,7 @@ export default function Perfil() {
   // Função para atualizar dados do usuário
   const handleEditar = async (e) => {
     e.preventDefault();
-    
+
     if (!nome.trim() || !email.trim()) {
       setMessage('Nome e email são obrigatórios');
       return;
@@ -81,9 +82,9 @@ export default function Perfil() {
     try {
       const updateData = {
         name: nome,
-        email: email
+        email,
       };
-      
+
       // Só inclui senha se foi fornecida
       if (senha.trim()) {
         updateData.password = senha;
@@ -96,10 +97,9 @@ export default function Perfil() {
         setSenha(''); // Limpa o campo de senha após salvar
       }
     } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
-      if (error.response?.status === 400) {
+      if (error.response && error.response.status === 400) {
         setMessage(error.response.data.message || 'Dados inválidos');
-      } else if (error.response?.status === 404) {
+      } else if (error.response && error.response.status === 404) {
         setMessage('Usuário não encontrado');
       } else {
         setMessage('Erro ao atualizar dados. Tente novamente.');
@@ -121,12 +121,12 @@ export default function Perfil() {
   const handleDeleteConfirmed = async () => {
     try {
       const response = await api.delete(`/users/${id}`);
-      
+
       if (response.status === 200) {
         // Limpa dados do localStorage
         localStorage.removeItem('userId');
         localStorage.removeItem('role');
-        
+
         setMessage('Conta excluída com sucesso!');
         setTimeout(() => {
           router.push('/login');
@@ -134,7 +134,7 @@ export default function Perfil() {
       }
     } catch (error) {
       console.error('Erro ao deletar usuário:', error);
-      if (error.response?.status === 404) {
+      if (error.response && error.response.status === 404) {
         setMessage('Usuário não encontrado');
       } else {
         setMessage('Erro ao excluir conta. Tente novamente.');
@@ -154,7 +154,14 @@ export default function Perfil() {
   if (loading) {
     return (
       <div className={styles.background}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+        >
           <p>Carregando...</p>
         </div>
       </div>
@@ -164,7 +171,18 @@ export default function Perfil() {
   return (
     <div className={styles.background}>
       <header className={styles.header}>
-        <div className={styles.logoArea} onClick={() => router.push('/homeCliente')} style={{ cursor: 'pointer' }}>
+        <div
+          className={styles.logoArea}
+          role="button"
+          tabIndex={0}
+          onClick={() => router.push('/homeCliente')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              router.push('/homeCliente');
+            }
+          }}
+          style={{ cursor: 'pointer' }}
+        >
           <img
             src="/Global_Market_Logo.png"
             alt="Logo"
@@ -174,34 +192,64 @@ export default function Perfil() {
         </div>
         <div className={styles.icons}>
           <img src="/person-outline.svg" alt="Perfil" className={styles.icon} />
-          <img 
-            src="/cart-outline.svg" 
-            alt="Carrinho" 
-            className={styles.icon} 
-            onClick={() => router.push('/shopCart')}
-            style={{ cursor: 'pointer' }}
-          />
-          <img 
-            src="/log-out-outline.svg" 
-            alt="Sair" 
-            className={styles.icon} 
+          <div
+            role="button"
+            tabIndex={0}
+            className={styles.icon}
+            onClick={() => router.push('/myLists')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                router.push('/myLists');
+              }
+            }}
+            style={{ cursor: 'pointer', display: 'inline-block' }}
+            title="Minhas Listas de Compras"
+            aria-label="Minhas Listas de Compras"
+          >
+            <img
+              src="/cart-outline.svg"
+              alt="Minhas Listas"
+              style={{ pointerEvents: 'none' }}
+            />
+          </div>
+          <div
+            role="button"
+            tabIndex={0}
+            className={styles.icon}
             onClick={handleLogout}
-            style={{ cursor: 'pointer' }}
-          />
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleLogout();
+              }
+            }}
+            style={{ cursor: 'pointer', display: 'inline-block' }}
+            title="Sair"
+            aria-label="Sair"
+          >
+            <img
+              src="/log-out-outline.svg"
+              alt="Sair"
+              style={{ pointerEvents: 'none' }}
+            />
+          </div>
         </div>
       </header>
       <main className={styles.main}>
         <h1 className={styles.title}>Dados do perfil</h1>
-        
+
         {message && (
-          <div style={{
-            padding: '10px',
-            margin: '10px 0',
-            borderRadius: '5px',
-            backgroundColor: message.includes('sucesso') ? '#d4edda' : '#f8d7da',
-            color: message.includes('sucesso') ? '#155724' : '#721c24',
-            textAlign: 'center'
-          }}>
+          <div
+            style={{
+              padding: '10px',
+              margin: '10px 0',
+              borderRadius: '5px',
+              backgroundColor: message.includes('sucesso')
+                ? '#d4edda'
+                : '#f8d7da',
+              color: message.includes('sucesso') ? '#155724' : '#721c24',
+              textAlign: 'center',
+            }}
+          >
             {message}
           </div>
         )}
@@ -211,7 +259,8 @@ export default function Perfil() {
             <img
               src="/person-outline.svg"
               alt="Perfil"
-              className={styles.profileIcon} />
+              className={styles.profileIcon}
+            />
           </div>
           <form className={styles.form} onSubmit={handleEditar}>
             <label className={styles.label} htmlFor="nome">
@@ -225,35 +274,39 @@ export default function Perfil() {
               onChange={handleChange(setNome)}
               disabled={saving}
             />
-            <label className={styles.label} htmlFor="email">Email</label>
-            <input 
-              className={styles.input} 
-              id="email" 
-              type="email" 
-              value={email} 
+            <label className={styles.label} htmlFor="email">
+              Email
+            </label>
+            <input
+              className={styles.input}
+              id="email"
+              type="email"
+              value={email}
               onChange={handleChange(setEmail)}
               disabled={saving}
             />
-            <label className={styles.label} htmlFor="senha">Senha</label>
-            <input 
-              className={styles.input} 
-              id="senha" 
-              type="password" 
-              value={senha} 
+            <label className={styles.label} htmlFor="senha">
+              Senha
+            </label>
+            <input
+              className={styles.input}
+              id="senha"
+              type="password"
+              value={senha}
               onChange={handleChange(setSenha)}
               placeholder="Digite a nova senha (opcional)"
               disabled={saving}
             />
             <div className={styles.buttonRow}>
-              <button 
-                className={styles.editButton} 
+              <button
+                className={styles.editButton}
                 type="submit"
                 disabled={saving}
               >
                 {saving ? 'Salvando...' : 'Editar'}
               </button>
-              <button 
-                className={styles.deleteButton} 
+              <button
+                className={styles.deleteButton}
                 type="button"
                 onClick={handleDeleteClick}
                 disabled={saving}
@@ -267,41 +320,54 @@ export default function Perfil() {
 
       {/* Modal de confirmação de exclusão */}
       {showDeleteModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            maxWidth: '400px',
-            textAlign: 'center'
-          }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '8px',
+              maxWidth: '400px',
+              textAlign: 'center',
+            }}
+          >
             <h3>Tem certeza que deseja excluir sua conta?</h3>
             <p>Esta ação não pode ser desfeita.</p>
-            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <div
+              style={{
+                marginTop: '20px',
+                display: 'flex',
+                gap: '10px',
+                justifyContent: 'center',
+              }}
+            >
               <button
+                type="button"
                 onClick={handleCancelDelete}
                 style={{
                   padding: '10px 20px',
                   border: '1px solid #ccc',
                   borderRadius: '5px',
                   backgroundColor: '#f8f9fa',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Cancelar
               </button>
               <button
+                type="button"
                 onClick={handleDeleteConfirmed}
                 style={{
                   padding: '10px 20px',
@@ -309,7 +375,7 @@ export default function Perfil() {
                   borderRadius: '5px',
                   backgroundColor: '#dc3545',
                   color: 'white',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Excluir

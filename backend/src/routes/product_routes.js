@@ -73,6 +73,77 @@ router.get('/', productController.getAllProducts);
 
 /**
  * @swagger
+ * /products/with-price-records:
+ *   get:
+ *     summary: Retorna todos os produtos com seus registros de preço agrupados por supermercado
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Lista de produtos com registros de preço
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   barCode:
+ *                     type: string
+ *                   variableDescription:
+ *                     type: string
+ *                     nullable: true
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                   pricesBySupermarket:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         supermarket:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                             name:
+ *                               type: string
+ *                             address:
+ *                               type: string
+ *                               nullable: true
+ *                         priceRecords:
+ *                           type: array
+ *                           items:
+ *                             type: object
+ *                             properties:
+ *                               id:
+ *                                 type: integer
+ *                               price:
+ *                                 type: number
+ *                               recordDate:
+ *                                 type: string
+ *                                 format: date-time
+ *                               available:
+ *                                 type: boolean
+ *                               verified:
+ *                                 type: boolean
+ *                               user:
+ *                                 type: object
+ *                                 properties:
+ *                                   id:
+ *                                     type: integer
+ *                                   name:
+ *                                     type: string
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.get('/with-price-records', productController.getAllProductsWithPriceRecords);
+
+/**
+ * @swagger
  * /products/{id}:
  *   get:
  *     summary: Retorna um produto pelo ID

@@ -126,10 +126,82 @@ const getProductById = async (id) => {
   }
 };
 
+const getAllProductsWithPriceRecords = async () => {
+  try {
+    const products = await prismaDatabase.product.findMany({
+      include: {
+        priceRecords: {
+          include: {
+            supermarket: {
+              select: {
+                id: true,
+                name: true,
+                address: true,
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          orderBy: [
+            {
+              price: 'asc', // Ordenar por preço (mais barato primeiro)
+            },
+            {
+              recordDate: 'desc', // Em caso de empate, mais recente primeiro
+            },
+          ],
+        },
+      },
+    });
+
+    // Pegar apenas os 3 registros de preço mais baratos por produto
+    const productsWithCheapestPrices = products.map((product) => {
+      // Pegar apenas os 3 primeiros registros (que já estão ordenados por preço)
+      const cheapestPriceRecords = product.priceRecords.slice(0, 3);
+
+      // Agrupar por supermercado para manter a estrutura esperada pelo frontend
+      const pricesBySupermarket = {};
+
+      cheapestPriceRecords.forEach((record) => {
+        const supermarketId = record.supermarket.id;
+        if (!pricesBySupermarket[supermarketId]) {
+          pricesBySupermarket[supermarketId] = {
+            supermarket: record.supermarket,
+            priceRecords: [],
+          };
+        }
+        pricesBySupermarket[supermarketId].priceRecords.push({
+          id: record.id,
+          price: record.price,
+          recordDate: record.recordDate,
+          available: record.available,
+          verified: record.verified,
+          user: record.user,
+        });
+      });
+
+      return {
+        ...product,
+        priceRecords: undefined, // Remove o array original
+        pricesBySupermarket: Object.values(pricesBySupermarket),
+      };
+    });
+
+    return { status: 200, data: productsWithCheapestPrices };
+  } catch (error) {
+    return { status: 500, error: 'Internal Server Error' };
+  }
+};
+
 module.exports = {
   registerProduct,
   updateProduct,
   deleteProduct,
   getAllProducts,
   getProductById,
+  getAllProductsWithPriceRecords,
 };

@@ -155,6 +155,50 @@ describe('PUT /supermarkets/manager/:id - Atualizar supermercado por ID de geren
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('message', 'Supermercado atualizado com sucesso');
   });
+
+  it('deve retornar status 400 ao tentar atualizar com request body inválida', async () => {
+    const responseSupermaketId = await createSupermarket();
+    const supermarket = await prismaDatabase.supermarket.findUnique({
+      where: { id: responseSupermaketId },
+      select: { managerId: true },
+    });
+    const { managerId } = supermarket;
+
+    const invalidData = {};
+
+    const response = await request(app).put(`/supermarkets/manager/${managerId}`).send(invalidData);
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error');
+  });
+
+  it('deve retornar status 400 ao tentar atualizar com body vazio', async () => {
+    const responseSupermaketId = await createSupermarket();
+    const supermarket = await prismaDatabase.supermarket.findUnique({
+      where: { id: responseSupermaketId },
+      select: { managerId: true },
+    });
+    const { managerId } = supermarket;
+
+    const response = await request(app).put(`/supermarkets/manager/${managerId}`).send({});
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('error');
+  });
+
+  it('deve retornar status 404 ao tentar atualizar supermercado com manager ID inexistente', async () => {
+    const invalidManagerId = 99999;
+    const validData = {
+      name: 'Supermercado Teste',
+      email: 'teste@email.com',
+      password: 'senha123',
+      address: 'Rua Teste, 123',
+    };
+
+    const response = await request(app)
+      .put(`/supermarkets/manager/${invalidManagerId}`)
+      .send(validData);
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error');
+  });
 });
 
 describe('GET /supermarkets/:id - Buscar supermercado por ID existente', () => {

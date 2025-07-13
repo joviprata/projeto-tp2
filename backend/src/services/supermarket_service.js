@@ -115,13 +115,29 @@ const getCheapestSupermarket = async (listId) => {
     const priceRecords = await prismaDatabase.priceRecord.findMany({
       where: { productId: { in: productIds }, available: true },
       include: { supermarket: true, product: true },
-      orderBy: { price: 'asc' },
+      orderBy: [{ productId: 'asc' }, { price: 'asc' }, { recordDate: 'desc' }],
     });
 
+    // Agrupar produtos por supermercado, pegando apenas o menor preço de cada produto
     const supermarketsMap = new Map();
+
     shoppingListItems.forEach((item) => {
-      const relevant = priceRecords.filter((p) => p.productId === item.productId);
-      relevant.forEach((record) => {
+      const productPrices = priceRecords.filter((p) => p.productId === item.productId);
+
+      // Agrupar por supermercado e pegar o menor preço de cada produto em cada supermercado
+      const pricesBySupermarket = new Map();
+      productPrices.forEach((record) => {
+        const supermarketId = record.supermarket.id;
+        if (
+          !pricesBySupermarket.has(supermarketId) ||
+          pricesBySupermarket.get(supermarketId).price > record.price
+        ) {
+          pricesBySupermarket.set(supermarketId, record);
+        }
+      });
+
+      // Adicionar o melhor preço de cada supermercado ao mapa principal
+      pricesBySupermarket.forEach((record) => {
         const { id } = record.supermarket;
         if (!supermarketsMap.has(id)) {
           supermarketsMap.set(id, {
@@ -133,17 +149,23 @@ const getCheapestSupermarket = async (listId) => {
           });
         }
         const sm = supermarketsMap.get(id);
-        sm.products.push({
-          productId: record.productId,
-          productName: record.product.name,
-          price: record.price,
-          quantity: item.quantity,
-          subtotal: item.quantity * record.price,
-        });
-        sm.totalPrice += item.quantity * record.price;
+
+        // Verificar se já existe um produto com este ID para evitar duplicatas
+        const existingProductIndex = sm.products.findIndex((p) => p.productId === record.productId);
+        if (existingProductIndex === -1) {
+          sm.products.push({
+            productId: record.productId,
+            productName: record.product.name,
+            price: record.price,
+            quantity: item.quantity,
+            subtotal: item.quantity * record.price,
+          });
+          sm.totalPrice += item.quantity * record.price;
+        }
       });
     });
 
+    // Filtrar apenas supermercados que têm todos os produtos da lista
     const result = Array.from(supermarketsMap.values()).filter((sm) => {
       const ids = new Set(sm.products.map((p) => p.productId));
       return productIds.every((pid) => ids.has(pid));

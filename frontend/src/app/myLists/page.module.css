@@ -140,12 +140,16 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .searchButton:hover {
   background: linear-gradient(90deg, #1d4ed8 0%, #3730a3 100%);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
   transform: scale(1.05);
 }
 
@@ -220,7 +224,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  color: #333; 
+  color: #333;
 }
 
 .productDescription {
@@ -260,7 +264,9 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 .priceSuggest {
   width: 100%;
@@ -272,12 +278,16 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .addToCartButton:hover {
   background: linear-gradient(90deg, #1d4ed8 0%, #3730a3 100%);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
   transform: scale(1.05);
 }
 
@@ -300,7 +310,7 @@
 .price-modal {
   background: white;
   border-radius: 2rem 2rem 2rem 2rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   width: 400px;
   max-width: 90vw;
   z-index: 20;
@@ -393,4 +403,867 @@
 
 .button:hover {
   background-color: #0059c1;
+}
+
+/* Notification System */
+.notificationContainer {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notification {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #10b981;
+  min-width: 350px;
+  max-width: 450px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification.success {
+  border-left-color: #10b981;
+}
+
+.notification.error {
+  border-left-color: #ef4444;
+}
+
+.notificationIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.notificationIcon.success {
+  color: #10b981;
+}
+
+.notificationIcon.error {
+  color: #ef4444;
+}
+
+.notificationContent {
+  flex: 1;
+}
+
+.notificationTitle {
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.notificationMessage {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+  white-space: pre-line;
+  line-height: 1.4;
+}
+
+.notificationClose {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.notificationClose:hover {
+  color: #6b7280;
+}
+
+/* Loading and Error States */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #4a5568;
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.errorContainer p {
+  color: #e53e3e;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.retryButton {
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.retryButton:hover {
+  background: #2c5aa0;
+}
+
+.noProductsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #718096;
+  grid-column: 1 / -1;
+}
+
+/* New Product Modal */
+.new-product-modal {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* List Details Page Styles */
+.listDetailsHeader {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.listTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.listInfo {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.listActions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.backButton {
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.backButton:hover {
+  background: #4b5563;
+}
+
+.findCheapestButton {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.findCheapestButton:hover {
+  background: linear-gradient(90deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.listItemsContainer {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.itemsTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.listItem:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.listItem.itemTaken {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  opacity: 0.8;
+}
+
+.listItem.itemTaken .itemName {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+.itemContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.itemInfo {
+  flex: 1;
+}
+
+.itemName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.itemDescription {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.itemBarcode {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-family: monospace;
+  margin: 0;
+}
+
+.itemQuantity {
+  background: #3b82f6;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-left: 1rem;
+}
+
+.itemActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toggleButton {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.markButton {
+  background: #10b981;
+  color: white;
+}
+
+.markButton:hover {
+  background: #059669;
+}
+
+.unmarkButton {
+  background: #6b7280;
+  color: white;
+}
+
+.unmarkButton:hover {
+  background: #4b5563;
+}
+
+.toggleButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addProductsButton {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.addProductsButton:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modalContent {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  min-width: 400px;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modalCloseButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.modalCloseButton:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modalBody {
+  padding: 1.5rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.modalButton {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalButton:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+}
+
+.modalButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.modalButtonSecondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalButtonSecondary:hover {
+  background: #e5e7eb;
+}
+
+/* Supermarkets Comparison Modal */
+.supermarketsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.supermarketItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.supermarketItem.cheapest {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.supermarketRank {
+  font-size: 1.5rem;
+  min-width: 40px;
+  text-align: center;
+}
+
+.supermarketInfo {
+  flex: 1;
+}
+
+.supermarketInfo h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.supermarketPrice {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #059669;
+  margin: 0;
+}
+
+.priceDifference {
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin: 0.25rem 0 0 0;
+}
+
+.savingsInfo {
+  background: #10b981;
+  color: white;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.savingsInfo p {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+/* Add Product Modal */
+.searchProductContainer {
+  margin-bottom: 1.5rem;
+}
+
+.searchProductInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.searchProductInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.productsList {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.productOption {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.productOption:last-child {
+  border-bottom: none;
+}
+
+.productOption:hover {
+  background: #f9fafb;
+}
+
+.productOption.selected {
+  background: #dbeafe;
+  border-left: 4px solid #3b82f6;
+}
+
+.productInfo h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.productInfo p {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.productBarcode {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.quantityContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.quantityContainer label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantityButton {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.quantityButton:hover {
+  background: #2563eb;
+}
+
+.quantityButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.quantityInput {
+  width: 80px;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* Updated List Item Styles */
+.itemQuantityContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.itemQuantity {
+  background: #3b82f6;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}
+
+.removeButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.removeButton:hover {
+  background: #dc2626;
+}
+
+.addProductButton {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addProductButton:hover {
+  background: linear-gradient(90deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+}
+
+/* Edit and Delete List Styles */
+.editListButton {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editListButton:hover {
+  background: linear-gradient(90deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-1px);
+}
+
+.deleteListButton {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteListButton:hover {
+  background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+}
+
+.editListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.editListContainer label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.editListInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.editListInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.editListInput:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.deleteConfirmContainer {
+  text-align: center;
+}
+
+.deleteConfirmContainer p {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  color: #374151;
+}
+
+.deleteWarning {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.deleteButton {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteButton:hover {
+  background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .modalContent {
+    min-width: unset;
+    width: 95vw;
+    margin: 1rem;
+  }
+
+  .listActions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .itemContent {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .itemQuantityContainer {
+    align-self: flex-start;
+    margin-left: 0;
+  }
+
+  .itemActions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .supermarketsList {
+    gap: 0.75rem;
+  }
+
+  .supermarketItem {
+    padding: 0.75rem;
+  }
+
+  .supermarketRank {
+    font-size: 1.25rem;
+    min-width: 30px;
+  }
 }

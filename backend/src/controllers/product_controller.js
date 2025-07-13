@@ -50,10 +50,20 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const getAllProductsWithPriceRecords = async (req, res) => {
+  try {
+    const result = await produtoService.getAllProductsWithPriceRecords();
+    res.status(result.status).json(result.data || { error: result.error });
+  } catch {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   registerProduct,
   getAllProducts,
   getProductById,
   updateProduct,
   deleteProduct,
+  getAllProductsWithPriceRecords,
 };

@@ -230,4 +230,41 @@ router.delete('/:listId/items/:productId', productListsController.deleteProductF
  */
 router.delete('/:listId', productListsController.deleteList);
 
+/**
+ * @swagger
+ * /product-lists/{listId}:
+ *   put:
+ *     summary: Atualiza o nome de uma lista de compras
+ *     tags: [ProductLists]
+ *     parameters:
+ *       - in: path
+ *         name: listId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID da lista
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               listName:
+ *                 type: string
+ *                 description: Novo nome da lista
+ *             example:
+ *               listName: "Compras da Semana"
+ *     responses:
+ *       200:
+ *         description: Lista de compras atualizada com sucesso.
+ *       400:
+ *         description: Nome da lista é obrigatório.
+ *       404:
+ *         description: Lista de compras não encontrada.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+router.put('/:listId', productListsController.updateList);
+
 module.exports = router;

@@ -164,6 +164,30 @@ const deleteList = async (listId) => {
   }
 };
 
+const updateList = async (listId, listName) => {
+  try {
+    if (!listName || listName.trim() === '') {
+      return { status: 400, error: 'O nome da lista é obrigatório' };
+    }
+
+    const listExists = await prismaDatabase.shoppingList.findUnique({
+      where: { id: listId },
+    });
+    if (!listExists) {
+      return { status: 404, error: 'Lista de compras não encontrada' };
+    }
+
+    const updatedList = await prismaDatabase.shoppingList.update({
+      where: { id: listId },
+      data: { listName: listName.trim() },
+    });
+
+    return { status: 200, data: updatedList, message: 'Lista de compras atualizada com sucesso' };
+  } catch (error) {
+    return { status: 500, error: 'Erro interno do servidor' };
+  }
+};
+
 module.exports = {
   createProductList,
   getListsByUserId,
@@ -171,4 +195,5 @@ module.exports = {
   updateProductFromList,
   deleteProductFromList,
   deleteList,
+  updateList,
 };
