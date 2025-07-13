@@ -236,4 +236,31 @@ router.put('/manager/:id', supermarketController.putSupermarketByManagerId);
  */
 router.get('/cheapest/:listId', supermarketController.getCheapestSupermarket);
 
+/**
+ * @swagger
+ * /supermarkets/byManager/{managerId}:
+ *   get:
+ *     summary: Retorna o supermercado associado a um ID de gerente
+ *     tags: [Supermarkets]
+ *     parameters:
+ *       - in: path
+ *         name: managerId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID do gerente específico
+ *     responses:
+ *       200:
+ *         description: Supermercado encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Supermarket'
+ *       404:
+ *         description: Supermercado não encontrado para o gerente fornecido
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.get('/byManager/:managerId', supermarketController.getSupermarketByManagerId);
+
 module.exports = router;

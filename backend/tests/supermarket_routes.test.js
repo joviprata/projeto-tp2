@@ -347,3 +347,33 @@ describe('GET /supermarkets/cheapest/:listId - Obter supermercados com os preço
     );
   });
 });
+
+describe('GET /supermarkets/byManager/:managerId - Obter supermercado por ID de gerente', () => {
+  it('deve retornar status 200 e os dados do supermercado para um ID de gerente válido', async () => {
+    // Crie um supermercado (e, por extensão, um gerente associado)
+    const supermarketId = await createSupermarket();
+
+    // Encontre o managerId associado a este supermercado
+    const supermarket = await prismaDatabase.supermarket.findUnique({
+      where: { id: supermarketId },
+      select: { managerId: true, name: true, address: true, latitude: true, longitude: true },
+    });
+    const managerId = supermarket.managerId;
+
+    const response = await request(app).get(`/supermarkets/byManager/${managerId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('id', supermarketId);
+    expect(response.body).toHaveProperty('managerId', managerId);
+    expect(response.body.name).toBe(supermarket.name);
+    expect(response.body.address).toBe(supermarket.address);
+  });
+
+  it('deve retornar status 404 se o ID de gerente não for encontrado ou não tiver supermercado associado', async () => {
+    const nonExistentManagerId = 99999; // Um ID que certamente não existe no banco de dados limpo
+    const response = await request(app).get(`/supermarkets/byManager/${nonExistentManagerId}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('error', 'Supermercado não encontrado para o gerente fornecido');
+  });
+});

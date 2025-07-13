@@ -124,6 +124,7 @@ const getPriceRecordsBySupermarketId = async (supermarketId) => {
 
     const priceRecords = await prismaDatabase.priceRecord.findMany({
       where: { supermarketId: parseInt(supermarketId, 10) },
+      include: { product: true },
     });
     return { status: 200, data: priceRecords };
   } catch (error) {
