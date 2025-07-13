@@ -1,9 +1,10 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
-import api from '../../../src/config/api'; // importa a instância do axios
+import api from '../../../src/config/api'; // Importa a instância do axios configurada
 
 function UserIcon({ className }) {
   return (
@@ -78,7 +79,7 @@ export default function Produtos() {
   const [supermarketId, setSupermarketId] = useState(null);
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentProductData, setCurrentProductData] = useState(null);
+  const [currentProductData, setCurrentProductData] = useState(null); // Para editar
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' ou 'error'
 
@@ -90,23 +91,21 @@ export default function Produtos() {
       const role = localStorage.getItem('role');
 
       if (!userId || role !== 'GERENTE') {
-        setMessage(
-          'Acesso negado. Você não tem permissão para acessar esta página.'
-        );
+        setMessage('Acesso não autorizado. Faça login como gerente.');
         setMessageType('error');
         setLoading(false);
         router.push('/login');
         return;
       }
+
       try {
         const supermarketResponse = await api.get(
           `/supermarkets/byManager/${userId}`
         );
-        const fetchedSupermarket = supermarketResponse.data.id;
-        setSupermarketId(fetchedSupermarket);
-
+        const fetchedSupermarketId = supermarketResponse.data.id;
+        setSupermarketId(fetchedSupermarketId);
         const priceRecordsResponse = await api.get(
-          `/price-records/supermarket/${fetchedSupermarket}`
+          `/price-records/supermarket/${fetchedSupermarketId}`
         );
         const fetchedPriceRecords = priceRecordsResponse.data;
 
@@ -114,9 +113,9 @@ export default function Produtos() {
           id: record.productId,
           priceRecordId: record.id,
           name: record.product.name,
+          description: record.product.variableDescription,
           price: record.price,
           barCode: record.product.barCode,
-          description: record.product.variableDescription,
         }));
 
         setProducts(formattedProducts);
@@ -129,7 +128,7 @@ export default function Produtos() {
         if (error.response?.status === 404) {
           setMessage('Supermercado não encontrado ou sem produtos.');
         } else if (error.code === 'ERR_NETWORK') {
-          setMessage('Erro de rede. Verifique sua conexão com a internet.');
+          setMessage('Erro de conexão. Verifique se o backend está rodando.');
         } else {
           setMessage('Erro ao carregar produtos.');
         }
@@ -138,10 +137,11 @@ export default function Produtos() {
         setLoading(false);
       }
     };
+
     fetchSupermarketAndProducts();
   }, [router]);
 
-  const refreshProducts = async () => {
+  const refreshProducts = () => {
     setLoading(true);
   };
 
@@ -158,8 +158,8 @@ export default function Produtos() {
   const handleEditProductClick = (product) => {
     setIsEditing(true);
     setCurrentProductData({
-      id: product.id,
-      priceRecordId: product.priceRecordId,
+      id: product.id, // ID do produto
+      priceRecordId: product.priceRecordId, // ID do registro de preço
       name: product.name,
       barCode: product.barCode,
       variableDescription: product.description,
@@ -169,7 +169,11 @@ export default function Produtos() {
   };
 
   const handleDeleteProduct = async (priceRecordId, productId) => {
-    if (!window.confirm('Tem certeza que deseja excluir este produto?')) {
+    if (
+      !window.confirm(
+        'Tem certeza que deseja remover este produto do seu mercado?'
+      )
+    ) {
       return;
     }
     setLoading(true);
@@ -178,22 +182,21 @@ export default function Produtos() {
       const priceRecordDeleteResponse = await api.delete(
         `/price-records/${priceRecordId}`
       );
+
       if (priceRecordDeleteResponse.status === 204) {
-        setMessage('Produto excluído com sucesso.');
+        setMessage('Produto removido do seu mercado com sucesso!');
         setMessageType('success');
         setProducts(products.filter((p) => p.priceRecordId !== priceRecordId));
       } else {
-        setMessage('Erro ao excluir produto.');
+        setMessage('Erro ao remover produto do mercado.');
         setMessageType('error');
       }
     } catch (error) {
-      console.error('Erro ao excluir produto:', error);
+      console.error('Erro ao deletar produto/registro de preço:', error);
       if (error.response?.status === 404) {
-        setMessage('Produto não encontrado.');
-      } else if (error.code === 'ERR_NETWORK') {
-        setMessage('Erro de rede. Verifique sua conexão com a internet.');
+        setMessage('Registro de preço ou produto não encontrado.');
       } else {
-        setMessage('Erro ao excluir produto.');
+        setMessage('Erro ao remover produto do mercado. Tente novamente.');
       }
       setMessageType('error');
     } finally {
@@ -450,4 +453,3 @@ ProductModal.propTypes = {
 ProductModal.defaultProps = {
   initialData: null,
 };
-// Gerar IDs únicos para cada produto

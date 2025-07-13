@@ -118,3 +118,163 @@
 .editar {
   color: #007bff;
 }
+
+.actionsBar {
+  display: flex;
+  justify-content: flex-end; /* Alinha o botão à direita */
+  margin: 1rem 2rem;
+}
+
+.addButton {
+  background: linear-gradient(
+    90deg,
+    #10b981 0%,
+    #059669 100%
+  ); /* Exemplo de cor para o botão */
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.addButton:hover {
+  background: linear-gradient(90deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.noProductsMessage {
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+  grid-column: 1 / -1; /* Para centralizar em todas as colunas do grid */
+}
+
+/* Estilos do Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Garante que fique acima de tudo */
+  backdrop-filter: blur(5px); /* Efeito de desfoque */
+}
+
+.modal {
+  background: linear-gradient(
+    135deg,
+    #f0f4f8 0%,
+    #e0e7ed 100%
+  ); /* Fundo claro para o modal */
+  border-radius: 15px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px; /* Largura máxima para o modal */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transform: scale(0.95); /* Pequena animação ao aparecer */
+  animation: modalAppear 0.3s forwards ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalTitle {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.modalForm label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.modalForm input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.modalForm input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modalButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalButton:first-child {
+  /* Botão principal, tipo "Salvar" ou "Adicionar" */
+  background: linear-gradient(90deg, #2563eb 0%, #4338ca 100%);
+  color: white;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+}
+
+.modalButton:first-child:hover {
+  background: linear-gradient(90deg, #1d4ed8 0%, #3730a3 100%);
+  transform: translateY(-1px);
+}
+
+.modalButton.cancel {
+  background: #ccc;
+  color: #333;
+}
+
+.modalButton.cancel:hover {
+  background: #bbb;
+  transform: translateY(-1px);
+}
