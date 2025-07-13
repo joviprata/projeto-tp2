@@ -1,16 +1,23 @@
+/* ===== PERFIL PAGE - DESIGN PADRONIZADO ===== */
+
+/* === BACKGROUND === */
 .background {
   min-height: 100vh;
-  background: linear-gradient(90deg, #d1ffe6 0%, #a3c9f9 100%);
+  background: var(--gradient-background);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
+/* === HEADER === */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #5677fc;
-  padding: 0.5rem 1.5rem;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  background: var(--gradient-primary);
+  padding: var(--spacing-md) var(--spacing-2xl);
+  border-top-left-radius: var(--radius-2xl);
+  border-top-right-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
 }
 
 .logoArea {
@@ -21,19 +28,21 @@
 .logo {
   width: 48px;
   height: 48px;
-  margin-right: 10px;
+  margin-right: var(--spacing-md);
+  object-fit: contain;
 }
 
 .logoText {
-  color: #fff;
-  font-size: 1.6rem;
+  color: white;
+  font-size: var(--font-size-2xl);
   font-style: italic;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .icons {
   display: flex;
-  gap: 18px;
+  gap: var(--spacing-lg);
 }
 
 .icon {
@@ -41,13 +50,23 @@
   height: 28px;
   filter: invert(1);
   cursor: pointer;
+  transition: all var(--transition-normal);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-md);
 }
 
+.icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+/* === MAIN === */
 .main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 2.5rem;
+  margin-top: var(--spacing-4xl);
+  padding: 0 var(--spacing-lg);
 }
 
 .title {
@@ -66,7 +85,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 .profileIconArea {
@@ -127,7 +146,9 @@
   font-size: 1.3rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .editButton:hover {
@@ -162,4 +183,4 @@
   .title {
     font-size: 1.3rem;
   }
-} 
+}
