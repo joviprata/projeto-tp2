@@ -122,7 +122,7 @@ function App() {
         );
         const userId = localStorage.getItem('userId') || '2';
         const userPendingRequests = allRequests.filter(
-          (request: any) => 
+          (request: any) =>
             request.userId === parseInt(userId) && request.status === 'pending'
         );
         setPendingRequestsCount(userPendingRequests.length);
@@ -501,7 +501,7 @@ function App() {
       const supermarket = supermarkets.find(
         (s) => s.id === parseInt(newProduct.supermarketId)
       );
-      
+
       const userId = localStorage.getItem('userId') || '2';
       const userResponse = await api.get(`/users/${userId}`);
       const userName = userResponse.data.name || 'Usuário';
@@ -534,7 +534,7 @@ function App() {
       );
 
       // Atualizar contagem de solicitações pendentes
-      setPendingRequestsCount(prev => prev + 1);
+      setPendingRequestsCount((prev) => prev + 1);
 
       closeNewProductModal();
 
@@ -703,8 +703,8 @@ function App() {
             <button className={styles.headerButton} onClick={handleAdminClick}>
               <AdminIcon />
             </button>
-            <button 
-              className={`${styles.headerButton} ${pendingRequestsCount > 0 ? styles.hasNotifications : ''}`} 
+            <button
+              className={`${styles.headerButton} ${pendingRequestsCount > 0 ? styles.hasNotifications : ''}`}
               onClick={handleRequestsClick}
             >
               <RequestsIcon />

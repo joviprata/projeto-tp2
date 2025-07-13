@@ -37,12 +37,12 @@ export default function UserRequestsPage() {
         localStorage.getItem('pendingPriceRequests') || '[]'
       );
       const userId = localStorage.getItem('userId') || '2';
-      
+
       // Filtrar apenas as solicitações do usuário logado
       const filteredRequests = allRequests.filter(
         (request: Request) => request.userId === parseInt(userId)
       );
-      
+
       setUserRequests(filteredRequests);
     } catch (err) {
       console.error('Erro ao carregar solicitações:', err);
@@ -64,9 +64,10 @@ export default function UserRequestsPage() {
       approved: { text: 'Aprovado', class: 'approved' },
       rejected: { text: 'Rejeitado', class: 'rejected' },
     };
-    
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    
+
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+
     return (
       <span className={`${styles.badge} ${styles[config.class]}`}>
         {config.text}
@@ -130,19 +131,19 @@ export default function UserRequestsPage() {
           <div className={styles.summaryStats}>
             <div className={styles.stat}>
               <span className={styles.statNumber}>
-                {userRequests.filter(r => r.status === 'pending').length}
+                {userRequests.filter((r) => r.status === 'pending').length}
               </span>
               <span className={styles.statLabel}>Pendentes</span>
             </div>
             <div className={styles.stat}>
               <span className={styles.statNumber}>
-                {userRequests.filter(r => r.status === 'approved').length}
+                {userRequests.filter((r) => r.status === 'approved').length}
               </span>
               <span className={styles.statLabel}>Aprovadas</span>
             </div>
             <div className={styles.stat}>
               <span className={styles.statNumber}>
-                {userRequests.filter(r => r.status === 'rejected').length}
+                {userRequests.filter((r) => r.status === 'rejected').length}
               </span>
               <span className={styles.statLabel}>Rejeitadas</span>
             </div>
@@ -164,48 +165,76 @@ export default function UserRequestsPage() {
         ) : (
           <div className={styles.requestsList}>
             {userRequests
-              .sort((a, b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime())
+              .sort(
+                (a, b) =>
+                  new Date(b.requestDate).getTime() -
+                  new Date(a.requestDate).getTime()
+              )
               .map((request) => (
                 <div key={request.id} className={styles.requestCard}>
                   <div className={styles.requestHeader}>
-                    <h3 className={styles.productName}>{request.productName}</h3>
+                    <h3 className={styles.productName}>
+                      {request.productName}
+                    </h3>
                     {getStatusBadge(request.status)}
                   </div>
-                  
+
                   <div className={styles.requestDetails}>
                     <div className={styles.detail}>
                       <span className={styles.detailLabel}>Preço:</span>
-                      <span className={styles.detailValue}>{formatPrice(request.price)}</span>
+                      <span className={styles.detailValue}>
+                        {formatPrice(request.price)}
+                      </span>
                     </div>
                     <div className={styles.detail}>
                       <span className={styles.detailLabel}>Supermercado:</span>
-                      <span className={styles.detailValue}>{request.supermarketName}</span>
+                      <span className={styles.detailValue}>
+                        {request.supermarketName}
+                      </span>
                     </div>
                     <div className={styles.detail}>
-                      <span className={styles.detailLabel}>Código de Barras:</span>
-                      <span className={styles.detailValue}>{request.barCode}</span>
+                      <span className={styles.detailLabel}>
+                        Código de Barras:
+                      </span>
+                      <span className={styles.detailValue}>
+                        {request.barCode}
+                      </span>
                     </div>
                     {request.variableDescription && (
                       <div className={styles.detail}>
                         <span className={styles.detailLabel}>Descrição:</span>
-                        <span className={styles.detailValue}>{request.variableDescription}</span>
+                        <span className={styles.detailValue}>
+                          {request.variableDescription}
+                        </span>
                       </div>
                     )}
                   </div>
 
                   <div className={styles.requestFooter}>
                     <span className={styles.requestDate}>
-                      Solicitado em {new Date(request.requestDate).toLocaleDateString('pt-BR')} às{' '}
-                      {new Date(request.requestDate).toLocaleTimeString('pt-BR')}
+                      Solicitado em{' '}
+                      {new Date(request.requestDate).toLocaleDateString(
+                        'pt-BR'
+                      )}{' '}
+                      às{' '}
+                      {new Date(request.requestDate).toLocaleTimeString(
+                        'pt-BR'
+                      )}
                     </span>
                     {request.status === 'approved' && request.approvedAt && (
                       <span className={styles.statusDate}>
-                        Aprovado em {new Date(request.approvedAt).toLocaleDateString('pt-BR')}
+                        Aprovado em{' '}
+                        {new Date(request.approvedAt).toLocaleDateString(
+                          'pt-BR'
+                        )}
                       </span>
                     )}
                     {request.status === 'rejected' && request.rejectedAt && (
                       <span className={styles.statusDate}>
-                        Rejeitado em {new Date(request.rejectedAt).toLocaleDateString('pt-BR')}
+                        Rejeitado em{' '}
+                        {new Date(request.rejectedAt).toLocaleDateString(
+                          'pt-BR'
+                        )}
                       </span>
                     )}
                   </div>
