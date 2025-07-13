@@ -72,6 +72,67 @@ XIcon.propTypes = {
   className: PropTypes.string.isRequired,
 };
 
+// Função de busca de dados isolada para ser chamada sob demanda
+async function fetchSupermarketAndProductsData({
+  setLoading,
+  setMessage,
+  setMessageType,
+  setProducts,
+  setSupermarketId,
+  router,
+}) {
+  setLoading(true);
+  setMessage('');
+  const userId = localStorage.getItem('userId');
+  const role = localStorage.getItem('role');
+
+  if (!userId || role !== 'GERENTE') {
+    setMessage('Acesso não autorizado. Faça login como gerente.');
+    setMessageType('error');
+    setLoading(false);
+    router.push('/login');
+    return;
+  }
+
+  try {
+    const supermarketResponse = await api.get(
+      `/supermarkets/byManager/${userId}`
+    );
+    const fetchedSupermarketId = supermarketResponse.data.id;
+    setSupermarketId(fetchedSupermarketId);
+
+    const priceRecordsResponse = await api.get(
+      `/price-records/supermarket/${fetchedSupermarketId}`
+    );
+    const fetchedPriceRecords = priceRecordsResponse.data;
+
+    const formattedProducts = fetchedPriceRecords.map((record) => ({
+      id: record.productId,
+      priceRecordId: record.id,
+      name: record.product.name,
+      description: record.product.variableDescription,
+      price: record.price,
+      barCode: record.product.barCode,
+    }));
+
+    setProducts(formattedProducts);
+    setMessage('Produtos carregados com sucesso!');
+    setMessageType('success');
+  } catch (error) {
+    console.error('Erro ao carregar dados do supermercado ou produtos:', error);
+    if (error.response?.status === 404) {
+      setMessage('Supermercado não encontrado ou sem produtos.');
+    } else if (error.code === 'ERR_NETWORK') {
+      setMessage('Erro de conexão. Verifique se o backend está rodando.');
+    } else {
+      setMessage('Erro ao carregar produtos.');
+    }
+    setMessageType('error');
+  } finally {
+    setLoading(false);
+  }
+}
+
 export default function Produtos() {
   const router = useRouter();
   const [products, setProducts] = useState([]);
@@ -79,71 +140,26 @@ export default function Produtos() {
   const [supermarketId, setSupermarketId] = useState(null);
   const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentProductData, setCurrentProductData] = useState(null); // Para editar
+  const [currentProductData, setCurrentProductData] = useState(null);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState(''); // 'success' ou 'error'
+  const [messageType, setMessageType] = useState('');
+
+  // Função para recarregar os produtos
+  const refreshProducts = () => {
+    fetchSupermarketAndProductsData({
+      setLoading,
+      setMessage,
+      setMessageType,
+      setProducts,
+      setSupermarketId,
+      router,
+    });
+  };
 
   useEffect(() => {
-    const fetchSupermarketAndProducts = async () => {
-      setLoading(true);
-      setMessage('');
-      const userId = localStorage.getItem('userId');
-      const role = localStorage.getItem('role');
-
-      if (!userId || role !== 'GERENTE') {
-        setMessage('Acesso não autorizado. Faça login como gerente.');
-        setMessageType('error');
-        setLoading(false);
-        router.push('/login');
-        return;
-      }
-
-      try {
-        const supermarketResponse = await api.get(
-          `/supermarkets/byManager/${userId}`
-        );
-        const fetchedSupermarketId = supermarketResponse.data.id;
-        setSupermarketId(fetchedSupermarketId);
-        const priceRecordsResponse = await api.get(
-          `/price-records/supermarket/${fetchedSupermarketId}`
-        );
-        const fetchedPriceRecords = priceRecordsResponse.data;
-
-        const formattedProducts = fetchedPriceRecords.map((record) => ({
-          id: record.productId,
-          priceRecordId: record.id,
-          name: record.product.name,
-          description: record.product.variableDescription,
-          price: record.price,
-          barCode: record.product.barCode,
-        }));
-
-        setProducts(formattedProducts);
-        setMessageType('success');
-      } catch (error) {
-        console.error(
-          'Erro ao carregar dados do supermercado ou produtos:',
-          error
-        );
-        if (error.response?.status === 404) {
-          setMessage('Supermercado não encontrado ou sem produtos.');
-        } else if (error.code === 'ERR_NETWORK') {
-          setMessage('Erro de conexão. Verifique se o backend está rodando.');
-        } else {
-          setMessage('Erro ao carregar produtos.');
-        }
-        setMessageType('error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSupermarketAndProducts();
-  }, [router]);
-
-  const refreshProducts = () => {
-    setLoading(true);
-  };
+    // Chama a função de busca no carregamento inicial
+    refreshProducts();
+  }, [router]); // `router` é uma dependência para garantir que se o objeto router mudar, o efeito seja reexecutado.
 
   const handleEditarSupermarket = () => {
     router.push('/perfilMercado');
@@ -158,8 +174,8 @@ export default function Produtos() {
   const handleEditProductClick = (product) => {
     setIsEditing(true);
     setCurrentProductData({
-      id: product.id, // ID do produto
-      priceRecordId: product.priceRecordId, // ID do registro de preço
+      id: product.id,
+      priceRecordId: product.priceRecordId,
       name: product.name,
       barCode: product.barCode,
       variableDescription: product.description,
@@ -186,7 +202,8 @@ export default function Produtos() {
       if (priceRecordDeleteResponse.status === 204) {
         setMessage('Produto removido do seu mercado com sucesso!');
         setMessageType('success');
-        setProducts(products.filter((p) => p.priceRecordId !== priceRecordId));
+        // Após a deleção, recarregar os produtos
+        refreshProducts();
       } else {
         setMessage('Erro ao remover produto do mercado.');
         setMessageType('error');
@@ -209,7 +226,6 @@ export default function Produtos() {
     setMessage('');
     try {
       if (isEditing) {
-        // Atualizar Produto e Registro de Preço
         await api.put(`/products/${data.id}`, {
           name: data.name,
           barCode: data.barCode,
@@ -220,7 +236,6 @@ export default function Produtos() {
         });
         setMessage('Produto atualizado com sucesso!');
       } else {
-        // Adicionar Novo Produto e Registro de Preço
         const productResponse = await api.post('/products', {
           name: data.name,
           barCode: data.barCode,
@@ -232,13 +247,14 @@ export default function Produtos() {
           price: parseFloat(data.price),
           productId: newProductId,
           supermarketId: supermarketId,
-          userId: parseInt(localStorage.getItem('userId'), 10), // Gerente é o usuário que registra o preço
+          userId: parseInt(localStorage.getItem('userId'), 10),
         });
         setMessage('Produto adicionado com sucesso!');
       }
       setMessageType('success');
       setShowAddEditModal(false);
-      refreshProducts(); // Recarrega a lista para mostrar as mudanças
+      // Após o submit bem-sucedido, recarregar os produtos
+      refreshProducts();
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
       if (error.response?.status === 400) {
@@ -249,6 +265,7 @@ export default function Produtos() {
         setMessage('Erro ao salvar produto. Tente novamente.');
       }
       setMessageType('error');
+    } finally {
       setLoading(false);
     }
   };
@@ -324,8 +341,7 @@ export default function Produtos() {
               <p className={styles.descricao}>{product.description}</p>
               <p className={styles.preco}>
                 R$ {parseFloat(product.price).toFixed(2).replace('.', ',')}
-              </p>{' '}
-              {/* Formata preço */}
+              </p>
               <div className={styles.acoes}>
                 <button
                   type="button"
@@ -361,7 +377,6 @@ export default function Produtos() {
   );
 }
 
-// Componente de Modal para Adicionar/Editar Produto
 function ProductModal({ onClose, onSubmit, isEditing, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
   const [barCode, setBarCode] = useState(initialData?.barCode || '');
@@ -373,8 +388,8 @@ function ProductModal({ onClose, onSubmit, isEditing, initialData }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
-      id: initialData?.id, // Envia ID para edição
-      priceRecordId: initialData?.priceRecordId, // Envia priceRecordId para edição
+      id: initialData?.id,
+      priceRecordId: initialData?.priceRecordId,
       name,
       barCode,
       variableDescription,
