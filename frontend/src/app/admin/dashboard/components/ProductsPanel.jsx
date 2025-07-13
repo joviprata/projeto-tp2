@@ -198,9 +198,7 @@ export default function ProductsPanel() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label htmlFor="variableDescription">
-                  Descrição (opcional)
-                </label>
+                <label htmlFor="variableDescription">Descrição</label>
                 <textarea
                   id="variableDescription"
                   name="variableDescription"
