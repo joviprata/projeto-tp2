@@ -8,6 +8,5 @@ RUN npm ci && npm cache clean --force
 
 COPY . .
 
-RUN npx prisma generate
 EXPOSE 5555
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
