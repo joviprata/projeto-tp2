@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "WATCHPACK_POLLING=true next dev",
+    "build": "next build",
+    "start": "next start",
     "test": "jest",
     "lint": "eslint src/**/*.{js,jsx}",
     "lint:fix": "eslint src/**/*.{js,jsx} --fix"

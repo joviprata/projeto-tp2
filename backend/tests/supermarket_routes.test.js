@@ -353,12 +353,11 @@ describe('GET /supermarkets/byManager/:managerId - Obter supermercado por ID de 
     // Crie um supermercado (e, por extensão, um gerente associado)
     const supermarketId = await createSupermarket();
 
-    // Encontre o managerId associado a este supermercado
     const supermarket = await prismaDatabase.supermarket.findUnique({
       where: { id: supermarketId },
       select: { managerId: true, name: true, address: true, latitude: true, longitude: true },
     });
-    const managerId = supermarket.managerId;
+    const { managerId } = supermarket;
 
     const response = await request(app).get(`/supermarkets/byManager/${managerId}`);
 
@@ -374,6 +373,9 @@ describe('GET /supermarkets/byManager/:managerId - Obter supermercado por ID de 
     const response = await request(app).get(`/supermarkets/byManager/${nonExistentManagerId}`);
 
     expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty('error', 'Supermercado não encontrado para o gerente fornecido');
+    expect(response.body).toHaveProperty(
+      'error',
+      'Supermercado não encontrado para o gerente fornecido',
+    );
   });
 });

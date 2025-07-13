@@ -133,7 +133,6 @@ export default function Perfil() {
         }, 2000);
       }
     } catch (error) {
-      console.error('Erro ao deletar usuário:', error);
       if (error.response && error.response.status === 404) {
         setMessage('Usuário não encontrado');
       } else {

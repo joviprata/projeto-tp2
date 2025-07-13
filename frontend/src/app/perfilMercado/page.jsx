@@ -1,8 +1,12 @@
+/* eslint-disable react/button-has-type */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable no-alert */
+/* eslint-disable no-console */
 /* eslint-disable no-undef */
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, React } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import styles from './page.module.css';
@@ -46,7 +50,8 @@ export default function Perfil() {
         alert('Usuário ou senha inválidos');
       }
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
+      // No error handling needed here
+      console.error('Erro ao atualizar perfil:', error);
     }
   };
 

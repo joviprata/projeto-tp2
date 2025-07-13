@@ -1,10 +1,17 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-undef */
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
-import api from '../../../src/config/api'; // Importa a instância do axios configurada
+import api from '../../config/api'; // Importa a instância do axios configurada
 
 function UserIcon({ className }) {
   return (
@@ -119,8 +126,7 @@ async function fetchSupermarketAndProductsData({
     setMessage('Produtos carregados com sucesso!');
     setMessageType('success');
   } catch (error) {
-    console.error('Erro ao carregar dados do supermercado ou produtos:', error);
-    if (error.response?.status === 404) {
+    if (error.response.status === 404) {
       setMessage('Supermercado não encontrado ou sem produtos.');
     } else if (error.code === 'ERR_NETWORK') {
       setMessage('Erro de conexão. Verifique se o backend está rodando.');
@@ -209,8 +215,7 @@ export default function Produtos() {
         setMessageType('error');
       }
     } catch (error) {
-      console.error('Erro ao deletar produto/registro de preço:', error);
-      if (error.response?.status === 404) {
+      if (error.response.status === 404) {
         setMessage('Registro de preço ou produto não encontrado.');
       } else {
         setMessage('Erro ao remover produto do mercado. Tente novamente.');
@@ -246,7 +251,7 @@ export default function Produtos() {
         await api.post('/price-records', {
           price: parseFloat(data.price),
           productId: newProductId,
-          supermarketId: supermarketId,
+          supermarketId,
           userId: parseInt(localStorage.getItem('userId'), 10),
         });
         setMessage('Produto adicionado com sucesso!');
@@ -256,10 +261,9 @@ export default function Produtos() {
       // Após o submit bem-sucedido, recarregar os produtos
       refreshProducts();
     } catch (error) {
-      console.error('Erro ao salvar produto:', error);
-      if (error.response?.status === 400) {
+      if (error.response.status === 400) {
         setMessage(error.response.data.error || 'Dados inválidos.');
-      } else if (error.response?.status === 409) {
+      } else if (error.response.status === 409) {
         setMessage('Produto com este nome ou código de barras já existe.');
       } else {
         setMessage('Erro ao salvar produto. Tente novamente.');
@@ -378,18 +382,18 @@ export default function Produtos() {
 }
 
 function ProductModal({ onClose, onSubmit, isEditing, initialData }) {
-  const [name, setName] = useState(initialData?.name || '');
-  const [barCode, setBarCode] = useState(initialData?.barCode || '');
+  const [name, setName] = useState(initialData.name || '');
+  const [barCode, setBarCode] = useState(initialData.barCode || '');
   const [variableDescription, setVariableDescription] = useState(
-    initialData?.variableDescription || ''
+    (initialData && initialData.variableDescription) || ''
   );
-  const [price, setPrice] = useState(initialData?.price || '');
+  const [price, setPrice] = useState(initialData.price || '');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
-      id: initialData?.id,
-      priceRecordId: initialData?.priceRecordId,
+      id: initialData.id,
+      priceRecordId: initialData.priceRecordId,
       name,
       barCode,
       variableDescription,

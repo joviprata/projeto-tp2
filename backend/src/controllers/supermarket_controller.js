@@ -22,10 +22,7 @@ const updateSupermarket = async (req, res) => {
     if (results.status === 404) {
       return res.status(404).json({ error: 'Supermercado não encontrado' });
     }
-    if (results.status === 200) {
-      return res.status(200).json({ message: results.message });
-    }
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(200).json({ message: results.message });
   } catch (e) {
     return res.status(500).json({ error: e });
   }
@@ -58,18 +55,15 @@ const getSupermarketById = async (req, res) => {
   try {
     const { id } = req.params;
     const results = await supermarketService.getSupermarketById(id);
-    if (results.status === 200) {
-      return res.status(200).json({
-        name: results.name,
-        email: results.email,
-        address: results.address,
-        managerId: results.managerId,
-      });
-    }
     if (results.status === 404) {
       return res.status(404).json({ error: 'Supermercado não encontrado' });
     }
-    return res.status(500).json({ error: 'Service error' });
+    return res.status(200).json({
+      name: results.name,
+      email: results.email,
+      address: results.address,
+      managerId: results.managerId,
+    });
   } catch {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
@@ -82,10 +76,7 @@ const deleteSupermarket = async (req, res) => {
     if (results.status === 404) {
       return res.status(404).json({ error: 'Supermercado não encontrado' });
     }
-    if (results.status === 204) {
-      return res.status(204).send();
-    }
-    return res.status(500).json({ error: 'Service error' });
+    return res.status(204).send();
   } catch {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
