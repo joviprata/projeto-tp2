@@ -68,9 +68,6 @@ O **Global Market** é uma aplicação web completa para comparação de preços
 # Executar todos os testes
 npm run test
 
-# Testes apenas do frontend
-npm run test:frontend
-
 # Testes apenas do backend
 npm run test:backend
 
@@ -85,7 +82,8 @@ npm run test:backend:coverage
 | Serviço | URL | Descrição |
 |---------|-----|-----------|
 | **Frontend** | [http://localhost:3000](http://localhost:3000) | Interface principal da aplicação |
-| **Backend API** | [http://localhost:3001](http://localhost:3001) | API REST com documentação Swagger |
+| **Backend API** | [http://localhost:3001](http://localhost:3001) | API REST |
+| **Docs API** | [http://localhost:3001/api-docs/#/](http://localhost:3001/api-docs/#/) | Documentação da API |
 | **Prisma Studio** | [http://localhost:5555](http://localhost:5555) | Interface para visualização do banco de dados |
 
 ## Banco de Dados
@@ -126,3 +124,4 @@ O sistema utiliza PostgreSQL com as seguintes entidades principais:
 - **Erro de porta ocupada**: Certifique-se de que as portas 3000, 3001 e 5555 estão livres
 - **Erro de migração**: Execute `npm run prisma:migrate` após alterações no schema
 - **Erro de dependências**: Verifique a versão do npm e faça upgrade se necessário
+- **Erro de Imagem e volumes**: Remover imagens e volumes antigas do Docker
